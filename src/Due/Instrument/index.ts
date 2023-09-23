@@ -61,7 +61,8 @@ export default class Instrument extends Instruction implements IInstrument {
       value = this._getRandom(values);
     } else if (
       typeof values === 'object' &&
-      !Array.isArray(values)
+      !Array.isArray(values) &&
+      (values.min && values.max)
     ) {
       value = this._getRandomMinMax(values);
     } else {

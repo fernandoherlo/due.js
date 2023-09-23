@@ -1,5 +1,5 @@
 import * as Tone from 'tone';
-import { ISampler } from '../../../vite-env';
+import { IInstrument, ISampler } from '../../../vite-env';
 import samples from '../../../../public/samples/index.json';
 import Instrument from '..';
 import { SAMPLER_MAP } from '../../constants';
@@ -24,6 +24,19 @@ export default class Sampler extends Instrument implements ISampler {
     this._instrument.debug = this._app.$debug;
 
     await super.start();
+  }
+
+  async update (newInstrument: IInstrument): Promise<void> {
+    if (this._canUpdate) {
+      this.value = newInstrument.value;
+      if (this.sound !== newInstrument.sound) {
+        this.sound = newInstrument.sound;
+        await this.end();
+        await this.start();
+      } else {
+        await this.play();
+      }
+    }
   }
 
   _pathUrl (notes: any, sound: string): any {
