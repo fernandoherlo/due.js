@@ -7,33 +7,11 @@ export default class Synth extends Instrument implements ISynth {
   _canUpdate: boolean = true;
 
   async start (): Promise<void> {
+    const vol = new Tone.Volume(-5).toDestination();
+
+    this._instrument = new Tone.Synth().connect(vol);
+    this._instrument.debug = this._app.$debug;
+
     await super.start();
-
-    this._instrument = new Tone.Synth().toDestination();
-    await this.play();
-  }
-
-  async play (): Promise<void> {
-    await super.play();
-
-    if (this._instrument) {
-      this._instrument.triggerAttackRelease(this.value, '8n');
-    }
-
-    setTimeout(() => this.play(), 1000);
-  }
-
-  async end (): Promise<void> {
-    await super.end();
-
-    if (this._instrument) {
-      await this._instrument.dispose();
-    }
-  }
-
-  async update (newInstrument: ISynth): Promise<void> {
-    await super.update(newInstrument);
-
-    await this.play();
   }
 }

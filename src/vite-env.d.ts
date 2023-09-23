@@ -18,6 +18,8 @@ export { IApp } from './App/IApp';
 export { IInstruction } from './Compiler/Instruction/IInstruction';
 export { IInstrument } from './Due/Instrument/IInstrument';
 export { ISynth } from './Due/Instrument/Synth/ISynth';
+export { ISampler } from './Due/Instrument/Sampler/ISampler';
+export { INote } from './Due/Note/INote';
 
 declare global {
   interface Window { App: IApp; }

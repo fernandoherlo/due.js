@@ -1,3 +1,4 @@
+import Note from '../../Due/Note';
 import { IApp, IParser } from '../../vite-env';
 
 export default class Parser implements IParser {
@@ -16,7 +17,7 @@ export default class Parser implements IParser {
     }
 
     const [groupCommands, connect] = line.trim().split('=>').map(value => value.trim());
-    const commands = groupCommands.split('.');
+    const commands = groupCommands.split(':');
 
     if (!connect) {
       return commands;
@@ -36,13 +37,17 @@ export default class Parser implements IParser {
       return;
     }
 
-    const [commandId, valueRaw] = command.slice(0, -1).split('(');
+    const [commandIdRaw, valueRaw] = command.slice(0, -1).split('(');
+
+    const [commandId, sound] = commandIdRaw.split('#');
+
     const { name, element } = this._commandId(commandId);
     const value = this._valueRaw(valueRaw);
 
     return {
       name,
       element,
+      sound,
       value
     };
   }
@@ -64,13 +69,33 @@ export default class Parser implements IParser {
   }
 
   _valueRaw (valueRaw: string) {
-    if (valueRaw.startsWith('[') && valueRaw.endsWith(']')) {
-      const value = valueRaw.replace(/\[|\]/g, '');
-      const values = value.trim().split(',');
+    const [value, duration, interval] = valueRaw.trim().split(';');
 
-      return values;
+    if (value.startsWith('[') && value.endsWith(']')) {
+      const valueArray = value.replace(/\[|\]/g, '');
+      const values = valueArray.trim().split(',');
+
+      return values.map(v => new Note({
+        value: v,
+        duration: this._getFloatOrArray(duration),
+        interval: this._getFloatOrArray(interval)
+      }));
     }
 
-    return valueRaw;
+    return new Note({
+      value,
+      duration: parseFloat(duration),
+      interval: parseFloat(interval)
+    });
+  }
+
+  _getFloatOrArray (valueRaw: string): number | Array<number> {
+    if (valueRaw.startsWith('[') && valueRaw.endsWith(']')) {
+      const valueArray = valueRaw.replace(/\[|\]/g, '');
+      const values = valueArray.trim().split(',');
+
+      return values.map(v => parseFloat(v));
+    }
+    return parseFloat(valueRaw);
   }
 }

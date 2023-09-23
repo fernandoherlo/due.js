@@ -1,8 +1,10 @@
-import { IInstruction } from '../../vite-env';
+import { IApp, IInstruction } from '../../vite-env';
 
 export interface IInstrument extends IInstruction {
+  _app: IApp;
   _instrument: any | null;
   _canUpdate: boolean;
+  _schedule: number | null;
 
   start: () => Promise<void>;
   end: () => Promise<void>;

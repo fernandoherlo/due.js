@@ -1,3 +1,4 @@
+import * as Tone from 'tone';
 import { IApp, ILooper, ICompiler, IEditor, IInstruction } from '../vite-env';
 
 export default class Looper implements ILooper {
@@ -10,15 +11,11 @@ export default class Looper implements ILooper {
   _compiler: ICompiler;
   _editor: IEditor;
 
-  static get LOOP_MILLISECONDS () {
-    return 1000;
-  }
-
-  constructor (app: IApp, compiler: ICompiler, editor: IEditor, timeLoop: number = 5000) {
+  constructor (app: IApp, compiler: ICompiler, editor: IEditor) {
     this._app = app;
 
     this._steps = 1;
-    this._totalSteps = Math.ceil(timeLoop / Looper.LOOP_MILLISECONDS);
+    this._totalSteps = 8;
 
     this._idTimeout = undefined;
     this._lastInstructions = {};
@@ -28,13 +25,11 @@ export default class Looper implements ILooper {
   }
 
   async loop () {
-    if (!this._compiler || !this._editor) {
-      throw new Error('Compiler or editor are undefined.');
-    }
+    Tone.Transport.scheduleRepeat(async (time: number) => {
+      if (!this._compiler || !this._editor) {
+        throw new Error('Compiler or editor are undefined.');
+      }
 
-    clearInterval(this._idTimeout);
-
-    this._idTimeout = setTimeout(async () => {
       this._editor.setLoopTime(this._steps, this._totalSteps);
 
       if (this._steps === this._totalSteps) {
@@ -43,9 +38,9 @@ export default class Looper implements ILooper {
       } else {
         this._steps++;
       }
+    }, 0.5);
 
-      await this.loop();
-    }, Looper.LOOP_MILLISECONDS);
+    Tone.Transport.start();
   }
 
   async _compile () {
@@ -71,9 +66,9 @@ export default class Looper implements ILooper {
       if (newInstructions.length > 0 || oldInstructions.length > 0) {
         this._editor.ok();
       }
-    } catch (e) {
+    } catch (e: any) {
       this._editor.setError();
-      throw Error('Error in proxy composer.');
+      throw Error(`Error in proxy composer. ${e.message}`);
     }
   }
 

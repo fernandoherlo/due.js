@@ -1,8 +1,6 @@
-import * as Tone from 'tone';
-
 import { IApp, IDue, IInstruction } from '../vite-env';
 import Proxy from '../Proxy';
-import Synth from './Instrument/Synth';
+import { COMMANDS_INSTRUMENT_MAP } from './constants';
 
 export default class Due extends Proxy implements IDue {
   _instructions: any;
@@ -18,7 +16,7 @@ export default class Due extends Proxy implements IDue {
     for (let i = 0; i < instructions.length; i++) {
       const instruction: IInstruction = instructions[i];
       if (!this._instructions[instruction.key]) {
-        const instrument = new Synth(instruction);
+        const instrument = COMMANDS_INSTRUMENT_MAP[instruction.name](instruction, this._app);
         await instrument.start();
 
         this._instructions[instruction.key] = instrument;
@@ -48,11 +46,5 @@ export default class Due extends Proxy implements IDue {
         delete this._instructions[instruction.key];
       }
     }
-  }
-
-  test () {
-    const synth = new Tone.Synth().toDestination();
-    synth.debug = this._debug;
-    synth.triggerAttackRelease('C4', '8n');
   }
 }
