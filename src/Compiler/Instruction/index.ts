@@ -6,7 +6,7 @@ export default class Instruction implements IInstruction {
   key: string;
   type: string;
   sound: string;
-  value: INote | Array<INote>
+  value: INote | Array<INote>;
   actions: Array<IInstruction>;
 
   constructor (data: any) {

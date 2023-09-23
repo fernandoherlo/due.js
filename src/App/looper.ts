@@ -25,7 +25,7 @@ export default class Looper implements ILooper {
   }
 
   async loop () {
-    Tone.Transport.scheduleRepeat(async (time: number) => {
+    Tone.Transport.scheduleRepeat(async () => {
       if (!this._compiler || !this._editor) {
         throw new Error('Compiler or editor are undefined.');
       }

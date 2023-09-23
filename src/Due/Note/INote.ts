@@ -3,4 +3,3 @@ export interface INote {
   duration: number;
   interval: number;
 }
-  

@@ -1,11 +1,11 @@
-import { INote } from "../../vite-env";
+import { INote } from '../../vite-env';
 
 export interface IInstruction {
   name: string;
   element: string;
   key: string;
   type: string;
-  sound: string;
+  sound: string | any;
   value: INote | Array<INote>;
   actions: Array<IInstruction>;
 }

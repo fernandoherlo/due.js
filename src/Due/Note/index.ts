@@ -2,7 +2,7 @@ import { INote } from '../../vite-env';
 
 export default class Note implements INote {
   value: string;
-  duration: number 
+  duration: number;
   interval: number;
 
   constructor (data: any) {

@@ -1,19 +1,20 @@
 import * as Tone from 'tone';
 import { ISampler } from '../../../vite-env';
-import samples from '../../samples.json';
+import samples from '../../../../public/samples/index.json';
 import Instrument from '..';
+import { SAMPLER_MAP } from '../../constants';
 
 export default class Sampler extends Instrument implements ISampler {
   _instrument: Tone.Sampler | null = null;
   _canUpdate: boolean = true;
 
   async start (): Promise<void> {
-    const samplesMap = samples[this.sound];
+    const samplesMap: any = samples;
     const samplerPromise: Promise<Tone.Sampler> = new Promise((resolve) => {
-       const sampler: Tone.Sampler = new Tone.Sampler({
-        urls: samplesMap,
+      const sampler: Tone.Sampler = new Tone.Sampler({
+        urls: this._pathUrl(samplesMap[SAMPLER_MAP[this.sound]]),
         baseUrl: '/',
-        onload: function onload() {
+        onload: function onload () {
           return resolve(sampler);
         }
       });
@@ -23,5 +24,13 @@ export default class Sampler extends Instrument implements ISampler {
     this._instrument.debug = this._app.$debug;
 
     await super.start();
+  }
+
+  _pathUrl (urls: any): any {
+    for (const sound of urls) {
+      for (const note of sound) {
+        sound[note] = `samples/${sound[note]}`;
+      }
+    }
   }
 }
