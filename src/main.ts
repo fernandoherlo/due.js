@@ -16,10 +16,10 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div id="editor">
     <div id="editor-progress-bar" style="background-color: aqua; width: 0%; height: 20px;"></div>
     <textarea id="editor-code" rows="20" cols="40" style="font-size: 3.5em;">
-sam3#vsco2-glock([A4,C4,D4];5;[12,17])
-sam4#vcsl-claves([A6,A2,D3];2;[0.5,1.5]) 
+sam3#glock([A4,C4,D4];5;[12,17])
+sam4#guitar3([A6,A2,D3];2;[0.5,1.5]) 
 sam2(A4;1;7)
-sam1#vsco2-contrabass-susvib([A3,C3,D3];[3, 8];[4,7])                   
+sam1#bass([A3,C3,D3];[3, 8];[4,7])                                        
     </textarea>
     <!--
     p1(algo).e(x).e(y).v(a) => 1

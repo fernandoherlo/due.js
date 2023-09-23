@@ -59,6 +59,11 @@ export default class Instrument extends Instruction implements IInstrument {
     let value;
     if (Array.isArray(values)) {
       value = this._getRandom(values);
+    } else if (
+      typeof values === 'object' &&
+      !Array.isArray(values)
+    ) {
+      value = this._getRandomMinMax(values);
     } else {
       value = values;
     }
@@ -68,5 +73,11 @@ export default class Instrument extends Instruction implements IInstrument {
 
   _getRandom (values: Array<any>) {
     return values[Math.floor(Math.random() * values.length)];
+  }
+
+  _getRandomMinMax (values: any) {
+    const min = Math.ceil(values.min);
+    const max = Math.floor(values.max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 }

@@ -14,7 +14,7 @@ export default class Instruction implements IInstruction {
     this.element = data.element;
     this.key = data.key;
     this.type = data.type;
-    this.sound = data.sound || 'vsco2-piano-mf';
+    this.sound = data.sound || 'piano';
     this.value = data.value;
     this.actions = data.actions;
   }

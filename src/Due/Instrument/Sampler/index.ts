@@ -10,10 +10,10 @@ export default class Sampler extends Instrument implements ISampler {
 
   async start (): Promise<void> {
     const samplesMap: any = samples;
+
     const samplerPromise: Promise<Tone.Sampler> = new Promise((resolve) => {
       const sampler: Tone.Sampler = new Tone.Sampler({
-        urls: this._pathUrl(samplesMap[SAMPLER_MAP[this.sound]]),
-        baseUrl: '/',
+        urls: this._pathUrl(samplesMap[SAMPLER_MAP[this.sound]], SAMPLER_MAP[this.sound]),
         onload: function onload () {
           return resolve(sampler);
         }
@@ -26,11 +26,13 @@ export default class Sampler extends Instrument implements ISampler {
     await super.start();
   }
 
-  _pathUrl (urls: any): any {
-    for (const sound of urls) {
-      for (const note of sound) {
-        sound[note] = `samples/${sound[note]}`;
-      }
-    }
+  _pathUrl (notes: any, sound: string): any {
+    const pathNotes: any = {};
+
+    Object.keys(notes).forEach((note) => {
+      pathNotes[note] = `samples/${sound}/${notes[note]}`;
+    });
+
+    return pathNotes;
   }
 }

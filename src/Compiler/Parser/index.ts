@@ -89,12 +89,20 @@ export default class Parser implements IParser {
     });
   }
 
-  _getFloatOrArray (valueRaw: string): number | Array<number> {
+  _getFloatOrArray (valueRaw: string): number | Array<number> | any {
     if (valueRaw.startsWith('[') && valueRaw.endsWith(']')) {
       const valueArray = valueRaw.replace(/\[|\]/g, '');
-      const values = valueArray.trim().split(',');
 
-      return values.map(v => parseFloat(v));
+      if (valueArray.includes(',')) {
+        const values = valueArray.trim().split(',');
+        return values.map(v => parseFloat(v));
+      } else if (valueArray.includes('-')) {
+        const values = valueArray.trim().split('-');
+        return {
+          min: values[0],
+          max: values[1]
+        };
+      }
     }
     return parseFloat(valueRaw);
   }

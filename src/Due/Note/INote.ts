@@ -1,5 +1,5 @@
 export interface INote {
   value: string;
-  duration: number;
-  interval: number;
+  duration: number | Array<number> | any;
+  interval: number | Array<number> | any;
 }
