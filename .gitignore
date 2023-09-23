@@ -2,6 +2,7 @@
 .idea
 *.log
 /.vscode/
+public/samples
 node_modules
 dist
 .eslintcache
