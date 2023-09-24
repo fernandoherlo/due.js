@@ -1,6 +1,7 @@
 import * as Tone from 'tone';
-import { IApp, IInstrument, INote } from '../../vite-env';
+import { IApp, IInstruction, IInstrument, INote } from '../../vite-env';
 import Instruction from '../../Compiler/Instruction';
+import { COMMANDS_ELEMENT_MAP } from '../constants';
 
 export default class Instrument extends Instruction implements IInstrument {
   _app: IApp;
@@ -16,6 +17,30 @@ export default class Instrument extends Instruction implements IInstrument {
 
   async start (): Promise<void> {
     await this.play();
+  }
+
+  async startActions (): Promise<void> {
+    let lastAction: any | null = null;
+
+    for (let i = 0; i < this.actions.length; i++) {
+      const action: IInstruction = this.actions[i];
+
+      const element = COMMANDS_ELEMENT_MAP[action.name](action, this._app);
+      await element.create();
+      this.actions[i] = element;
+
+      if (i === 0) {
+        this.actions[i].toDestination();
+      } else {
+        if (lastAction) {
+          this.actions[i].connect(lastAction);
+        }
+      }
+
+      lastAction = element;
+    }
+
+    return lastAction;
   }
 
   async play (): Promise<void> {
@@ -40,6 +65,12 @@ export default class Instrument extends Instruction implements IInstrument {
   async end (): Promise<void> {
     if (this._schedule) {
       await Tone.Transport.clear(this._schedule);
+    }
+    if (this.actions) {
+      for (let i = 0; i < this.actions.length; i++) {
+        await this.actions[i]._effect.disconnect();
+        await this.actions[i]._effect.dispose();
+      }
     }
     if (this._instrument) {
       await this._instrument.disconnect();

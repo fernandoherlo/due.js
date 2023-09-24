@@ -1,6 +1,6 @@
 import { IApp, IDue, IInstruction } from '../vite-env';
 import Proxy from '../Proxy';
-import { COMMANDS_INSTRUMENT_MAP } from './constants';
+import { COMMANDS_ELEMENT_MAP } from './constants';
 
 export default class Due extends Proxy implements IDue {
   _instructions: any;
@@ -16,10 +16,10 @@ export default class Due extends Proxy implements IDue {
     for (let i = 0; i < instructions.length; i++) {
       const instruction: IInstruction = instructions[i];
       if (!this._instructions[instruction.key]) {
-        const instrument = COMMANDS_INSTRUMENT_MAP[instruction.name](instruction, this._app);
-        await instrument.start();
+        const element = COMMANDS_ELEMENT_MAP[instruction.name](instruction, this._app);
+        await element.start();
 
-        this._instructions[instruction.key] = instrument;
+        this._instructions[instruction.key] = element;
       }
     }
   }

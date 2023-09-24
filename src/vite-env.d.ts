@@ -20,6 +20,11 @@ export { IInstrument } from './Due/Instrument/IInstrument';
 export { ISynth } from './Due/Instrument/Synth/ISynth';
 export { ISampler } from './Due/Instrument/Sampler/ISampler';
 export { INote } from './Due/Note/INote';
+export { IEffect } from './Due/Effect/IEffect';
+export { IVolumen } from './Due/Effect/Volumen/IVolumen';
+export { IReverb } from './Due/Effect/Reverb/IReverb';
+export { IChorus } from './Due/Effect/Chorus/IChorus';
+export { IDelay } from './Due/Effect/Delay/IDelay';
 
 declare global {
   interface Window { App: IApp; }

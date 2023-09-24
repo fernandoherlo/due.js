@@ -37,5 +37,9 @@ export default class App implements IApp {
       await Tone.start();
       return false;
     };
+    container.ontouchstart = async () => {
+      await Tone.start();
+      return false;
+    };
   }
 }

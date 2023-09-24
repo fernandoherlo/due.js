@@ -1,5 +1,6 @@
 import * as Tone from 'tone';
 import { IApp, ILooper, ICompiler, IEditor, IInstruction } from '../vite-env';
+import { compareInstructions } from '../Compiler/Instruction/compare';
 
 export default class Looper implements ILooper {
   _app: IApp;
@@ -25,6 +26,8 @@ export default class Looper implements ILooper {
   }
 
   async loop () {
+    this._editor.create();
+
     Tone.Transport.scheduleRepeat(async () => {
       if (!this._compiler || !this._editor) {
         throw new Error('Compiler or editor are undefined.');
@@ -46,25 +49,27 @@ export default class Looper implements ILooper {
   async _compile () {
     try {
       this._editor.setWaiting();
-
       const editorCode = this._editor.getCode();
-      const instructions = this._compiler.exec(editorCode);
 
-      const newInstructions: Array<IInstruction> = this._getNewInstructions(instructions);
-      const updateInstructions: Array<IInstruction> = this._getUpdateInstructions(instructions);
-      const oldInstructions: Array<IInstruction> = this._getOldInstructions(instructions);
+      if (editorCode) {
+        const instructions = this._compiler.exec(editorCode);
 
-      if (this._app.$proxy) {
-        await this._app.$proxy.add(newInstructions);
-        await this._app.$proxy.update(updateInstructions);
-        await this._app.$proxy.delete(oldInstructions);
-      }
+        const newInstructions: Array<IInstruction> = this._getNewInstructions(instructions);
+        const updateInstructions: Array<IInstruction> = this._getUpdateInstructions(instructions);
+        const oldInstructions: Array<IInstruction> = this._getOldInstructions(instructions);
 
-      this._lastInstructions = instructions;
-      this._editor.setValid();
+        if (this._app.$proxy) {
+          await this._app.$proxy.add(newInstructions);
+          await this._app.$proxy.update(updateInstructions);
+          await this._app.$proxy.delete(oldInstructions);
+        }
 
-      if (newInstructions.length > 0 || oldInstructions.length > 0) {
-        this._editor.ok();
+        this._lastInstructions = instructions;
+        this._editor.setValid();
+
+        if (newInstructions.length > 0 || oldInstructions.length > 0) {
+          this._editor.ok();
+        }
       }
     } catch (e: any) {
       this._editor.setError();
@@ -89,7 +94,7 @@ export default class Looper implements ILooper {
 
     for (const key in instructions) {
       if (instructions[key] && this._lastInstructions && Object.keys(this._lastInstructions).includes(key)) {
-        if (JSON.stringify(instructions[key]) !== JSON.stringify(this._lastInstructions[key])) {
+        if (compareInstructions(instructions[key], this._lastInstructions[key])) {
           updateInstructions.push(instructions[key]);
         }
       }

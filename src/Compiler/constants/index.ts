@@ -9,6 +9,9 @@ export const COMMANDS: any = {
   c: 'c',
   e: 'e',
   v: 'v',
+  r: 'r',
+  d: 'd',
+  cho: 'cho',
   con: 'con'
 };
 
@@ -23,5 +26,8 @@ export const COMMANDS_MAP: any = {
   [COMMANDS.c]: 'channel',
   [COMMANDS.e]: 'effect',
   [COMMANDS.v]: 'volumen',
+  [COMMANDS.r]: 'reverb',
+  [COMMANDS.d]: 'delay',
+  [COMMANDS.cho]: 'chorus',
   [COMMANDS.con]: 'connect'
 };

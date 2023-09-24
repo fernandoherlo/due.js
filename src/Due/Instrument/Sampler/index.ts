@@ -1,16 +1,21 @@
 import * as Tone from 'tone';
 import { IInstrument, ISampler } from '../../../vite-env';
-import samples from '../../../../public/samples/index.json';
+import samples from '../../samples.json';
 import Instrument from '..';
 import { SAMPLER_MAP } from '../../constants';
+import { compareInstructions } from '../../../Compiler/Instruction/compare';
 
 export default class Sampler extends Instrument implements ISampler {
   _instrument: Tone.Sampler | null = null;
   _canUpdate: boolean = true;
 
   async start (): Promise<void> {
-    const samplesMap: any = samples;
+    let connect: any | null = null;
+    if (this.actions.length) {
+      connect = await this.startActions();
+    }
 
+    const samplesMap: any = samples;
     const samplerPromise: Promise<Tone.Sampler> = new Promise((resolve) => {
       const sampler: Tone.Sampler = new Tone.Sampler({
         urls: this._pathUrl(samplesMap[SAMPLER_MAP[this.sound]], SAMPLER_MAP[this.sound]),
@@ -19,9 +24,15 @@ export default class Sampler extends Instrument implements ISampler {
         }
       });
     });
-    const gain = new Tone.Gain(6).toDestination();
-    this._instrument = (await samplerPromise).connect(gain);
+
+    this._instrument = (await samplerPromise);
     this._instrument.debug = this._app.$debug;
+
+    if (connect) {
+      this._instrument.connect(connect._effect);
+    } else {
+      this._instrument.toDestination();
+    }
 
     await super.start();
   }
@@ -29,12 +40,19 @@ export default class Sampler extends Instrument implements ISampler {
   async update (newInstrument: IInstrument): Promise<void> {
     if (this._canUpdate) {
       this.value = newInstrument.value;
-      if (this.sound !== newInstrument.sound) {
-        this.sound = newInstrument.sound;
+      if (
+        this.sound !== newInstrument.sound ||
+        this.actions.some((action, index) => compareInstructions(newInstrument.actions?.[index], action)) ||
+        newInstrument.actions.some((action, index) => compareInstructions(this.actions?.[index], action))
+      ) {
         await this.end();
+
+        this.sound = newInstrument.sound;
+        this.actions = newInstrument.actions;
+
         await this.start();
       } else {
-        await this.play();
+        await super.start();
       }
     }
   }

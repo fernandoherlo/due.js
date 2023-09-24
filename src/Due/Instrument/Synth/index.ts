@@ -7,10 +7,19 @@ export default class Synth extends Instrument implements ISynth {
   _canUpdate: boolean = true;
 
   async start (): Promise<void> {
-    const vol = new Tone.Volume(-5).toDestination();
+    let connect: any | null = null;
+    if (this.actions.length) {
+      connect = await this.startActions();
+    }
 
-    this._instrument = new Tone.Synth().connect(vol);
+    this._instrument = new Tone.Synth();
     this._instrument.debug = this._app.$debug;
+
+    if (connect) {
+      this._instrument.connect(connect._effect);
+    } else {
+      this._instrument.toDestination();
+    }
 
     await super.start();
   }

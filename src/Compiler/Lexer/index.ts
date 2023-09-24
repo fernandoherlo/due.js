@@ -28,7 +28,7 @@ export default class Lexer implements ILexer {
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      if (!line || !line.trim()) {
+      if (!line || !line.trim() || line.startsWith('//')) {
         continue;
       }
 
@@ -66,7 +66,7 @@ export default class Lexer implements ILexer {
     return new Instruction({
       name: commandParsed.name,
       element: commandParsed.element,
-      key: `${commandParsed.name}${commandParsed.element}`,
+      key: commandParsed.element ? `${commandParsed.name}${commandParsed.element}` : commandParsed.name,
       type: COMMANDS_MAP[commandParsed.name],
       sound: commandParsed.sound,
       value: commandParsed.value,

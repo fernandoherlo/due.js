@@ -7,6 +7,7 @@ export interface IInstrument extends IInstruction {
   _schedule: number | null;
 
   start: () => Promise<void>;
+  startActions: () => Promise<void>;
   end: () => Promise<void>;
   play: () => Promise<void>;
   update: (newIntrument: IInstrument) => Promise<void>;
