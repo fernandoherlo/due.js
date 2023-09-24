@@ -16,9 +16,8 @@
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
+  width: 100%;
+  overflow: hidden;
   min-height: 100vh;
 }
 
@@ -48,6 +47,7 @@ body {
 }
 
 .monaco-editor {
+  width: 100% !important;
   top: 5px;
   overflow: hidden;
 }

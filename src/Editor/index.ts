@@ -29,10 +29,10 @@ export default class Editor implements IEditor {
     });
 
     this._monaco = monaco.editor.create(document.body, {
-      value: `//sam3#glock([A4,C4,D4];5;[9-17])
-//sam4#guitar([A6,A2,D3];2;[11,16])
-//sam2(A4;1;7)
-//sam1#bass([A3,C3,D3];[3-8];[4,7]):v(3)
+      value: `sam3#glock([A#4,C3,D2];5;[2-4]):d(0.2-0.1):r(6):v(8)
+sam4#guitar4([A4,A2,D3];12;[4,16]):cho(0.5):v(-9)
+sam2([A4,C3,A4,F4];[2];[0.5-4]):r(6):v(9)
+sam1#bass([A3,C2,D2];[2-8];[2,7]):d(0.5-0.7):r(6):v(1)
 sam5(D3;3;7):d(1-0.5):r(6):v(8)`,
       language: 'due#',
       theme: 'vs-dark',
@@ -42,7 +42,8 @@ sam5(D3;3;7):d(1-0.5):r(6):v(8)`,
       glyphMargin: false,
       folding: false,
       lineDecorationsWidth: 0,
-      lineNumbersMinChars: 0
+      lineNumbersMinChars: 0,
+      automaticLayout: true
     });
   }
 
