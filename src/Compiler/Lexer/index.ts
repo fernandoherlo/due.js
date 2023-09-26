@@ -70,6 +70,7 @@ export default class Lexer implements ILexer {
       type: COMMANDS_MAP[commandParsed.name],
       sound: commandParsed.sound,
       value: commandParsed.value,
+      typeValue: commandParsed.typeValue,
       actions: []
     });
   }

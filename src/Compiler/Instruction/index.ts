@@ -7,6 +7,7 @@ export default class Instruction implements IInstruction {
   type: string;
   sound: string;
   value: INote | Array<INote>;
+  typeValue: string;
   actions: Array<any>;
 
   constructor (data: any) {
@@ -16,6 +17,7 @@ export default class Instruction implements IInstruction {
     this.type = data.type;
     this.sound = data.sound || 'piano';
     this.value = data.value;
+    this.typeValue = data.typeValue;
     this.actions = data.actions;
   }
 }

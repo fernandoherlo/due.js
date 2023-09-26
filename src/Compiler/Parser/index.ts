@@ -1,5 +1,6 @@
-import Note from '../../Due/Note';
 import { IApp, IParser } from '../../vite-env';
+import Note from '../../Due/Note';
+import { TYPE_VALUE_NOTE } from '../../Due/constants';
 
 export default class Parser implements IParser {
   _app: IApp;
@@ -42,13 +43,14 @@ export default class Parser implements IParser {
     const [commandId, sound] = commandIdRaw.split('#');
 
     const { name, element } = this._commandId(commandId);
-    const value = this._valueRaw(valueRaw);
+    const [value, typeValue] = this._valueRaw(valueRaw);
 
     return {
       name,
       element,
       sound,
-      value
+      value,
+      typeValue
     };
   }
 
@@ -71,26 +73,43 @@ export default class Parser implements IParser {
   _valueRaw (valueRaw: string) {
     const [value, duration, interval] = valueRaw.trim().split(';');
 
-    if (value.startsWith('[') && value.endsWith(']')) {
-      const valueArray = value.replace(/\[|\]/g, '');
-      const values = valueArray.trim().split(',');
+    let typeValue = TYPE_VALUE_NOTE.normal;
 
-      return values.map(v => new Note({
+    if (value && value.startsWith('[') && value.endsWith(']')) {
+      const valueArray = value.replace(/\[|\]/g, '');
+
+      let values: any[] = [];
+      if (valueArray.includes(',')) {
+        typeValue = TYPE_VALUE_NOTE.random;
+        values = valueArray.trim().split(',');
+      } else if (valueArray.includes('>')) {
+        typeValue = TYPE_VALUE_NOTE.sequence;
+        values = valueArray.trim().split('>');
+      } else if (valueArray.includes('=')) {
+        typeValue = TYPE_VALUE_NOTE.chord;
+        return [new Note({
+          value,
+          duration: this._getFloatOrArray(duration),
+          interval: this._getFloatOrArray(interval)
+        }), typeValue];
+      }
+
+      return [values.map(v => new Note({
         value: v,
         duration: this._getFloatOrArray(duration),
         interval: this._getFloatOrArray(interval)
-      }));
+      })), typeValue];
     }
 
-    return new Note({
+    return [new Note({
       value,
-      duration: parseFloat(duration),
-      interval: parseFloat(interval)
-    });
+      duration: this._getFloatOrArray(duration),
+      interval: this._getFloatOrArray(interval)
+    }), typeValue];
   }
 
   _getFloatOrArray (valueRaw: string): number | Array<number> | any {
-    if (valueRaw.startsWith('[') && valueRaw.endsWith(']')) {
+    if (valueRaw && valueRaw.startsWith('[') && valueRaw.endsWith(']')) {
       const valueArray = valueRaw.replace(/\[|\]/g, '');
 
       if (valueArray.includes(',')) {

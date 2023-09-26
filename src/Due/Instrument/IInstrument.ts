@@ -5,6 +5,7 @@ export interface IInstrument extends IInstruction {
   _instrument: any | null;
   _canUpdate: boolean;
   _schedule: number | null;
+  _valueStep: number;
 
   start: () => Promise<void>;
   startActions: () => Promise<void>;

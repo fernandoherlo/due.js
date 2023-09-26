@@ -16,7 +16,7 @@ export const richLanguageConfiguration: IRichLanguageConfiguration = {
 const keywords: any[] = [];
 Object.keys(COMMANDS).forEach((key) => {
   keywords.push(`${COMMANDS[key]}`);
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 20; i++) {
     keywords.push(`${COMMANDS[key]}${i}`);
   }
 });

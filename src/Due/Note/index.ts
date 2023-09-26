@@ -1,7 +1,7 @@
 import { INote } from '../../vite-env';
 
 export default class Note implements INote {
-  value: string;
+  value: string | Array<string> | any;
   duration: number | Array<number> | any;
   interval: number | Array<number> | any;
 

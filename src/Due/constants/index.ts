@@ -75,3 +75,10 @@ export const SAMPLER_MAP: any = {
   birds: 'birds',
   explosion: 'explosion'
 };
+
+export const TYPE_VALUE_NOTE: any = {
+  random: 'random',
+  sequence: 'sequence',
+  chord: 'chord',
+  normal: 'normal'
+};

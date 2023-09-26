@@ -4,7 +4,6 @@ import { IApp } from '../vite-env';
 export interface IEditor {
   _app: IApp;
   _htmlId: string;
-  _htmlIdCode: string;
   _htmlIdProgressBar: string;
   _idTimeoutValid: number | undefined;
   _monaco: monaco.editor.IStandaloneCodeEditor | null;

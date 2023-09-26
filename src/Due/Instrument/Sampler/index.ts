@@ -40,6 +40,7 @@ export default class Sampler extends Instrument implements ISampler {
   async update (newInstrument: IInstrument): Promise<void> {
     if (this._canUpdate) {
       this.value = newInstrument.value;
+      this.typeValue = newInstrument.typeValue;
       if (
         this.sound !== newInstrument.sound ||
         this.actions.some((action, index) => compareInstructions(newInstrument.actions?.[index], action)) ||

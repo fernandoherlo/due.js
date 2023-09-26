@@ -18,6 +18,7 @@ function _clearInstruction (instruction: any) {
   delete clone._app;
   delete clone._canUpdate;
   delete clone._schedule;
+  delete clone._valueStep;
 
   if (clone?.actions?.length) {
     clone.actions = clone.actions.map((action: any) => {

@@ -7,5 +7,6 @@ export interface IInstruction {
   type: string;
   sound: string | any;
   value: INote | Array<INote>;
+  typeValue: string;
   actions: Array<IInstruction>;
 }

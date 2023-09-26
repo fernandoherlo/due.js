@@ -6,7 +6,6 @@ export default class Looper implements ILooper {
   _app: IApp;
   _steps: number;
   _totalSteps: number;
-  _idTimeout: number | undefined;
   _lastInstructions: any;
 
   _compiler: ICompiler;
@@ -16,9 +15,8 @@ export default class Looper implements ILooper {
     this._app = app;
 
     this._steps = 1;
-    this._totalSteps = 8;
+    this._totalSteps = 4;
 
-    this._idTimeout = undefined;
     this._lastInstructions = {};
 
     this._compiler = compiler;
@@ -28,25 +26,31 @@ export default class Looper implements ILooper {
   async loop () {
     this._editor.create();
 
-    Tone.Transport.scheduleRepeat(async () => {
+    await this.compile();
+
+    Tone.Transport.scheduleRepeat(async (time) => {
       if (!this._compiler || !this._editor) {
         throw new Error('Compiler or editor are undefined.');
       }
-
-      this._editor.setLoopTime(this._steps, this._totalSteps);
+      Tone.Draw.schedule(() => {
+        this._editor.setLoopTime(this._steps, this._totalSteps);
+      }, time);
 
       if (this._steps === this._totalSteps) {
         this._steps = 1;
-        await this._compile();
       } else {
         this._steps++;
       }
-    }, 0.5);
+    }, 1);
 
-    Tone.Transport.start();
+    this.toggle();
   }
 
-  async _compile () {
+  async toggle () {
+    Tone.Transport.toggle();
+  }
+
+  async compile () {
     try {
       this._editor.setWaiting();
       const editorCode = this._editor.getCode();
@@ -65,11 +69,11 @@ export default class Looper implements ILooper {
         }
 
         this._lastInstructions = instructions;
-        this._editor.setValid();
+        // this._editor.setValid();
 
-        if (newInstructions.length > 0 || oldInstructions.length > 0) {
-          this._editor.ok();
-        }
+        // if (newInstructions.length > 0 || oldInstructions.length > 0) {
+        this._editor.ok();
+        // }
       }
     } catch (e: any) {
       this._editor.setError();
