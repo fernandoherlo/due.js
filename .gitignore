@@ -6,3 +6,4 @@ public/samples
 node_modules
 dist
 .eslintcache
+src/Tests/coverage

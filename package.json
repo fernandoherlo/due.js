@@ -8,11 +8,13 @@
     "build": "npm run lint && tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint ./src --ext .vue,.js,.ts,.tsx",
-    "test": "vitest"
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.7.2",
     "@typescript-eslint/parser": "^6.7.2",
+    "@vitest/coverage-istanbul": "^0.34.6",
     "eslint": "^8.49.0",
     "eslint-config-semistandard": "^17.0.0",
     "eslint-plugin-vue": "^9.17.0",

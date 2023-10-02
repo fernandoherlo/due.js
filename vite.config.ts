@@ -6,5 +6,12 @@ export default {
     monacoEditorPluginDefault({
       languageWorkers: ['editorWorkerService']
     })
-  ]
+  ],
+  test: {
+    coverage: {
+      provider: 'istanbul',
+      reporter: ['text', 'json', 'html'],
+      reportsDirectory: './src/Tests/coverage'
+    }
+  }
 };
