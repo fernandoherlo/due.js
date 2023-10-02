@@ -1,4 +1,4 @@
-import * as monaco from 'monaco-editor';
+import { languages, editor, KeyMod, KeyCode } from 'monaco-editor';
 
 import { IApp } from '../vite-env';
 import { richLanguageConfiguration, monarchLanguage, languageID, languageExtensionPoint } from './language';
@@ -9,7 +9,7 @@ export default class Editor implements IEditor {
   _htmlId: string;
   _htmlIdProgressBar: string;
   _idTimeoutValid: number | undefined;
-  _monaco: monaco.editor.IStandaloneCodeEditor | null;
+  _monaco: editor.IStandaloneCodeEditor | null;
 
   constructor (app: IApp, htmlId: string) {
     this._app = app;
@@ -20,13 +20,13 @@ export default class Editor implements IEditor {
   }
 
   create () {
-    monaco.languages.register(languageExtensionPoint);
-    monaco.languages.onLanguage(languageID, () => {
-      monaco.languages.setMonarchTokensProvider(languageID, monarchLanguage);
-      monaco.languages.setLanguageConfiguration(languageID, richLanguageConfiguration);
+    languages.register(languageExtensionPoint);
+    languages.onLanguage(languageID, () => {
+      languages.setMonarchTokensProvider(languageID, monarchLanguage);
+      languages.setLanguageConfiguration(languageID, richLanguageConfiguration);
     });
 
-    this._monaco = monaco.editor.create(document.body, {
+    this._monaco = editor.create(document.body, {
       value: `// .#####..##..##.######........######..####..
 // .##..##.##..##.##................##.##.....
 // .##..##.##..##.####..............##..####..
@@ -54,8 +54,8 @@ sam10#birds([A3,C2];1;[2-4]):v(-8)`,
       lineNumbersMinChars: 0,
       automaticLayout: true
     });
-    this._monaco.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, this._onSave.bind(this));
-    this._monaco.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyD, this._onToogle.bind(this));
+    this._monaco.addCommand(KeyMod.CtrlCmd | KeyCode.KeyS, this._onSave.bind(this));
+    this._monaco.addCommand(KeyMod.CtrlCmd | KeyCode.KeyD, this._onToogle.bind(this));
   }
 
   _onSave () {
@@ -78,7 +78,7 @@ sam10#birds([A3,C2];1;[2-4]):v(-8)`,
     progressBarEditorElement.classList.add('ok');
 
     clearInterval(this._idTimeoutValid);
-    this._idTimeoutValid = setTimeout(() => {
+    this._idTimeoutValid = window.setTimeout(() => {
       progressBarEditorElement.className = '';
     }, 250);
   }

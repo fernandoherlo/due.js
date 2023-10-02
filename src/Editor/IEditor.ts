@@ -1,4 +1,4 @@
-import * as monaco from 'monaco-editor';
+import { editor } from 'monaco-editor';
 import { IApp } from '../vite-env';
 
 export interface IEditor {
@@ -6,7 +6,7 @@ export interface IEditor {
   _htmlId: string;
   _htmlIdProgressBar: string;
   _idTimeoutValid: number | undefined;
-  _monaco: monaco.editor.IStandaloneCodeEditor | null;
+  _monaco: editor.IStandaloneCodeEditor | null;
 
   create: () => void;
   getCode: () => string | undefined;
