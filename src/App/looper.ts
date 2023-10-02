@@ -42,8 +42,6 @@ export default class Looper implements ILooper {
         this._steps++;
       }
     }, 1);
-
-    this.toggle();
   }
 
   async toggle () {

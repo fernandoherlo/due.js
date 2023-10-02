@@ -56,6 +56,13 @@ sam10#birds([A3,C2];1;[2-4]):v(-8)`,
     });
     this._monaco.addCommand(KeyMod.CtrlCmd | KeyCode.KeyS, this._onSave.bind(this));
     this._monaco.addCommand(KeyMod.CtrlCmd | KeyCode.KeyD, this._onToogle.bind(this));
+
+    const container = window || {};
+    container.onresize = () => {
+      if (this._monaco) {
+        this._monaco.layout();
+      }
+    };
   }
 
   _onSave () {
