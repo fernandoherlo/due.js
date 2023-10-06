@@ -9,7 +9,7 @@ export interface ILooper {
   _compiler: ICompiler;
   _editor: IEditor;
 
-  loop: () => void;
+  start: () => void;
   compile: () => void;
   toggle: () => void;
 }

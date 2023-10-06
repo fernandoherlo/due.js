@@ -1,13 +1,14 @@
 import * as Tone from 'tone';
 import { IApp, IInstruction, IInstrument, INote } from '../../vite-env';
 import Instruction from '../../Compiler/Instruction';
-import { COMMANDS_ELEMENT_MAP, TYPE_VALUE_NOTE } from '../constants';
+import { COMMANDS_ELEMENT_MAP } from '../constants';
+import TriggerAttack from './triggerAttack';
 
 export default class Instrument extends Instruction implements IInstrument {
   _app: IApp;
   _instrument: any | null = null;
   _canUpdate: boolean = false;
-  _schedule: number | null = null;
+  _loop: Tone.Loop<Tone.LoopOptions> | null = null;
   _valueStep: number = 0;
 
   constructor (data: any, app: IApp) {
@@ -45,43 +46,32 @@ export default class Instrument extends Instruction implements IInstrument {
   }
 
   async play (): Promise<void> {
-    if (this._schedule) {
-      await Tone.Transport.clear(this._schedule);
+    const note: INote = TriggerAttack.getValue(this.value);
+
+    if (this._loop) {
+      await this._loop.cancel();
+      await this._loop.dispose();
     }
 
-    let note: INote;
-    note = this._getValue(this.value);
-
-    this._schedule = Tone.Transport.scheduleRepeat(async (/* time: number */) => {
+    this._loop = new Tone.Loop((/* time: number */) => {
       if (this._instrument) {
-        note = this._getValue(this.value, this.typeValue);
-        if (note.value) {
-          if (this._isChord(note.value, this.typeValue)) {
-            if (!Array.isArray(note.value)) {
-              this._instrument.triggerAttackRelease(this._createChord(note.value), this._getValue(note.duration));
-            } else {
-              this._instrument.triggerAttackRelease(note.value, this._getValue(note.duration));
-            }
-          } else {
-            this._instrument.triggerAttackRelease(note.value, this._getValue(note.duration), /* time */ '+0.05');
-          }
-        }
+        TriggerAttack.play(this.value, this.typeValue, this._valueStep, this._instrument);
       }
-      if (Array.isArray(note.interval)) {
-        await this.play();
-      }
-    }, this._getValue(note.interval));
+    }, TriggerAttack.getValue(note.interval)).start(0);
   }
 
   async end (): Promise<void> {
-    if (this._schedule) {
-      await Tone.Transport.clear(this._schedule);
+    if (this._loop) {
+      await this._loop.cancel();
+      await this._loop.dispose();
     }
+
     if (this.actions) {
       for (let i = 0; i < this.actions.length; i++) {
         await this.actions[i].end();
       }
     }
+
     if (this._instrument) {
       await this._instrument.disconnect();
       await this._instrument.dispose();
@@ -95,54 +85,5 @@ export default class Instrument extends Instruction implements IInstrument {
       this.sound = newInstrument.sound;
       await this.play();
     }
-  }
-
-  _getValue (values: any | Array<any>, typeValue?: string | undefined) {
-    let value;
-    if (Array.isArray(values)) {
-      if (typeValue === TYPE_VALUE_NOTE.sequence) {
-        value = values[this._valueStep % values.length];
-        this._valueStep++;
-      } else if (typeValue === TYPE_VALUE_NOTE.random) {
-        value = this._getRandom(values);
-      } else {
-        value = this._getRandom(values);
-      }
-    } else if (
-      typeof values === 'object' &&
-      !Array.isArray(values) &&
-      (values.min && values.max)
-    ) {
-      value = this._getRandomMinMax(values);
-    } else {
-      value = values;
-      if (this._isChord(value.value, typeValue) && !Array.isArray(value.value)) {
-        value.value = this._createChord(value.value);
-      }
-    }
-
-    return value;
-  }
-
-  _getRandom (values: Array<any>) {
-    return values[Math.floor(Math.random() * values.length)];
-  }
-
-  _getRandomMinMax (values: any) {
-    const min = Math.ceil(values.min);
-    const max = Math.floor(values.max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-  _isChord (value: string | Array<string>, typeValue: string | undefined) {
-    if (typeof value === 'string' && typeValue) {
-      return typeValue === TYPE_VALUE_NOTE.chord || ((typeValue === TYPE_VALUE_NOTE.random || typeValue === TYPE_VALUE_NOTE.sequence) && value.includes('='));
-    } else if (Array.isArray(value) && typeValue) {
-      return true;
-    }
-  }
-
-  _createChord (string: string): Array<string> {
-    return string.replace(/\[|\]/g, '').trim().split('=');
   }
 }

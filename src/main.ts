@@ -7,4 +7,4 @@ const app = new App();
 const due = new Due(app);
 due.linkToApp();
 
-app.$looper.loop();
+app.$looper.start();

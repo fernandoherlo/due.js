@@ -1,10 +1,11 @@
+import * as Tone from 'tone';
 import { IApp, IInstruction } from '../../vite-env';
 
 export interface IInstrument extends IInstruction {
   _app: IApp;
   _instrument: any | null;
   _canUpdate: boolean;
-  _schedule: number | null;
+  _loop: Tone.Loop<Tone.LoopOptions> | null;
   _valueStep: number;
 
   start: () => Promise<void>;

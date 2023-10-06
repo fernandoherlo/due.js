@@ -23,10 +23,8 @@ export default class Looper implements ILooper {
     this._editor = editor;
   }
 
-  async loop () {
+  async start () {
     this._editor.create();
-
-    await this.compile();
 
     Tone.Transport.scheduleRepeat(async (time) => {
       if (!this._compiler || !this._editor) {
@@ -67,11 +65,7 @@ export default class Looper implements ILooper {
         }
 
         this._lastInstructions = instructions;
-        // this._editor.setValid();
-
-        // if (newInstructions.length > 0 || oldInstructions.length > 0) {
         this._editor.ok();
-        // }
       }
     } catch (e: any) {
       this._editor.setError();
