@@ -6,8 +6,6 @@ const folder = process.cwd();
 let tmpDir;
 
 try {
-  // tmpDir = fs.mkdtempSync(path.join(folder, 'temp'));
-  // shell.cd(tmpDir);
   tmpDir = path.join(folder, 'samples-alex-bainter/');
   shell.exec('git clone --verbose https://github.com/generative-music/samples-alex-bainter.git');
   shell.cp('-R', tmpDir + '/samples', path.join(folder, 'public/'));
