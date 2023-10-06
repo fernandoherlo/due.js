@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run samples && npm run lint && tsc && vite build",
+    "build": "npm run lint && tsc && vite build",
+    "build-netlify": "npm run samples && npm run lint && tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint ./src --ext .vue,.js,.ts,.tsx",
+    "lint": "eslint ./src --ext .vue,.js,.ts,.tsx && tsc",
     "test": "vitest",
     "coverage": "vitest run --coverage",
     "samples": "node samples.js"
