@@ -79,8 +79,7 @@ export default class Instrument extends Instruction implements IInstrument {
     }
     if (this.actions) {
       for (let i = 0; i < this.actions.length; i++) {
-        await this.actions[i]._effect.disconnect();
-        await this.actions[i]._effect.dispose();
+        await this.actions[i].end();
       }
     }
     if (this._instrument) {
