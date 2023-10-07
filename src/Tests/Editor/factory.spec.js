@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import Editor from '../../Editor';
-import EditorFactory from '../../Editor/factory';
+import Editor from '~/src/modules/Editor';
+import EditorFactory from '~/src/modules/Editor/factory';
 
 vi.mock('../../Editor', () => {
   const Editor = vi.fn();

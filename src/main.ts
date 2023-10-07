@@ -1,7 +1,7 @@
-import './style.scss';
+import '~/src/assets/app.scss';
 
-import App from './App';
-import Due from './Due';
+import App from '~/src/modules/App';
+import Due from '~/src/modules/Due';
 
 const app = new App();
 const due = new Due(app);

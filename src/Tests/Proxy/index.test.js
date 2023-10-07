@@ -1,5 +1,5 @@
 import { describe, afterEach, it, expect, vi } from 'vitest';
-import Proxy from '../../Proxy';
+import Proxy from '~/src/modules/Proxy';
 
 const mockApp = {
   $debug: true,
