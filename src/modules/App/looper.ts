@@ -51,6 +51,8 @@ export default class Looper implements ILooper {
       this._editor.setWaiting();
       const editorCode = this._editor.getCode();
 
+      localStorage.setItem('due#editor', editorCode || '');
+
       if (editorCode) {
         const instructions = this._compiler.exec(editorCode);
 
