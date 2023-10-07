@@ -1,7 +1,6 @@
 import { IApp, IDue, IInstruction } from '~/src/vite-env';
 import Proxy from '~/src/modules/Proxy';
-import { COMMANDS_ELEMENT_MAP } from './constants';
-import samples from './samples.json';
+import { COMMANDS_ELEMENT_MAP, SAMPLER_MAP } from './constants';
 
 export default class Due extends Proxy implements IDue {
   _instructions: any;
@@ -12,7 +11,7 @@ export default class Due extends Proxy implements IDue {
   }
 
   samples () {
-    this._app.$logger.log(samples);
+    this._app.$logger.log(SAMPLER_MAP);
   }
 
   async add (instructions: Array<IInstruction>) {
