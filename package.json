@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "npm run lint && tsc && vite build",
-    "build-netlify": "npm run samples && npm run lint && tsc && vite build",
+    "build-netlify": "npm i esbuild-linux-64 && npm run samples && npm run lint && tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint ./src --ext .vue,.js,.ts,.tsx && tsc",
     "test": "vitest",
