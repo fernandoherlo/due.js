@@ -1,30 +1,30 @@
 /// <reference types="vite/client" />
-import { IApp } from '~/src/modules/App/IApp';
+import { IApp } from '~/src/types/IApp';
 
-export { IProxy } from '~/src/modules/Proxy/IProxy';
-export { IEditor } from '~/src/modules/Editor/IEditor';
-export { IParser } from '~/src/modules/Parser/IParser';
-export { ILexer } from '~/src/modules/Lexer/ILexer';
-export { IInterpreter } from '~/src/modules/Interpreter/IInterpreter';
-export { ICompiler } from '~/src/modules/Compiler/ICompiler';
-export { IDue } from '~/src/modules/Due/IDue';
-export { ILogger } from '~/src/modules/App/Logger/ILogger';
-export { IStore } from '~/src/modules/App/Store/IStore';
-export { IDebugger } from '~/src/modules/App/Debugger/IDebugger';
-export { ILooper } from '~/src/modules/App/ILooper';
-export { IErrorHandler } from '~/src/modules/App/Error/IErrorHandler';
-export { IApp } from '~/src/modules/App/IApp';
+export { IProxy } from '~/src/types/IProxy';
+export { IEditor } from '~/src/types/IEditor';
+export { IParser } from '~/src/types/IParser';
+export { ILexer } from '~/src/types/ILexer';
+export { IInterpreter } from '~/src/types/IInterpreter';
+export { ICompiler } from '~/src/types/ICompiler';
+export { IDue } from '~/src/types/IDue';
+export { ILogger } from '~/src/types/ILogger';
+export { IStore } from '~/src/types/IStore';
+export { IDebugger } from '~/src/types/IDebugger';
+export { ILooper } from '~/src/types/ILooper';
+export { IErrorHandler } from '~/src/types/IErrorHandler';
+export { IApp } from '~/src/types/IApp';
 
-export { IInstruction } from '~/src/modules/Compiler/Instruction/IInstruction';
-export { IInstrument } from '~/src/modules/Due/Instrument/IInstrument';
-export { ISynth } from '~/src/modules/Due/Instrument/Synth/ISynth';
-export { ISampler } from '~/src/modules/Due/Instrument/Sampler/ISampler';
-export { INote } from '~/src/modules/Due/Note/INote';
-export { IEffect } from '~/src/modules/Due/Effect/IEffect';
-export { IVolumen } from '~/src/modules/Due/Effect/Volumen/IVolumen';
-export { IReverb } from '~/src/modules/Due/Effect/Reverb/IReverb';
-export { IChorus } from '~/src/modules/Due/Effect/Chorus/IChorus';
-export { IDelay } from '~/src/modules/Due/Effect/Delay/IDelay';
+export { IInstruction } from '~/src/types/IInstruction';
+export { IInstrument } from '~/src/types/IInstrument';
+export { ISynth } from '~/src/types/ISynth';
+export { ISampler } from '~/src/types/ISampler';
+export { INote } from '~/src/types/INote';
+export { IEffect } from '~/src/types/IEffect';
+export { IVolumen } from '~/src/types/IVolumen';
+export { IReverb } from '~/src/types/IReverb';
+export { IChorus } from '~/src/types/IChorus';
+export { IDelay } from '~/src/types/IDelay';
 
 declare global {
   interface Window { App: IApp; }

@@ -2,7 +2,7 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
 
 import { IApp } from '~/src/vite-env';
 import { richLanguageConfiguration, monarchLanguage, languageID, languageExtensionPoint } from './language';
-import { IEditor } from './IEditor';
+import { IEditor } from '../../types/IEditor';
 
 export default class Editor implements IEditor {
   _app: IApp;

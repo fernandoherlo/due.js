@@ -11,7 +11,7 @@ export default class Lexer implements ILexer {
     this._parser = parser;
   }
 
-  exec (code: string): Array<object> {
+  exec (code: string): Array<IInstruction> {
     if (!code) {
       throw Error('Code is empty.');
     }
