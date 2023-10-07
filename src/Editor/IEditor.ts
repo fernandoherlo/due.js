@@ -1,4 +1,5 @@
-import { editor } from 'monaco-editor';
+// import { editor } from 'monaco-editor';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
 import { IApp } from '../vite-env';
 
 export interface IEditor {
@@ -6,7 +7,7 @@ export interface IEditor {
   _htmlId: string;
   _htmlIdProgressBar: string;
   _idTimeoutValid: number | undefined;
-  _monaco: editor.IStandaloneCodeEditor | null;
+  _monaco: monaco.editor.IStandaloneCodeEditor | null;
 
   create: () => void;
   getCode: () => string | undefined;

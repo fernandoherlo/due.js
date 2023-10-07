@@ -16,21 +16,18 @@ export default class Proxy implements IProxy {
 
   add (instructions: Array<any> = []): void {
     if (instructions.length) {
-      this._app.$logger.log(stringify(instructions, null, 2));
       this._app.$debugger.add('ADD', stringify(instructions, null, 2));
     }
   }
 
   update (instructions: Array<any> = []): void {
     if (instructions.length) {
-      this._app.$logger.log(stringify(instructions, null, 2));
       this._app.$debugger.add('UPDATE', stringify(instructions, null, 2));
     }
   }
 
   delete (instructions: Array<any> = []): void {
     if (instructions.length) {
-      this._app.$logger.log(stringify(instructions, null, 2));
       this._app.$debugger.add('DELETE', stringify(instructions, null, 2));
     }
   }

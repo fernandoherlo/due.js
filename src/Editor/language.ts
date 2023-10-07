@@ -43,12 +43,20 @@ export const monarchLanguage = <ILanguage>{
       [/\(/, 'string', '@string']
     ],
     whitespace: [
-      [/[; \t\r\n]+/, '']
+      [/[ \t\r\n]+/, ''],
+      [/\/\*\*(?!\/)/, 'comment.doc', '@jsdoc'],
+      [/\/\*/, 'comment', '@comment'],
+      [/\/\/.*$/, 'comment']
     ],
     comment: [
       [/[^/*]+/, 'comment'],
       [/\*\//, 'comment', '@pop'],
       [/[/*]/, 'comment']
+    ],
+    jsdoc: [
+      [/[^/*]+/, 'comment.doc'],
+      [/\*\//, 'comment.doc', '@pop'],
+      [/[/*]/, 'comment.doc']
     ],
     string: [
       [/[^)]+/, 'string'],

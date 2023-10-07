@@ -1,4 +1,4 @@
-import './style.css';
+import './style.scss';
 
 import App from './App';
 import Due from './Due';

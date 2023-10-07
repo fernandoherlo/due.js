@@ -1,4 +1,5 @@
-import { languages, editor, KeyMod, KeyCode } from 'monaco-editor';
+// import { languages, editor, KeyMod, KeyCode } from 'monaco-editor';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
 
 import { IApp } from '../vite-env';
 import { richLanguageConfiguration, monarchLanguage, languageID, languageExtensionPoint } from './language';
@@ -9,7 +10,7 @@ export default class Editor implements IEditor {
   _htmlId: string;
   _htmlIdProgressBar: string;
   _idTimeoutValid: number | undefined;
-  _monaco: editor.IStandaloneCodeEditor | null;
+  _monaco: monaco.editor.IStandaloneCodeEditor | null;
 
   constructor (app: IApp, htmlId: string) {
     this._app = app;
@@ -20,13 +21,13 @@ export default class Editor implements IEditor {
   }
 
   create () {
-    languages.register(languageExtensionPoint);
-    languages.onLanguage(languageID, () => {
-      languages.setMonarchTokensProvider(languageID, monarchLanguage);
-      languages.setLanguageConfiguration(languageID, richLanguageConfiguration);
+    monaco.languages.register(languageExtensionPoint);
+    monaco.languages.onLanguage(languageID, () => {
+      monaco.languages.setMonarchTokensProvider(languageID, monarchLanguage);
+      monaco.languages.setLanguageConfiguration(languageID, richLanguageConfiguration);
     });
 
-    this._monaco = editor.create(document.body, {
+    this._monaco = monaco.editor.create(document.body, {
       value: `// .#####..##..##.######........######..####..
 // .##..##.##..##.##................##.##.....
 // .##..##.##..##.####..............##..####..
@@ -43,25 +44,60 @@ sam6#ocean([G3>D3>A4];6;[6-8]):v(11):r(1)
 sam9#cellos([C3=E3=G3];3;[11-14]):v(-8)
 sam10#birds([A3,C2];1;[2-4]):v(-8)`,
       language: 'due#',
-      theme: 'vs-dark',
       fontFamily: 'Fira Code',
-      fontSize: 32,
+      fontSize: 26,
       minimap: { enabled: false },
-      lineNumbers: 'off',
-      glyphMargin: false,
-      folding: false,
-      lineDecorationsWidth: 0,
-      lineNumbersMinChars: 0,
+      // glyphMargin: false,
+      // lineDecorationsWidth: 0,
+      // lineNumbersMinChars: 0,
       automaticLayout: true
+      // fixedOverflowWidgets: true
     });
-    this._monaco.addCommand(KeyMod.CtrlCmd | KeyCode.KeyS, this._onSave.bind(this));
-    this._monaco.addCommand(KeyMod.CtrlCmd | KeyCode.KeyD, this._onToogle.bind(this));
+    this._monaco.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, this._onSave.bind(this));
+    this._monaco.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyD, this._onToogle.bind(this));
+
+    monaco.editor.defineTheme('default', {
+      base: 'vs-dark',
+      inherit: true,
+      rules: [
+        {
+          token: 'comment',
+          foreground: '3c3b3d'
+        },
+        {
+          token: 'string',
+          foreground: 'bd93f9'
+        },
+        {
+          token: 'identifier', // sample
+          foreground: 'd5eb34'
+        },
+        {
+          foreground: '8be9fd', // instrument / efecct
+          token: 'keyword'
+        }
+      ],
+      colors: {
+        'editor.background': '#282a36'
+      }
+    });
+    monaco.editor.setTheme('default');
 
     const container = window || {};
     container.onresize = () => {
       if (this._monaco) {
         this._monaco.layout();
       }
+    };
+
+    const togglePlay: HTMLDivElement | null = document.getElementById('toggle') as HTMLDivElement;
+    togglePlay.onclick = () => {
+      this._onToogle();
+    };
+
+    const save: HTMLDivElement | null = document.getElementById('save') as HTMLDivElement;
+    save.onclick = () => {
+      this._onSave();
     };
   }
 
