@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import Editor from '~/src/modules/Editor';
 import EditorFactory from '~/src/modules/Editor/factory';
 
-vi.mock('../../Editor', () => {
+vi.mock('~/src/modules/Editor', () => {
   const Editor = vi.fn();
   return { default: Editor };
 });

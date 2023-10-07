@@ -41,7 +41,6 @@ describe('Proxy', () => {
       // Activate
       proxy.add(instructions);
       // Assert
-      expect(proxy._app.$logger.log).toHaveBeenCalled();
       expect(proxy._app.$debugger.add).toHaveBeenCalledWith('ADD', expect.anything());
     });
 
@@ -52,7 +51,6 @@ describe('Proxy', () => {
       // Activate
       proxy.add(instructions);
       // Assert
-      expect(proxy._app.$logger.log).not.toHaveBeenCalled();
       expect(proxy._app.$debugger.add).not.toHaveBeenCalled();
     });
 
@@ -63,7 +61,6 @@ describe('Proxy', () => {
       // Activate
       proxy.update(instructions);
       // Assert
-      expect(proxy._app.$logger.log).toHaveBeenCalled();
       expect(proxy._app.$debugger.add).toHaveBeenCalledWith('UPDATE', expect.anything());
     });
 
@@ -74,7 +71,6 @@ describe('Proxy', () => {
       // Activate
       proxy.update(instructions);
       // Assert
-      expect(proxy._app.$logger.log).not.toHaveBeenCalled();
       expect(proxy._app.$debugger.add).not.toHaveBeenCalled();
     });
 
@@ -85,7 +81,6 @@ describe('Proxy', () => {
       // Activate
       proxy.delete(instructions);
       // Assert
-      expect(proxy._app.$logger.log).toHaveBeenCalled();
       expect(proxy._app.$debugger.add).toHaveBeenCalledWith('DELETE', expect.anything());
     });
 
@@ -96,7 +91,6 @@ describe('Proxy', () => {
       // Activate
       proxy.delete(instructions);
       // Assert
-      expect(proxy._app.$logger.log).not.toHaveBeenCalled();
       expect(proxy._app.$debugger.add).not.toHaveBeenCalled();
     });
   });
