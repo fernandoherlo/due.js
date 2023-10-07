@@ -77,11 +77,11 @@ body {
   bottom: 0;
   right: 0;
   left: 0;
-  color: $black;
+  color: $gray;
   top: calc(80% + $topbar_height);
   height: calc(20% - ($topbar_height + ($topbar_height /2)) - 1px);
   bottom: 0;
-  padding: 10px;
+  padding: 10px 30px;
   font-weight: 600;
   font-size: 12px;
   overflow-y: scroll;

@@ -6,7 +6,7 @@ export const themeDue: monaco.editor.IStandaloneThemeData = {
   rules: [
     {
       token: 'comment',
-      foreground: '3c3b3d'
+      foreground: '6d6d6d'
     },
     {
       token: 'string',
