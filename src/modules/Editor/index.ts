@@ -1,3 +1,4 @@
+import * as Tone from 'tone';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
 
 import { IApp } from '~/src/vite-env';
@@ -49,8 +50,8 @@ export default class Editor implements IEditor {
     };
 
     const togglePlay: HTMLDivElement | null = document.getElementById('toggle') as HTMLDivElement;
-    togglePlay.onclick = () => {
-      this._onToogle();
+    togglePlay.onclick = async () => {
+      await this._onToogle();
     };
 
     const save: HTMLDivElement | null = document.getElementById('save') as HTMLDivElement;
@@ -63,7 +64,8 @@ export default class Editor implements IEditor {
     this._app.$looper.compile();
   }
 
-  _onToogle () {
+  async _onToogle () {
+    await Tone.start();
     this._app.$looper.toggle();
   }
 

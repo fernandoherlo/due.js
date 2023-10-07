@@ -1,4 +1,3 @@
-import * as Tone from 'tone';
 import { IApp, ILogger, IStore, IErrorHandler, IDebugger, ILooper, IProxy } from '~/src/vite-env';
 import Logger from './Logger';
 import Store from './Store';
@@ -31,15 +30,5 @@ export default class App implements IApp {
     const editor = EditorFactory(this);
 
     this.$looper = new Looper(this, compiler, editor);
-
-    const container = window || {};
-    container.onclick = async () => {
-      await Tone.start();
-      return false;
-    };
-    container.ontouchstart = async () => {
-      await Tone.start();
-      return false;
-    };
   }
 }
