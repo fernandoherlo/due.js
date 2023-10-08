@@ -1,12 +1,12 @@
 {
   "name": "due.js",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.2.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "npm run lint && tsc && vite build",
-    "build-netlify": "npm i esbuild-linux-64 && npm run samples && npm run lint && tsc && vite build",
+    "build-netlify": "npm i esbuild-linux-64 && npm run coverage && npm run samples && npm run lint && tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint ./src --ext .vue,.js,.ts,.tsx && tsc",
     "test": "vitest",
