@@ -20,5 +20,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
+      - name: Execute Lint
+        run: npm ci && npm run lint
       - name: Execute Unit tests
-        run: npm ci && npm run test
+        run: npm ci && npm run coverage
