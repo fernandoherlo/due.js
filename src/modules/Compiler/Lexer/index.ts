@@ -68,7 +68,7 @@ export default class Lexer implements ILexer {
       element: commandParsed.element,
       key: commandParsed.element ? `${commandParsed.name}${commandParsed.element}` : commandParsed.name,
       type: COMMANDS_MAP[commandParsed.name],
-      sound: commandParsed.sound,
+      modifier: commandParsed.modifier,
       value: commandParsed.value,
       typeValue: commandParsed.typeValue,
       actions: []

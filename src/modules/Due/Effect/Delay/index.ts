@@ -9,9 +9,8 @@ export default class Delay extends Effect implements IDelay {
   create () {
     this._effect = new Tone.FeedbackDelay();
     if (!Array.isArray(this.value)) {
-      const value = this.value.value.split('-');
-      const delay = parseFloat(value[0]);
-      const feedback = parseFloat(value[1]);
+      const delay = parseFloat(this.value.value);
+      const feedback = parseFloat(this.value.duration);
 
       this._effect.delayTime.value = delay;
       this._effect.feedback.value = feedback || 0.5;

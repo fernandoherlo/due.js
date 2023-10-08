@@ -31,3 +31,10 @@ export const COMMANDS_MAP: any = {
   [COMMANDS.cho]: 'chorus',
   [COMMANDS.con]: 'connect'
 };
+
+export const TYPE_VALUE: any = {
+  normal: 'normal',
+  random: 'random',
+  sequence: 'sequence',
+  multi: 'multi'
+};

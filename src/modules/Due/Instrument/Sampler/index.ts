@@ -17,8 +17,9 @@ export default class Sampler extends Instrument implements ISampler {
 
     const samplesMap: any = samples;
     const samplerPromise: Promise<Tone.Sampler> = new Promise((resolve) => {
+      const sound = this.modifier || 'piano';
       const sampler: Tone.Sampler = new Tone.Sampler({
-        urls: this._pathUrl(samplesMap[SAMPLER_MAP[this.sound]], SAMPLER_MAP[this.sound]),
+        urls: this._pathUrl(samplesMap[SAMPLER_MAP[sound]], SAMPLER_MAP[sound]),
         onload: function onload () {
           return resolve(sampler);
         }
@@ -42,13 +43,13 @@ export default class Sampler extends Instrument implements ISampler {
       this.value = newInstrument.value;
       this.typeValue = newInstrument.typeValue;
       if (
-        this.sound !== newInstrument.sound ||
+        this.modifier !== newInstrument.modifier ||
         this.actions.some((action, index) => compareInstructions(newInstrument.actions?.[index], action)) ||
         newInstrument.actions.some((action, index) => compareInstructions(this.actions?.[index], action))
       ) {
         await this.end();
 
-        this.sound = newInstrument.sound;
+        this.modifier = newInstrument.modifier;
         this.actions = newInstrument.actions;
 
         await this.start();

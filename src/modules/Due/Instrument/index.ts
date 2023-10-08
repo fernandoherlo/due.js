@@ -82,7 +82,7 @@ export default class Instrument extends Instruction implements IInstrument {
     if (this._canUpdate) {
       this.value = newInstrument.value;
       this.typeValue = newInstrument.typeValue;
-      this.sound = newInstrument.sound;
+      this.modifier = newInstrument.modifier;
       await this.play();
     }
   }

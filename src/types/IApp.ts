@@ -8,4 +8,5 @@ export interface IApp {
   $debugger: IDebugger;
   $looper: ILooper;
   $proxy: IProxy | undefined;
+  $valueFactory: any | undefined;
 }

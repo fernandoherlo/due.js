@@ -22,6 +22,7 @@ describe('Proxy', () => {
     // Activate
     // Assert
     expect(proxy._debug).toBeTruthy();
+    expect(proxy._app).toEqual(mockApp);
   });
 
   it('Link to app', () => {

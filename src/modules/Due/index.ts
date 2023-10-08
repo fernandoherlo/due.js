@@ -1,6 +1,7 @@
 import { IApp, IDue, IInstruction } from '~/src/vite-env';
-import Proxy from '~/src/modules/Proxy';
 import { COMMANDS_ELEMENT_MAP, SAMPLER_MAP } from './constants';
+import Proxy from '~/src/modules/Proxy';
+import NoteFactory from '~/src/modules/Due/Note/factory';
 
 export default class Due extends Proxy implements IDue {
   _instructions: any;
@@ -8,6 +9,12 @@ export default class Due extends Proxy implements IDue {
   constructor (app: IApp) {
     super(app);
     this._instructions = {};
+  }
+
+  linkToApp () {
+    super.linkToApp();
+
+    this._app.$valueFactory = NoteFactory;
   }
 
   samples () {

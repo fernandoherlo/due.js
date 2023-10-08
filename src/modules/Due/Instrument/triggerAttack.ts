@@ -1,5 +1,5 @@
 import { INote } from '~/src/vite-env';
-import { TYPE_VALUE_NOTE } from '../constants';
+import { TYPE_VALUE } from '~/src/modules/Compiler/constants';
 
 export default class TriggerAttack {
   static play (value: any, typeValue: string, valueStep: number, instrument: any) {
@@ -12,7 +12,7 @@ export default class TriggerAttack {
           instrument.triggerAttackRelease(note.value, TriggerAttack.getValue(note.duration));
         }
       } else {
-        instrument.triggerAttackRelease(note.value, TriggerAttack.getValue(note.duration), /* time */ '+0.05');
+        instrument.triggerAttackRelease(note.value, TriggerAttack.getValue(note.duration));
       }
     }
   }
@@ -20,19 +20,15 @@ export default class TriggerAttack {
   static getValue (values: any | Array<any>, typeValue?: string | undefined, valueStep?: number | undefined) {
     let value;
     if (Array.isArray(values)) {
-      if (typeValue === TYPE_VALUE_NOTE.sequence && valueStep) {
+      if (typeValue === TYPE_VALUE.sequence && valueStep) {
         value = values[valueStep % values.length];
         valueStep++;
-      } else if (typeValue === TYPE_VALUE_NOTE.random) {
+      } else if (typeValue === TYPE_VALUE.random) {
         value = this._getRandom(values);
       } else {
         value = this._getRandom(values);
       }
-    } else if (
-      typeof values === 'object' &&
-      !Array.isArray(values) &&
-      (values.min && values.max)
-    ) {
+    } else if (typeof values === 'object' && (values.min && values.max)) {
       value = this._getRandomMinMax(values);
     } else {
       value = values;
@@ -56,7 +52,7 @@ export default class TriggerAttack {
 
   static _isChord (value: string | Array<string>, typeValue: string | undefined) {
     if (typeof value === 'string' && typeValue) {
-      return typeValue === TYPE_VALUE_NOTE.chord || ((typeValue === TYPE_VALUE_NOTE.random || typeValue === TYPE_VALUE_NOTE.sequence) && value.includes('='));
+      return typeValue === TYPE_VALUE.multi || ((typeValue === TYPE_VALUE.random || typeValue === TYPE_VALUE.sequence) && value.includes('='));
     } else if (Array.isArray(value) && typeValue) {
       return true;
     }

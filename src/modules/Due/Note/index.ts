@@ -5,9 +5,9 @@ export default class Note implements INote {
   duration: number | Array<number> | any;
   interval: number | Array<number> | any;
 
-  constructor (data: any) {
+  constructor (data: any, defaults: boolean = false) {
     this.value = data.value;
-    this.duration = data.duration || 0.25;
-    this.interval = data.interval || 2;
+    this.duration = data.value2 || (defaults ? 0.25 : undefined);
+    this.interval = data.value3 || (defaults ? 2 : undefined);
   }
 }

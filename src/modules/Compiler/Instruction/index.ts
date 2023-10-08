@@ -5,7 +5,7 @@ export default class Instruction implements IInstruction {
   element: string;
   key: string;
   type: string;
-  sound: string;
+  modifier: string;
   value: INote | Array<INote>;
   typeValue: string;
   actions: Array<any>;
@@ -15,7 +15,7 @@ export default class Instruction implements IInstruction {
     this.element = data.element;
     this.key = data.key;
     this.type = data.type;
-    this.sound = data.sound || 'piano';
+    this.modifier = data.modifier;
     this.value = data.value;
     this.typeValue = data.typeValue;
     this.actions = data.actions;

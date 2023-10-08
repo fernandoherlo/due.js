@@ -16,6 +16,7 @@ export default class App implements IApp {
   $debugger: IDebugger;
   $looper: ILooper;
   $proxy: IProxy | undefined;
+  $valueFactory: any | undefined;
 
   constructor (debug: boolean = true, debuggerHtmlId: string = 'debugger') {
     this.$debug = debug;
