@@ -57,7 +57,7 @@ export default class Instrument extends Instruction implements IInstrument {
       if (this._instrument) {
         TriggerAttack.play(this.value, this.typeValue, this._valueStep, this._instrument);
       }
-    }, TriggerAttack.getValue(note.interval)).start(0);
+    }, parseFloat(TriggerAttack.getValue(note.interval))).start(0);
   }
 
   async end (): Promise<void> {

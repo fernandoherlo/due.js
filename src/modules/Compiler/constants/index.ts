@@ -5,14 +5,16 @@ export const COMMANDS: any = {
   sam: 'sam',
   s: 's',
   ai: 'ai',
-  m: 'm',
+  mo: 'mo',
   c: 'c',
   e: 'e',
   v: 'v',
   r: 'r',
   d: 'd',
   cho: 'cho',
-  con: 'con'
+  con: 'con',
+  $: '$',
+  $$: '$$'
 };
 
 export const COMMANDS_MAP: any = {
@@ -22,14 +24,16 @@ export const COMMANDS_MAP: any = {
   [COMMANDS.sam]: 'sampler',
   [COMMANDS.s]: 'synth',
   [COMMANDS.ai]: 'ai',
-  [COMMANDS.m]: 'midi',
+  [COMMANDS.mo]: 'midiOut',
   [COMMANDS.c]: 'channel',
   [COMMANDS.e]: 'effect',
   [COMMANDS.v]: 'volumen',
   [COMMANDS.r]: 'reverb',
   [COMMANDS.d]: 'delay',
   [COMMANDS.cho]: 'chorus',
-  [COMMANDS.con]: 'connect'
+  [COMMANDS.con]: 'connect',
+  [COMMANDS.$]: '0_variable_',
+  [COMMANDS.$$]: '1_live_variable_'
 };
 
 export const TYPE_VALUE: any = {

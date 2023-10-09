@@ -14,7 +14,13 @@ export default class Compiler implements ICompiler {
   exec (code: string) {
     this._app.$logger.log(code);
 
+    this._resetVariables();
+
     const lexical: Array<IInstruction> = this._lexer.exec(code);
     return this._interpreter.exec(lexical);
+  }
+
+  _resetVariables () {
+    this._app.$variables = {};
   }
 }

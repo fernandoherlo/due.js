@@ -9,4 +9,6 @@ export interface IApp {
   $looper: ILooper;
   $proxy: IProxy | undefined;
   $valueFactory: any | undefined;
+  $variables: any;
+  $variablesLive: any;
 }

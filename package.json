@@ -30,8 +30,10 @@
     "vitest": "^0.34.5"
   },
   "dependencies": {
+    "@magenta/music": "^1.23.1",
     "flatted": "^3.2.9",
     "monaco-editor": "^0.43.0",
-    "tone": "^14.7.77"
+    "tone": "^14.7.77",
+    "webmidi": "^3.1.6"
   }
 }

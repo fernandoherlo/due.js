@@ -19,7 +19,8 @@ export default class Lexer implements ILexer {
       throw Error('Code is not string.');
     }
 
-    return this._generateLexical(code);
+    const newCode = code.replace(' ', '');
+    return this._generateLexical(newCode);
   }
 
   _generateLexical (code: string) {

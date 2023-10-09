@@ -1,5 +1,5 @@
 import { IApp, IParser } from '~/src/vite-env';
-import { TYPE_VALUE } from '~/src/modules/Compiler/constants';
+import { COMMANDS, TYPE_VALUE } from '~/src/modules/Compiler/constants';
 
 export default class Parser implements IParser {
   _app: IApp;
@@ -33,6 +33,27 @@ export default class Parser implements IParser {
     if (typeof command !== 'string') {
       throw Error('Command is not string.');
     }
+
+    if (command.startsWith(COMMANDS.$$) && command.includes('=')) {
+      const [variable, variableValue] = command.split('=');
+      const element = variable.replace(COMMANDS.$$, '');
+
+      return {
+        name: COMMANDS.$$,
+        element,
+        modifier: undefined,
+        value: variableValue,
+        typeValue: TYPE_VALUE.normal
+      };
+    }
+
+    if (command.startsWith(COMMANDS.$) && command.includes('=')) {
+      const [variable, variableValue] = command.split('=');
+      this._app.$variables[variable] = this._app?.$valueFactory.adapt(variableValue, this._app.$variables);
+
+      return;
+    }
+
     if (command.startsWith('//') || !command.endsWith(')')) {
       return;
     }
@@ -42,7 +63,8 @@ export default class Parser implements IParser {
     const [commandId, modifier] = commandIdRaw.split('#');
 
     const { name, element } = this._commandId(commandId);
-    const [value, typeValue] = this._valueRaw(valueRaw, !!element);
+    const newValueRaw = this._app?.$valueFactory.adapt(valueRaw, this._app.$variables);
+    const [value, typeValue] = this._valueRaw(newValueRaw, !!element);
 
     return {
       name,
@@ -84,7 +106,7 @@ export default class Parser implements IParser {
       } else if (valueArray.includes('>')) {
         typeValue = TYPE_VALUE.sequence;
         values = valueArray.trim().split('>');
-      } else if (valueArray.includes('=')) {
+      } else if (valueArray.includes('|')) {
         typeValue = TYPE_VALUE.multi;
         return [this._createValue(value, value2, value3, defaults), typeValue];
       }
@@ -99,7 +121,7 @@ export default class Parser implements IParser {
     const value2Parse = this._calculateValue(value2);
     const value3Parse = this._calculateValue(value3);
 
-    return this._app?.$valueFactory({ value, value2: value2Parse, value3: value3Parse }, defaults);
+    return this._app?.$valueFactory.create({ value, value2: value2Parse, value3: value3Parse }, defaults);
   }
 
   _calculateValue (valueRaw: string | undefined): number | Array<number> | any | undefined {
@@ -112,15 +134,15 @@ export default class Parser implements IParser {
 
       if (valueArray.includes(',')) {
         const values = valueArray.trim().split(',');
-        return values.map(v => parseFloat(v));
+        return values.map(v => v);
       } else if (valueArray.includes('-')) {
         const values = valueArray.trim().split('-');
         return {
-          min: parseFloat(values[0]),
-          max: parseFloat(values[1])
+          min: values[0],
+          max: values[1]
         };
       }
     }
-    return parseFloat(valueRaw);
+    return valueRaw;
   }
 }

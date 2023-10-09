@@ -2,7 +2,10 @@ import { describe, afterEach, it, expect, vi, beforeEach } from 'vitest';
 import Parser from '~/src/modules/Compiler/Parser';
 
 const mockApp = {
-  $valueFactory: (value) => value
+  $valueFactory: {
+    create: (value) => value,
+    adapt: (value) => value
+  }
 };
 
 describe('Parser', () => {
@@ -119,8 +122,8 @@ describe('Parser', () => {
         typeValue: 'normal',
         value: {
           value: 'bar',
-          value2: 2,
-          value3: 3
+          value2: '2',
+          value3: '3'
         }
       }],
       ['foo1([bar,ter])', {
@@ -146,13 +149,13 @@ describe('Parser', () => {
         typeValue: 'random',
         value: [{
           value: 'bar',
-          value2: 0,
-          value3: 1
+          value2: '0',
+          value3: '1'
         },
         {
           value: 'ter',
-          value2: 0,
-          value3: 1
+          value2: '0',
+          value3: '1'
         }]
       }],
       ['foo1([bar>ter];3;10)', {
@@ -162,13 +165,13 @@ describe('Parser', () => {
         typeValue: 'sequence',
         value: [{
           value: 'bar',
-          value2: 3,
-          value3: 10
+          value2: '3',
+          value3: '10'
         },
         {
           value: 'ter',
-          value2: 3,
-          value3: 10
+          value2: '3',
+          value3: '10'
         }]
       }],
       ['foo3#mod([bar,ter];[1,3];[1-10])', {
@@ -178,13 +181,13 @@ describe('Parser', () => {
         typeValue: 'random',
         value: [{
           value: 'bar',
-          value2: [1, 3],
-          value3: { min: 1, max: 10 }
+          value2: ['1', '3'],
+          value3: { min: '1', max: '10' }
         },
         {
           value: 'ter',
-          value2: [1, 3],
-          value3: { min: 1, max: 10 }
+          value2: ['1', '3'],
+          value3: { min: '1', max: '10' }
         }]
       }],
       ['foo3#mod([bar=ter,tor=bor];1;2)', {
@@ -194,29 +197,29 @@ describe('Parser', () => {
         typeValue: 'random',
         value: [{
           value: 'bar=ter',
-          value2: 1,
-          value3: 2
+          value2: '1',
+          value3: '2'
         },
         {
           value: 'tor=bor',
-          value2: 1,
-          value3: 2
+          value2: '1',
+          value3: '2'
         }]
       }],
-      ['foo2([bar=ter>tor=bor];1;2)', {
+      ['foo2([bar|ter>tor|bor];1;2)', {
         element: '2',
         name: 'foo',
         modifier: undefined,
         typeValue: 'sequence',
         value: [{
-          value: 'bar=ter',
-          value2: 1,
-          value3: 2
+          value: 'bar|ter',
+          value2: '1',
+          value3: '2'
         },
         {
-          value: 'tor=bor',
-          value2: 1,
-          value3: 2
+          value: 'tor|bor',
+          value2: '1',
+          value3: '2'
         }]
       }],
       ['foo1(bar;[1-2];[1,2,3])', {
@@ -226,17 +229,17 @@ describe('Parser', () => {
         typeValue: 'normal',
         value: {
           value: 'bar',
-          value2: { min: 1, max: 2 },
-          value3: [1, 2, 3]
+          value2: { min: '1', max: '2' },
+          value3: ['1', '2', '3']
         }
       }],
-      ['foo1([bar=ter])', {
+      ['foo1([bar|ter])', {
         element: '1',
         name: 'foo',
         modifier: undefined,
         typeValue: 'multi',
         value: {
-          value: '[bar=ter]',
+          value: '[bar|ter]',
           value2: undefined,
           value3: undefined
         }
@@ -253,24 +256,24 @@ describe('Parser', () => {
   it('should call factory with defaults false', () => {
     // Arrange
     const parser = new Parser(mockApp);
-    mockApp.$valueFactory = vi.fn();
+    mockApp.$valueFactory.create = vi.fn();
 
     const command = 'foo(1)';
     // Activate
     parser.command(command);
     // Assert
-    expect(mockApp.$valueFactory).toHaveBeenCalledWith(expect.anything(), false);
+    expect(mockApp.$valueFactory.create).toHaveBeenCalledWith(expect.anything(), false);
   });
 
   it('should call factory with defaults true', () => {
     // Arrange
     const parser = new Parser(mockApp);
-    mockApp.$valueFactory = vi.fn();
+    mockApp.$valueFactory.create = vi.fn();
 
     const command = 'foo1(1)';
     // Activate
     parser.command(command);
     // Assert
-    expect(mockApp.$valueFactory).toHaveBeenCalledWith(expect.anything(), true);
+    expect(mockApp.$valueFactory.create).toHaveBeenCalledWith(expect.anything(), true);
   });
 });

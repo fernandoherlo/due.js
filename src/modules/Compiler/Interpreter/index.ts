@@ -39,6 +39,14 @@ export default class Interpreter implements IInterpreter {
       throw Error('Can`t interprete command');
     }
 
-    return instructions;
+    const orderedInstructions: any = Object.keys(instructions).sort().reduce(
+      (obj: any, key) => {
+        obj[key] = instructions[key];
+        return obj;
+      },
+      {}
+    );
+
+    return orderedInstructions;
   }
 }

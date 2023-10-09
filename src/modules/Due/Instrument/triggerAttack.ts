@@ -7,12 +7,12 @@ export default class TriggerAttack {
     if (note.value) {
       if (this._isChord(note.value, typeValue)) {
         if (!Array.isArray(note.value)) {
-          instrument.triggerAttackRelease(this._createChord(note.value), TriggerAttack.getValue(note.duration));
+          instrument.triggerAttackRelease(this._createChord(note.value), parseFloat(TriggerAttack.getValue(note.duration)));
         } else {
-          instrument.triggerAttackRelease(note.value, TriggerAttack.getValue(note.duration));
+          instrument.triggerAttackRelease(note.value, parseFloat(TriggerAttack.getValue(note.duration)));
         }
       } else {
-        instrument.triggerAttackRelease(note.value, TriggerAttack.getValue(note.duration));
+        instrument.triggerAttackRelease(note.value, parseFloat(TriggerAttack.getValue(note.duration)));
       }
     }
   }
@@ -52,13 +52,13 @@ export default class TriggerAttack {
 
   static _isChord (value: string | Array<string>, typeValue: string | undefined) {
     if (typeof value === 'string' && typeValue) {
-      return typeValue === TYPE_VALUE.multi || ((typeValue === TYPE_VALUE.random || typeValue === TYPE_VALUE.sequence) && value.includes('='));
+      return typeValue === TYPE_VALUE.multi || ((typeValue === TYPE_VALUE.random || typeValue === TYPE_VALUE.sequence) && value.includes('|'));
     } else if (Array.isArray(value) && typeValue) {
       return true;
     }
   }
 
   static _createChord (string: string): Array<string> {
-    return string.replace(/\[|\]/g, '').trim().split('=');
+    return string.replace(/\[|\]/g, '').trim().split('|');
   }
 }
