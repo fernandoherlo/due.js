@@ -1,6 +1,6 @@
-import { IInstrument } from '~/src/vite-env';
+import { ISampler } from '~/src/vite-env';
 
-export interface IMagenta extends IInstrument {
+export interface IMagenta extends ISampler {
   _instrument: any | null;
 
   update: (newIntrument: IMagenta) => Promise<void>;

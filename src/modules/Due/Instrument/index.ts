@@ -3,6 +3,7 @@ import { IApp, IInstruction, IInstrument, INote } from '~/src/vite-env';
 import Instruction from '~/src/modules/Compiler/Instruction';
 import { COMMANDS_ELEMENT_MAP } from '../constants';
 import TriggerAttack from './triggerAttack';
+import { TYPE_VALUE } from '../../Compiler/constants';
 
 export default class Instrument extends Instruction implements IInstrument {
   _app: IApp;
@@ -56,6 +57,9 @@ export default class Instrument extends Instruction implements IInstrument {
     this._loop = new Tone.Loop((/* time: number */) => {
       if (this._instrument) {
         TriggerAttack.play(this.value, this.typeValue, this._valueStep, this._instrument);
+        if (this.typeValue === TYPE_VALUE.sequence) {
+          this._valueStep++;
+        }
       }
     }, parseFloat(TriggerAttack.getValue(note.interval))).start(0);
   }

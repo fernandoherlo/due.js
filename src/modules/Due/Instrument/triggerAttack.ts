@@ -17,12 +17,11 @@ export default class TriggerAttack {
     }
   }
 
-  static getValue (values: any | Array<any>, typeValue?: string | undefined, valueStep?: number | undefined) {
+  static getValue (values: any | Array<any>, typeValue?: string | undefined, valueStep: number | undefined = 0) {
     let value;
     if (Array.isArray(values)) {
-      if (typeValue === TYPE_VALUE.sequence && valueStep) {
+      if (typeValue === TYPE_VALUE.sequence) {
         value = values[valueStep % values.length];
-        valueStep++;
       } else if (typeValue === TYPE_VALUE.random) {
         value = this._getRandom(values);
       } else {

@@ -40,8 +40,8 @@ export default class Sampler extends Instrument implements ISampler {
 
   async update (newInstrument: IInstrument): Promise<void> {
     if (this._canUpdate) {
-      this.value = newInstrument.value;
-      this.typeValue = newInstrument.typeValue;
+      await this.setNewValue(newInstrument);
+
       if (
         this.modifier !== newInstrument.modifier ||
         this.actions.some((action, index) => compareInstructions(newInstrument.actions?.[index], action)) ||
@@ -57,6 +57,11 @@ export default class Sampler extends Instrument implements ISampler {
         await super.start();
       }
     }
+  }
+
+  async setNewValue (newInstrument: IInstrument) {
+    this.value = newInstrument.value;
+    this.typeValue = newInstrument.typeValue;
   }
 
   _pathUrl (notes: any, sound: string): any {
