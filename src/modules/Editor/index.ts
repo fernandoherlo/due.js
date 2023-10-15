@@ -61,12 +61,12 @@ export default class Editor implements IEditor {
   }
 
   _onSave () {
-    this._app.$looper.compile();
+    this._app.compile();
   }
 
   async _onToogle () {
     await Tone.start();
-    this._app.$looper.toggle();
+    this._app.toggle();
   }
 
   getCode (): string | undefined {

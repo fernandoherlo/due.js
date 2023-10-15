@@ -10,7 +10,6 @@ export { IDue } from '~/src/types/IDue';
 export { ILogger } from '~/src/types/ILogger';
 export { IStore } from '~/src/types/IStore';
 export { IDebugger } from '~/src/types/IDebugger';
-export { ILooper } from '~/src/types/ILooper';
 export { IErrorHandler } from '~/src/types/IErrorHandler';
 export { IApp } from '~/src/types/IApp';
 
