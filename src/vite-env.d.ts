@@ -1,7 +1,6 @@
 /// <reference types="vite/client" />
 import { IApp } from '~/src/types/IApp';
 
-export { IProxy } from '~/src/types/IProxy';
 export { IEditor } from '~/src/types/IEditor';
 export { IParser } from '~/src/types/IParser';
 export { ILexer } from '~/src/types/ILexer';

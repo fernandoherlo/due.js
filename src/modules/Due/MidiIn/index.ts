@@ -20,9 +20,10 @@ export default class MidiIn extends Instruction implements IMidiIn {
     this._instrument = input.channels[parseInt(this.modifier)];
 
     this._instrument.addListener('noteon', (e: any) => {
+      // TODO: test with arturia minilab 3
       console.log(e.note);
       this.value = e.note.identifier;
-      this._app.$variablesLiveMap[this.key].update(e.note.attack);
+      this._app.$variablesLiveMap[this.key] && this._app.$variablesLiveMap[this.key].update(e.note.attack);
     });
   }
 

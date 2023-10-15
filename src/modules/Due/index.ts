@@ -1,18 +1,17 @@
+import { stringify } from 'flatted';
 import { IApp, IDue, IInstruction } from '~/src/vite-env';
 import { COMMANDS_ELEMENT_MAP, SAMPLER_MAP } from './constants';
-import Proxy from '~/src/modules/Proxy';
 import NoteFactory from '~/src/modules/Due/Note/factory';
 
-export default class Due extends Proxy implements IDue {
+export default class Due implements IDue {
+  _app: IApp;
+  _debug: boolean;
   _instructions: any;
 
   constructor (app: IApp) {
-    super(app);
+    this._app = app;
+    this._debug = this._app.$debug;
     this._instructions = {};
-  }
-
-  linkToApp () {
-    super.linkToApp();
 
     this._app.$valueFactory = NoteFactory;
   }
@@ -22,7 +21,9 @@ export default class Due extends Proxy implements IDue {
   }
 
   async add (instructions: Array<IInstruction>) {
-    super.add(instructions);
+    if (instructions.length) {
+      this._app.$debugger.add('ADD', stringify(instructions, null, 2));
+    }
 
     for (let i = 0; i < instructions.length; i++) {
       const instruction: IInstruction = instructions[i];
@@ -36,7 +37,9 @@ export default class Due extends Proxy implements IDue {
   }
 
   async update (instructions: Array<IInstruction>) {
-    super.update(instructions);
+    if (instructions.length) {
+      this._app.$debugger.add('UPDATE', stringify(instructions, null, 2));
+    }
 
     for (let i = 0; i < instructions.length; i++) {
       const instruction: IInstruction = instructions[i];
@@ -47,7 +50,9 @@ export default class Due extends Proxy implements IDue {
   }
 
   async delete (instructions: Array<IInstruction>) {
-    super.delete(instructions);
+    if (instructions.length) {
+      this._app.$debugger.add('DELETE', stringify(instructions, null, 2));
+    }
 
     for (let i = 0; i < instructions.length; i++) {
       const instruction: IInstruction = instructions[i];

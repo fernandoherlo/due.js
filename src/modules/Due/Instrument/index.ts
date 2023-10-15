@@ -57,6 +57,10 @@ export default class Instrument extends Instruction implements IInstrument {
     this._loop = new Tone.Loop((/* time: number */) => {
       if (this._instrument) {
         TriggerAttack.play(this.value, this.typeValue, this._valueStep, this._instrument);
+
+        if (this._loop) {
+          this._loop.interval = parseFloat(TriggerAttack.getValue(note.interval));
+        }
         if (this.typeValue === TYPE_VALUE.sequence) {
           this._valueStep++;
         }
