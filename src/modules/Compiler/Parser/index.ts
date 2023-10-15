@@ -37,12 +37,13 @@ export default class Parser implements IParser {
     if (command.startsWith(COMMANDS.$$) && command.includes('=')) {
       const [variable, variableValue] = command.split('=');
       const element = variable.replace(COMMANDS.$$, '');
+      const [commandId, modifier] = variableValue.split('#');
 
       return {
         name: COMMANDS.$$,
         element,
-        modifier: undefined,
-        value: variableValue,
+        modifier,
+        value: this._commandId(commandId),
         typeValue: TYPE_VALUE.normal
       };
     }

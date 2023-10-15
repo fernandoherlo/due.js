@@ -19,6 +19,7 @@ export default class App implements IApp {
   $valueFactory: any | undefined;
   $variables: any = {};
   $variablesLive: any = {};
+  $variablesLiveMap: any = {};
 
   constructor (debug: boolean = true, debuggerHtmlId: string = 'debugger') {
     this.$debug = debug;

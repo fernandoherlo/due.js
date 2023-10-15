@@ -1,13 +1,12 @@
 import { WebMidi } from 'webmidi';
-import { IMidi } from '~/src/vite-env';
+import { IMidiOut } from '~/src/vite-env';
 import Instrument from '..';
 
-export default class Midi extends Instrument implements IMidi {
+export default class MidiOut extends Instrument implements IMidiOut {
   _instrument: any | null = null;
   _canUpdate: boolean = true;
 
   async start (): Promise<void> {
-    await WebMidi.enable();
     WebMidi.outputs.forEach(output => this._app.$logger.log(output.name));
 
     this._instrument = {

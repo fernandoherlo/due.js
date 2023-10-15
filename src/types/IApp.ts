@@ -11,4 +11,5 @@ export interface IApp {
   $valueFactory: any | undefined;
   $variables: any;
   $variablesLive: any;
+  $variablesLiveMap: any;
 }

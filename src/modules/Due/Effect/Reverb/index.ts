@@ -9,9 +9,16 @@ export default class Reverb extends Effect implements IReverb {
   create () {
     this._effect = new Tone.Reverb();
     if (!Array.isArray(this.value)) {
-      this._effect.decay = parseFloat(this.value.value);
+      this._effect.decay = this._getValue(this.value.value);
     }
 
     super.create();
+  }
+
+  async update (value: any): Promise<void> {
+    if (this._canUpdate && this._effect) {
+      const decay = this._getValue(value);
+      this._effect.decay = decay;
+    }
   }
 }

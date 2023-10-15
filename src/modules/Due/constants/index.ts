@@ -3,18 +3,20 @@ import { COMMANDS } from '../../Compiler/constants';
 
 import Synth from '../Instrument/Synth';
 import Sampler from '../Instrument/Sampler';
-import Midi from '../Instrument/Midi';
+import MidiOut from '../Instrument/MidiOut';
 import Magenta from '../Instrument/Magenta';
 import Volumen from '../Effect/Volumen';
 import Reverb from '../Effect/Reverb';
 import Chorus from '../Effect/Chorus';
 import Delay from '../Effect/Delay';
 import Variable from '../Variable';
+import MidiIn from '../MidiIn';
 
 export const COMMANDS_ELEMENT_MAP: any = {
   [COMMANDS.n]: (instruction: IInstruction, app: IApp) => new Synth(instruction, app),
   [COMMANDS.sam]: (instruction: IInstruction, app: IApp) => new Sampler(instruction, app),
-  [COMMANDS.mo]: (instruction: IInstruction, app: IApp) => new Midi(instruction, app),
+  [COMMANDS.mo]: (instruction: IInstruction, app: IApp) => new MidiOut(instruction, app),
+  [COMMANDS.mi]: (instruction: IInstruction, app: IApp) => new MidiIn(instruction, app),
   [COMMANDS.v]: (instruction: IInstruction, app: IApp) => new Volumen(instruction, app),
   [COMMANDS.r]: (instruction: IInstruction, app: IApp) => new Reverb(instruction, app),
   [COMMANDS.d]: (instruction: IInstruction, app: IApp) => new Delay(instruction, app),

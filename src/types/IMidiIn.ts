@@ -1,10 +1,9 @@
 import { IApp, IInstruction } from '~/src/vite-env';
 
-export interface IVariable extends IInstruction {
+export interface IMidiIn extends IInstruction {
   _app: IApp;
-  value: any;
 
   start: () => Promise<void>;
   end: () => Promise<void>;
-  update: (newVariable: IVariable) => Promise<void>;
+  update: (newMidi: IMidiIn) => Promise<void>;
 }

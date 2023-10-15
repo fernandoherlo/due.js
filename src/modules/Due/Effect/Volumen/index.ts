@@ -9,9 +9,16 @@ export default class Volumen extends Effect implements IVolumen {
   create () {
     this._effect = new Tone.Volume();
     if (!Array.isArray(this.value)) {
-      this._effect.volume.value = parseFloat(this.value.value);
+      this._effect.volume.value = this._getValue(this.value.value);
     }
 
     super.create();
+  }
+
+  async update (value: any): Promise<void> {
+    if (this._canUpdate && this._effect) {
+      const volume = this._getValue(value);
+      this._effect.volume.value = volume;
+    }
   }
 }

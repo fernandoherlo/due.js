@@ -1,4 +1,5 @@
 import * as Tone from 'tone';
+import { WebMidi } from 'webmidi';
 import { IApp, ILooper, ICompiler, IEditor, IInstruction } from '~/src/vite-env';
 import { compareInstructions } from '~/src/modules/Compiler/Instruction/compare';
 
@@ -24,6 +25,8 @@ export default class Looper implements ILooper {
   }
 
   async start () {
+    await WebMidi.enable();
+
     this._editor.create();
 
     Tone.Transport.scheduleRepeat(async (time) => {
