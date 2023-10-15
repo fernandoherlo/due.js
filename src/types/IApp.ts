@@ -1,4 +1,4 @@
-import { IDebugger, IErrorHandler, ILogger, ILooper, IProxy, IStore } from '~/src/vite-env';
+import { IDebugger, IDue, IErrorHandler, ILogger, ILooper, IStore } from '~/src/vite-env';
 
 export interface IApp {
   $debug: boolean;
@@ -7,7 +7,7 @@ export interface IApp {
   $error: IErrorHandler
   $debugger: IDebugger;
   $looper: ILooper;
-  $proxy: IProxy | undefined;
+  $proxy: IDue | undefined;
   $valueFactory: any | undefined;
   $variables: any;
   $variablesLive: any;
