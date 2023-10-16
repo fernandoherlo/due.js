@@ -6,7 +6,7 @@ export { IParser } from '~/src/types/IParser';
 export { ILexer } from '~/src/types/ILexer';
 export { IInterpreter } from '~/src/types/IInterpreter';
 export { ICompiler } from '~/src/types/ICompiler';
-export { IDue } from '~/src/types/IDue';
+export { IMusic } from '~/src/types/IMusic';
 export { ILogger } from '~/src/types/ILogger';
 export { IStore } from '~/src/types/IStore';
 export { IDebugger } from '~/src/types/IDebugger';

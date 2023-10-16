@@ -1,13 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
-import Note from '~/src/modules/Due/Note';
-import NoteFactory from '~/src/modules/Due/Note/factory';
-import getter from '~/src/modules/Due/Variable/getter';
+import Note from '~/src/modules/Music/Note';
+import NoteFactory from '~/src/modules/Music/Note/factory';
+import getter from '~/src/modules/Music/Variable/getter';
 
-vi.mock('~/src/modules/Due/Note', () => {
+vi.mock('~/src/modules/Music/Note', () => {
   const Note = vi.fn();
   return { default: Note };
 });
-vi.mock('~/src/modules/Due/Variable/getter', () => {
+vi.mock('~/src/modules/Music/Variable/getter', () => {
   const getter = vi.fn();
   return { default: getter };
 });

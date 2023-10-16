@@ -1,7 +1,7 @@
 import { describe, afterEach, it, expect, vi } from 'vitest';
-import Due from '~/src/modules/Due';
+import Music from '~/src/modules/Music';
 
-vi.mock('~/src/modules/Due/constants', () => {
+vi.mock('~/src/modules/Music/constants', () => {
   const COMMANDS_ELEMENT_MAP = {
     foo: () => {
       return { start: vi.fn() };
@@ -21,79 +21,79 @@ const mockApp = {
   }
 };
 
-describe('Due', () => {
+describe('Music', () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
   it('Create new instance', () => {
     // Arrange
-    const due = new Due(mockApp);
+    const music = new Music(mockApp);
     // Activate
     // Assert
-    expect(due._debug).toBeTruthy();
-    expect(due._app).toEqual(mockApp);
+    expect(music._debug).toBeTruthy();
+    expect(music._app).toEqual(mockApp);
   });
 
   describe('Instructions', () => {
     it('Add', () => {
       // Arrange
-      const due = new Due(mockApp);
+      const music = new Music(mockApp);
       const instructions = [{ name: 'foo', key: 'bar' }];
       // Activate
-      due.add(instructions);
+      music.add(instructions);
       // Assert
-      expect(due._app.$debugger.add).toHaveBeenCalledWith('ADD', expect.anything());
+      expect(music._app.$debugger.add).toHaveBeenCalledWith('ADD', expect.anything());
     });
 
     it('Add empty', () => {
       // Arrange
-      const due = new Due(mockApp);
+      const music = new Music(mockApp);
       const instructions = [];
       // Activate
-      due.add(instructions);
+      music.add(instructions);
       // Assert
-      expect(due._app.$debugger.add).not.toHaveBeenCalled();
+      expect(music._app.$debugger.add).not.toHaveBeenCalled();
     });
 
     it('Update', () => {
       // Arrange
-      const due = new Due(mockApp);
+      const music = new Music(mockApp);
       const instructions = ['foo'];
       // Activate
-      due.update(instructions);
+      music.update(instructions);
       // Assert
-      expect(due._app.$debugger.add).toHaveBeenCalledWith('UPDATE', expect.anything());
+      expect(music._app.$debugger.add).toHaveBeenCalledWith('UPDATE', expect.anything());
     });
 
     it('Update empty', () => {
       // Arrange
-      const due = new Due(mockApp);
+      const music = new Music(mockApp);
       const instructions = [];
       // Activate
-      due.update(instructions);
+      music.update(instructions);
       // Assert
-      expect(due._app.$debugger.add).not.toHaveBeenCalled();
+      expect(music._app.$debugger.add).not.toHaveBeenCalled();
     });
 
     it('Delete', () => {
       // Arrange
-      const due = new Due(mockApp);
+      const music = new Music(mockApp);
       const instructions = ['foo'];
       // Activate
-      due.delete(instructions);
+      music.delete(instructions);
       // Assert
-      expect(due._app.$debugger.add).toHaveBeenCalledWith('DELETE', expect.anything());
+      expect(music._app.$debugger.add).toHaveBeenCalledWith('DELETE', expect.anything());
     });
 
     it('Delete empty', () => {
       // Arrange
-      const due = new Due(mockApp);
+      const music = new Music(mockApp);
       const instructions = [];
       // Activate
-      due.delete(instructions);
+      music.delete(instructions);
       // Assert
-      expect(due._app.$debugger.add).not.toHaveBeenCalled();
+      expect(music._app.$debugger.add).not.toHaveBeenCalled();
     });
   });
 });

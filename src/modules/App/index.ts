@@ -1,4 +1,4 @@
-import { IApp, ILogger, IStore, IErrorHandler, IDebugger, IDue, ICompiler, IEditor, IInstruction } from '~/src/vite-env';
+import { IApp, ILogger, IStore, IErrorHandler, IDebugger, IMusic, ICompiler, IEditor, IInstruction } from '~/src/vite-env';
 import Logger from './Logger';
 import Store from './Store';
 import ErrorHandler from './Error/handler';
@@ -18,7 +18,7 @@ export default class App implements IApp {
 
   $compiler: ICompiler | undefined;
   $editor: IEditor | undefined;
-  $proxy: IDue | undefined;
+  $music: IMusic | undefined;
 
   $valueFactory: any | undefined;
   $variables: any = {};
@@ -91,10 +91,10 @@ export default class App implements IApp {
         const updateInstructions: Array<IInstruction> = this._getUpdateInstructions(instructions);
         const oldInstructions: Array<IInstruction> = this._getOldInstructions(instructions);
 
-        if (this.$proxy) {
-          await this.$proxy.add(newInstructions);
-          await this.$proxy.update(updateInstructions);
-          await this.$proxy.delete(oldInstructions);
+        if (this.$music) {
+          await this.$music.add(newInstructions);
+          await this.$music.update(updateInstructions);
+          await this.$music.delete(oldInstructions);
         }
 
         this._lastInstructions = instructions;

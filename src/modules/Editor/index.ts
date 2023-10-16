@@ -13,7 +13,7 @@ export default class Editor implements IEditor {
   _idTimeoutValid: number | undefined;
   _monaco: monaco.editor.IStandaloneCodeEditor | null;
 
-  constructor (app: IApp, htmlId: string) {
+  constructor (app: IApp, htmlId: string = 'editor') {
     this._app = app;
     this._htmlId = htmlId;
     this._htmlIdProgressBar = `${this._htmlId}-progress-bar`;

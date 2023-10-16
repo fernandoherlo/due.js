@@ -1,9 +1,9 @@
 import { stringify } from 'flatted';
-import { IApp, IDue, IInstruction } from '~/src/vite-env';
+import { IApp, IMusic, IInstruction } from '~/src/vite-env';
 import { COMMANDS_ELEMENT_MAP, SAMPLER_MAP } from './constants';
-import NoteFactory from '~/src/modules/Due/Note/factory';
+import NoteFactory from '~/src/modules/Music/Note/factory';
 
-export default class Due implements IDue {
+export default class Music implements IMusic {
   _app: IApp;
   _debug: boolean;
   _instructions: any;

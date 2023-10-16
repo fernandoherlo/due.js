@@ -1,6 +1,6 @@
 import { IApp } from '~/src/vite-env';
 
-export interface IDue {
+export interface IMusic {
   _app: IApp;
   _debug: boolean;
   _instructions: any;
