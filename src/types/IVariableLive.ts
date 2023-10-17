@@ -1,10 +1,10 @@
 import { IApp, IInstruction } from '~/src/vite-env';
 
-export interface IMidiIn extends IInstruction {
+export interface IVariableLive extends IInstruction {
   _app: IApp;
-  _midi: any | null;
+  value: any;
 
   start: () => Promise<void>;
   end: () => Promise<void>;
-  update: (newMidi: IMidiIn) => Promise<void>;
+  update: (newVariable: IVariableLive) => Promise<void>;
 }

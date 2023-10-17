@@ -9,14 +9,16 @@ export { ICompiler } from '~/src/types/ICompiler';
 export { IMusic } from '~/src/types/IMusic';
 export { ILogger } from '~/src/types/ILogger';
 export { IStore } from '~/src/types/IStore';
-export { IDebugger } from '~/src/types/IDebugger';
 export { IErrorHandler } from '~/src/types/IErrorHandler';
+export { IDebugger } from '~/src/types/IDebugger';
+export { IUi } from '~/src/types/IUi';
 export { IApp } from '~/src/types/IApp';
 
 export { IInstruction } from '~/src/types/IInstruction';
 export { IInstrument } from '~/src/types/IInstrument';
 export { ISynth } from '~/src/types/ISynth';
 export { ISampler } from '~/src/types/ISampler';
+export { IMidiSampler } from '~/src/types/IMidiSampler';
 export { IMidiOut } from '~/src/types/IMidiOut';
 export { IMidiIn } from '~/src/types/IMidiIn';
 export { IMagenta } from '~/src/types/IMagenta';
@@ -27,7 +29,7 @@ export { IReverb } from '~/src/types/IReverb';
 export { IChorus } from '~/src/types/IChorus';
 export { IDelay } from '~/src/types/IDelay';
 
-export { IVariable } from '~/src/types/IVariable';
+export { IVariableLive } from '~/src/types/IVariableLive';
 
 declare global {
   interface Window { App: IApp; }
