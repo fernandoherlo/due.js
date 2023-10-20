@@ -1,7 +1,7 @@
 import { IApp, IVariableLive } from '~/src/vite-env';
-import Instruction from '~/src/packages/Compiler/Instruction';
-import { COMMANDS_ELEMENT_MAP } from '../constants';
-import { COMMANDS } from '../../Compiler/constants';
+import Instruction from '~/src/packages/Compiler/services/Instruction';
+import { COMMANDS } from '~/src/packages/Compiler/constants';
+import { COMMANDS_ELEMENT_MAP } from '../../constants';
 
 export default class VariableLive extends Instruction implements IVariableLive {
   _app: IApp;

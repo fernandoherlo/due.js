@@ -1,17 +1,17 @@
 import { IApp, IInstruction } from '~/src/vite-env';
-import { COMMANDS } from '../../Compiler/constants';
+import { COMMANDS } from '~/src/packages/Compiler/constants';
 
-import Synth from '../Instrument/Synth';
-import Sampler from '../Instrument/Sampler';
-import MidiSampler from '../Instrument/MidiSampler';
-import MidiOut from '../Instrument/MidiOut';
-import Magenta from '../Instrument/Magenta';
-import Volumen from '../Effect/Volumen';
-import Reverb from '../Effect/Reverb';
-import Chorus from '../Effect/Chorus';
-import Delay from '../Effect/Delay';
-import VariableLive from '../VariableLive';
-import MidiIn from '../MidiIn';
+import Synth from '../services/Instrument/Synth';
+import Sampler from '../services/Instrument/Sampler';
+import MidiSampler from '../services/Instrument/MidiSampler';
+import MidiOut from '../services/Instrument/MidiOut';
+import Magenta from '../services/Instrument/Magenta';
+import Volumen from '../services/Effect/Volumen';
+import Reverb from '../services/Effect/Reverb';
+import Chorus from '../services/Effect/Chorus';
+import Delay from '../services/Effect/Delay';
+import VariableLive from '../services/VariableLive';
+import MidiIn from '../services/MidiIn';
 
 export const COMMANDS_ELEMENT_MAP: any = {
   [COMMANDS.n]: (instruction: IInstruction, app: IApp) => new Synth(instruction, app),

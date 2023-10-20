@@ -2,8 +2,8 @@ import * as Tone from 'tone';
 import { WebMidi } from 'webmidi';
 
 import { IApp, IMusic, IInstruction } from '~/src/vite-env';
-import { COMMANDS_ELEMENT_MAP, SAMPLER_MAP } from './constants';
-import ValueFactory from '~/src/packages/Music/valueFactory';
+import ValueFactory from '~/src/packages/Music/services/Music/valueFactory';
+import { COMMANDS_ELEMENT_MAP, SAMPLER_MAP } from '../../constants';
 
 export default class Music implements IMusic {
   _app: IApp;

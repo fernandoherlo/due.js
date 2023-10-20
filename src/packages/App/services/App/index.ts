@@ -1,9 +1,9 @@
 import { IApp, ILogger, IStore, IErrorHandler, IDebugger, IMusic, ICompiler, IEditor, IUi, IValueFactory } from '~/src/vite-env';
-import Logger from './Logger';
-import Store from './Store';
-import ErrorHandler from './Error/handler';
-import Debugger from './Debugger';
-import Ui from './Ui';
+import Logger from '../Logger';
+import Store from '../Store';
+import ErrorHandler from '../Error/handler';
+import Debugger from '../Debugger';
+import Ui from '../Ui';
 
 export default class App implements IApp {
   $debug: boolean;

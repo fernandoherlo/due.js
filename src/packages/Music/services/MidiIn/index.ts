@@ -1,6 +1,6 @@
 import { WebMidi } from 'webmidi';
 import { IApp, IMidiIn } from '~/src/vite-env';
-import Instruction from '../../Compiler/Instruction';
+import Instruction from '~/src/packages/Compiler/services/Instruction';
 
 export default class MidiIn extends Instruction implements IMidiIn {
   _app: IApp;

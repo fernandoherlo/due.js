@@ -1,9 +1,9 @@
 import '~/src/assets/app.scss';
 
-import App from '~/src/packages/App';
-import Music from '~/src/packages/Music';
-import CompilerFactory from '~/src/packages/Compiler/factory';
-import Editor from '~/src/packages/Editor/';
+import App from '~/src/packages/App/services/App';
+import Music from '~/src/packages/Music/services/Music';
+import CompilerFactory from '~/src/packages/Compiler/services/Compiler/factory';
+import Editor from '~/src/packages/Editor/services/Editor';
 
 // TODO: dependency injector https://github.com/typestack/typedi
 

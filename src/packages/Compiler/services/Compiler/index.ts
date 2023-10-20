@@ -1,5 +1,5 @@
 import { IApp, ILexer, IInterpreter, ICompiler, IInstruction } from '~/src/vite-env';
-import { compareInstructions } from './Instruction/compare';
+import { compareInstructions } from '../Instruction/compare';
 
 export default class Compiler implements ICompiler {
   _app: IApp;

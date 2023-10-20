@@ -1,6 +1,6 @@
 import { IApp, IParser, ILexer, IInstruction } from '~/src/vite-env';
 import Instruction from '../Instruction';
-import { COMMANDS_MAP } from '../constants';
+import { COMMANDS_MAP } from '../../constants';
 
 export default class Lexer implements ILexer {
   _app: IApp;

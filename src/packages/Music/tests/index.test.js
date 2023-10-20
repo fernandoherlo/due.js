@@ -1,5 +1,5 @@
 import { describe, afterEach, it, expect, vi } from 'vitest';
-import Music from '~/src/packages/Music';
+import Music from '~/src/packages/Music/services/Music';
 
 vi.mock('~/src/packages/Music/constants', () => {
   const COMMANDS_ELEMENT_MAP = {

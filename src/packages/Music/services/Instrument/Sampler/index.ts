@@ -1,9 +1,9 @@
 import * as Tone from 'tone';
 import { IInstrument, ISampler } from '~/src/vite-env';
-import { compareInstructions } from '~/src/packages/Compiler/Instruction/compare';
-import samples from '../../samples.json';
+import { compareInstructions } from '~/src/packages/Compiler/services/Instruction/compare';
+import samples from '../../../constants/samples.json';
 import Instrument from '..';
-import { SAMPLER_MAP } from '../../constants';
+import { SAMPLER_MAP } from '../../../constants';
 
 export default class Sampler extends Instrument implements ISampler {
   _instrument: Tone.Sampler | null = null;

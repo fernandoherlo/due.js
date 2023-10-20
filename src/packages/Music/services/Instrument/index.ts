@@ -1,9 +1,9 @@
 import * as Tone from 'tone';
 import { IApp, IInstruction, IInstrument, INote } from '~/src/vite-env';
-import Instruction from '~/src/packages/Compiler/Instruction';
-import { COMMANDS_ELEMENT_MAP } from '../constants';
+import Instruction from '~/src/packages/Compiler/services/Instruction';
+import { TYPE_VALUE } from '~/src/packages/Compiler/constants';
 import TriggerAttack from './triggerAttack';
-import { TYPE_VALUE } from '../../Compiler/constants';
+import { COMMANDS_ELEMENT_MAP } from '../../constants';
 
 export default class Instrument extends Instruction implements IInstrument {
   _app: IApp;

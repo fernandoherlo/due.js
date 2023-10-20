@@ -1,6 +1,6 @@
 import { IEffect } from '~/src/vite-env';
 import Instrument from '../Instrument';
-import { COMMANDS } from '../../Compiler/constants';
+import { COMMANDS } from '~/src/packages/Compiler/constants';
 
 export default class Effect extends Instrument implements IEffect {
   _effect: any | null = null;

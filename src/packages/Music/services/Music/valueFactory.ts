@@ -1,6 +1,6 @@
 import { INote, IValueFactory } from '~/src/vite-env';
-import Note from './Note';
-import getter from './Variable/getter';
+import Note from '../Note';
+import getter from '../Variable/getter';
 
 export default class ValueFactory implements IValueFactory {
   create (data: any, defaults: boolean): INote {
