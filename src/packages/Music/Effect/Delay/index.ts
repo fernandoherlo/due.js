@@ -5,6 +5,8 @@ import Effect from '..';
 export default class Delay extends Effect implements IDelay {
   _effect: Tone.FeedbackDelay | null = null;
   _canUpdate: boolean = true;
+  _min: number = 0;
+  _max: number = 3;
 
   create () {
     this._effect = new Tone.FeedbackDelay();

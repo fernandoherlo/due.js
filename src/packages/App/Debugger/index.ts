@@ -1,3 +1,4 @@
+import { stringify } from 'flatted';
 import { IDebugger, IApp } from '~/src/vite-env';
 
 export default class Debugger implements IDebugger {
@@ -16,14 +17,14 @@ export default class Debugger implements IDebugger {
     }
   }
 
-  add (title: string, string: string) {
-    if (!title || !string) {
+  add (title: string, text: any) {
+    if (!title || !text) {
       return;
     }
 
     if (this._debug) {
       const debuggerElement: HTMLDivElement | null = document.getElementById(this._htmlId) as HTMLDivElement;
-      debuggerElement.innerHTML = `${this._getDate()} | ${title} | ${string}<br><br>---<br><br>` + debuggerElement.innerHTML;
+      debuggerElement.innerHTML = `${this._getDate()} | ${title} | ${stringify(text, null, 2)}<br><br>---<br><br>` + debuggerElement.innerHTML;
     }
   }
 

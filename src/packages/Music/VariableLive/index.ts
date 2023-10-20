@@ -20,8 +20,10 @@ export default class VariableLive extends Instruction implements IVariableLive {
   }
 
   async end (): Promise<void> {
-    await this._app.$variablesLive[this.key].end();
-    delete this._app.$variablesLive[this.key];
+    if (this._app.$variablesLive[this.key]) {
+      await this._app.$variablesLive[this.key].end();
+      delete this._app.$variablesLive[this.key];
+    }
   }
 
   async update (newVariable: IVariableLive) {
@@ -29,6 +31,7 @@ export default class VariableLive extends Instruction implements IVariableLive {
     this.typeValue = newVariable.typeValue;
     this.modifier = newVariable.modifier;
 
-    this._app.$variablesLive[this.key] = COMMANDS_ELEMENT_MAP[newVariable.value.name](this, this._app);
+    await this.end();
+    await this.start();
   }
 }

@@ -4,12 +4,10 @@ export interface IMusic {
   _app: IApp;
   _debug: boolean;
   _instructions: any;
-  _lastInstructions: any;
 
   start: () => Promise<void>;
   toggle: () => Promise<void>;
-  process: (instructions: Array<any>) => Promise<void>;
-  _add: (instructions: Array<any>) => Promise<void>;
-  _update: (instructions: Array<any>) => void;
-  _delete: (instructions: Array<any>) => Promise<void>;
+  add: (instructions: Array<any>) => Promise<void>;
+  update: (instructions: Array<any>) => void;
+  delete: (instructions: Array<any>) => Promise<void>;
 }

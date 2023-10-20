@@ -1,4 +1,4 @@
-import { IApp, ILogger, IStore, IErrorHandler, IDebugger, IMusic, ICompiler, IEditor, IUi } from '~/src/vite-env';
+import { IApp, ILogger, IStore, IErrorHandler, IDebugger, IMusic, ICompiler, IEditor, IUi, IValueFactory } from '~/src/vite-env';
 import Logger from './Logger';
 import Store from './Store';
 import ErrorHandler from './Error/handler';
@@ -17,7 +17,8 @@ export default class App implements IApp {
   $editor: IEditor | undefined;
   $music: IMusic | undefined;
 
-  $valueFactory: any | undefined;
+  $valueFactory: IValueFactory | undefined;
+
   $variables: any = {};
   $variablesLive: any = {};
   $variablesLiveMap: any = {};
@@ -34,7 +35,7 @@ export default class App implements IApp {
 
   async start () {
     if (!this.$editor || !this.$music) {
-      throw Error('Not service set.');
+      throw Error('No services set.');
     }
 
     this.$editor.create();
@@ -44,7 +45,7 @@ export default class App implements IApp {
 
   async compile () {
     if (!this.$compiler || !this.$editor || !this.$music) {
-      throw Error('Not service set.');
+      throw Error('No services set.');
     }
 
     try {
@@ -52,12 +53,15 @@ export default class App implements IApp {
       const editorCode = this.$editor.getCode();
 
       if (editorCode) {
-        localStorage.setItem('due#editor', editorCode || '');
-        const instructions = this.$compiler.exec(editorCode);
+        const [, addedInstructions, updatedInstructions, deletedInstructions] = this.$compiler.exec(editorCode);
 
-        await this.$music.process(instructions);
+        await this.$music.add(addedInstructions);
+        await this.$music.update(updatedInstructions);
+        await this.$music.delete(deletedInstructions);
 
         this.$ui.setOk();
+
+        localStorage.setItem('due#editor', editorCode || '');
       }
     } catch (e: any) {
       this.$ui.setError();

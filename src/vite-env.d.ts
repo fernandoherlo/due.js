@@ -28,6 +28,7 @@ export { IVolumen } from '~/src/types/IVolumen';
 export { IReverb } from '~/src/types/IReverb';
 export { IChorus } from '~/src/types/IChorus';
 export { IDelay } from '~/src/types/IDelay';
+export { IValueFactory } from '~/src/types/IValueFactory';
 
 export { IVariableLive } from '~/src/types/IVariableLive';
 

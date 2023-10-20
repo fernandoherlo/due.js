@@ -5,5 +5,5 @@ export interface IDebugger {
   _debug: boolean;
   _htmlId: string;
 
-  add: (title: string, string: string) => void;
+  add: (title: string, text: any) => void;
 }

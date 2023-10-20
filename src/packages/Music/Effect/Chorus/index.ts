@@ -5,6 +5,8 @@ import Effect from '..';
 export default class Reverb extends Effect implements IChorus {
   _effect: Tone.Chorus | null = null;
   _canUpdate: boolean = true;
+  _min: number = 0;
+  _max: number = 30;
 
   create () {
     this._effect = new Tone.Chorus();

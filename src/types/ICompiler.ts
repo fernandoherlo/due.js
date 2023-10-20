@@ -5,5 +5,7 @@ export interface ICompiler {
   _lexer: ILexer;
   _interpreter: IInterpreter;
 
+  _lastInstructions: any;
+
   exec: (code: string) => any;
 }

@@ -53,7 +53,7 @@ export default class Parser implements IParser {
 
     if (command.startsWith(COMMANDS.$) && command.includes('=')) {
       const [variable, variableValue] = command.split('=');
-      this._app.$variables[variable] = this._app?.$valueFactory.adapt(variableValue, this._app.$variables);
+      this._app.$variables[variable] = this._app.$valueFactory && this._app.$valueFactory.adapt(variableValue, this._app.$variables);
 
       return;
     }
@@ -67,7 +67,7 @@ export default class Parser implements IParser {
     const [commandId, modifier] = commandIdRaw.split('#');
 
     const { name, element } = this._commandId(commandId);
-    const newValueRaw = this._app?.$valueFactory.adapt(valueRaw, this._app.$variables);
+    const newValueRaw = this._app.$valueFactory && this._app.$valueFactory.adapt(valueRaw, this._app.$variables);
     const [value, typeValue] = this._valueRaw(newValueRaw, !!element);
 
     return {
@@ -125,7 +125,7 @@ export default class Parser implements IParser {
     const value2Parse = this._calculateValue(value2);
     const value3Parse = this._calculateValue(value3);
 
-    return this._app?.$valueFactory.create({ value, value2: value2Parse, value3: value3Parse }, defaults);
+    return this._app.$valueFactory && this._app.$valueFactory.create({ value, value2: value2Parse, value3: value3Parse }, defaults);
   }
 
   _calculateValue (valueRaw: string | undefined): number | Array<number> | any | undefined {

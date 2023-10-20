@@ -5,6 +5,8 @@ import Effect from '..';
 export default class Volumen extends Effect implements IVolumen {
   _effect: Tone.Volume | null = null;
   _canUpdate: boolean = true;
+  _min: number = -30;
+  _max: number = 30;
 
   create () {
     this._effect = new Tone.Volume();

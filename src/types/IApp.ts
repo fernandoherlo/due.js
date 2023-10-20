@@ -1,4 +1,4 @@
-import { ICompiler, IDebugger, IMusic, IEditor, IErrorHandler, ILogger, IStore, IUi } from '~/src/vite-env';
+import { ICompiler, IDebugger, IMusic, IEditor, IErrorHandler, ILogger, IStore, IUi, IValueFactory } from '~/src/vite-env';
 
 export interface IApp {
   $debug: boolean;
@@ -12,7 +12,8 @@ export interface IApp {
   $editor: IEditor | undefined;
   $music: IMusic | undefined;
 
-  $valueFactory: any | undefined;
+  $valueFactory: IValueFactory | undefined;
+
   $variables: any;
   $variablesLive: any;
   $variablesLiveMap: any;

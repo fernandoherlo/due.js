@@ -15,20 +15,25 @@ export default class MidiIn extends Instruction implements IMidiIn {
   async start (): Promise<void> {
     WebMidi.inputs.forEach(input => this._app.$logger.log(input.name));
 
-    const varElement: any = this.value;
-    const input = WebMidi.inputs[parseInt(varElement.element)];
-    this._midi = input.channels[1];
+    const [channel, note] = this.value.split('@');
 
-    // this._midi.addListener('midimessage', (e: any) => {
-    //   // TODO: test with arturia minilab 3
-    //   console.log(e);
-    //   this.value = e.note.identifier;
-    //   this._app.$variablesLiveMap[this.key] && this._app.$variablesLiveMap[this.key].update(e.note.attack);
-    // });
+    const input = WebMidi.inputs[parseInt(this.element)];
+    this._midi = input.channels[parseInt(channel)];
+
+    this._midi.addListener('midimessage', (e: any) => {
+      this._app.$debugger.add('MIDI', (e.data || e.note));
+
+      if (note && e.data[0] === 176 && e.data[1] !== parseInt(note)) {
+        return;
+      }
+      if (this._app.$variablesLiveMap[this.key]) {
+        this._app.$variablesLiveMap[this.key].update(e.data[2]);
+      }
+    });
   }
 
   async end (): Promise<void> {
-    // this._midi.removeListener('midimessage');
+    this._midi.removeListener('midimessage');
   }
 
   async update (/* newMidi: IMidiIn */): Promise<void> {

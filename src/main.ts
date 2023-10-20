@@ -1,6 +1,6 @@
 import '~/src/assets/app.scss';
 
-import App from '~/src/duejs';
+import App from '~/src/packages/App';
 import Music from '~/src/packages/Music';
 import CompilerFactory from '~/src/packages/Compiler/factory';
 import Editor from '~/src/packages/Editor/';

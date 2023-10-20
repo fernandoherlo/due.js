@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import Note from '~/src/packages/Music/Note';
-import NoteFactory from '~/src/packages/Music/Note/factory';
+import NoteFactory from '~/src/packages/Music/valueFactory';
 import getter from '~/src/packages/Music/Variable/getter';
 
 vi.mock('~/src/packages/Music/Note', () => {

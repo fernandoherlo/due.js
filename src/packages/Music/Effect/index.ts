@@ -5,6 +5,8 @@ import { COMMANDS } from '../../Compiler/constants';
 export default class Effect extends Instrument implements IEffect {
   _effect: any | null = null;
   _canUpdate: boolean = true;
+  _min: number = 0;
+  _max: number = 0;
 
   create () {
     if (this._effect) {
@@ -37,6 +39,20 @@ export default class Effect extends Instrument implements IEffect {
       return 0; // default, set on live midi in
     }
 
-    return parseFloat(value);
+    return this._mapValue(value);
+  }
+
+  _mapValue (value: number) {
+    const { min: fromMin, max: fromMax } = { min: 0, max: 127 };
+    const { min: toMin, max: toMax } = { min: this._min, max: this._max };
+    // Determine how wide the ranges are
+    const fromSize = fromMax - fromMin;
+    const toSize = toMax - toMin;
+    // Get the percentage of the original range `value` represents, ignoring the minimum value
+    const fromPercent = (value - fromMin) / fromSize;
+    // Get the corresponding percentage of the new range, plus its minimum value
+    const result = (fromPercent * toSize) + toMin;
+
+    return result;
   }
 }
