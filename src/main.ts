@@ -5,6 +5,8 @@ import Music from '~/src/packages/Music';
 import CompilerFactory from '~/src/packages/Compiler/factory';
 import Editor from '~/src/packages/Editor/';
 
+// TODO: dependency injector https://github.com/typestack/typedi
+
 const app = new App();
 
 const compiler = CompilerFactory(app);

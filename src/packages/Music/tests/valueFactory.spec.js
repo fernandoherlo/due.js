@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import Note from '~/src/packages/Music/Note';
-import NoteFactory from '~/src/packages/Music/valueFactory';
+import ValueFactory from '~/src/packages/Music/valueFactory';
 import getter from '~/src/packages/Music/Variable/getter';
 
 vi.mock('~/src/packages/Music/Note', () => {
@@ -12,12 +12,13 @@ vi.mock('~/src/packages/Music/Variable/getter', () => {
   return { default: getter };
 });
 
-describe('NoteFactory', () => {
+describe('ValueFactory', () => {
   it('Create should return new instance', () => {
     // Arrange
     const data = { foo: 'bar' };
+    const valueFactory = new ValueFactory();
     // Activate
-    const note = NoteFactory.create(data);
+    const note = valueFactory.create(data);
     // Assert
     expect(note).toBeInstanceOf(Note);
   });
@@ -25,8 +26,9 @@ describe('NoteFactory', () => {
     // Arrange
     const value = 'foo';
     const variables = { foo: 'bar' };
+    const valueFactory = new ValueFactory();
     // Activate
-    NoteFactory.adapt(value, variables);
+    valueFactory.adapt(value, variables);
     // Assert
     expect(getter).toHaveBeenCalledWith(value, variables);
   });

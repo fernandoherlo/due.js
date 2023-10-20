@@ -4,7 +4,7 @@ import Music from '~/src/packages/Music';
 vi.mock('~/src/packages/Music/constants', () => {
   const COMMANDS_ELEMENT_MAP = {
     foo: () => {
-      return { start: vi.fn() };
+      return { start: vi.fn(), update: vi.fn(), end: vi.fn() };
     }
   };
   const SAMPLER_MAP = vi.fn();
@@ -39,12 +39,12 @@ describe('Music', () => {
     it('Add', async () => {
       // Arrange
       const music = new Music(mockApp);
-      music._lastInstructions = {};
-      const instructions = { foo: { name: 'foo', key: 'bar' } };
+      const instructions = [{ name: 'foo', key: 'bar' }];
       // Activate
-      await music.process(instructions);
+      await music.add(instructions);
       // Assert
-      expect(music._app.$debugger.add).toHaveBeenCalledWith('ADD', expect.anything());
+      expect(mockApp.$debugger.add).toHaveBeenCalledWith('ADD', expect.anything());
+      expect(music._instructions).toHaveProperty('bar');
     });
 
     it('Add empty', async () => {
@@ -52,43 +52,42 @@ describe('Music', () => {
       const music = new Music(mockApp);
       const instructions = [];
       // Activate
-      await music.process(instructions);
+      await music.add(instructions);
       // Assert
-      expect(music._app.$debugger.add).not.toHaveBeenCalled();
+      expect(mockApp.$debugger.add).not.toHaveBeenCalled();
     });
 
     it('Update', async () => {
       // Arrange
       const music = new Music(mockApp);
-      music._lastInstructions = { foo: { name: 'foo', key: 'bar' } };
-      const instructions = { foo: { name: 'ter', key: 'tor' } };
+      const instructions = [{ name: 'foo', key: 'bar' }];
+      await music.add(instructions);
       // Activate
-      console.log(music._lastInstructions);
-      await music.process(instructions);
-      console.log(music._lastInstructions);
+      await music.update(instructions);
       // Assert
-      expect(music._app.$debugger.add).toHaveBeenCalledWith('UPDATE', expect.anything());
+      expect(mockApp.$debugger.add).toHaveBeenCalledWith('UPDATE', expect.anything());
+      expect(music._instructions.bar.update).toHaveBeenCalled();
     });
 
     it('Update empty', async () => {
       // Arrange
       const music = new Music(mockApp);
-      const instructions = [];
       // Activate
-      await music.process(instructions);
+      await music.update([]);
       // Assert
-      expect(music._app.$debugger.add).not.toHaveBeenCalled();
+      expect(mockApp.$debugger.add).not.toHaveBeenCalled();
     });
 
     it('Delete', async () => {
       // Arrange
       const music = new Music(mockApp);
-      music._lastInstructions = { foo: { name: 'foo', key: 'bar' } };
-      const instructions = {};
+      const instructions = [{ name: 'foo', key: 'bar' }];
+      await music.add(instructions);
       // Activate
-      await music.process(instructions);
+      await music.delete(instructions);
       // Assert
-      expect(music._app.$debugger.add).toHaveBeenCalledWith('DELETE', expect.anything());
+      expect(mockApp.$debugger.add).toHaveBeenCalledWith('DELETE', expect.anything());
+      expect(music._instructions).not.toHaveProperty('bar');
     });
 
     it('Delete empty', async () => {
@@ -96,9 +95,9 @@ describe('Music', () => {
       const music = new Music(mockApp);
       const instructions = [];
       // Activate
-      await music.process(instructions);
+      await music.delete(instructions);
       // Assert
-      expect(music._app.$debugger.add).not.toHaveBeenCalled();
+      expect(mockApp.$debugger.add).not.toHaveBeenCalled();
     });
   });
 });
