@@ -1,8 +1,8 @@
-import { languages } from 'monaco-editor';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
 import { COMMANDS } from '~/src/packages/Compiler/constants';
 
-type IRichLanguageConfiguration = languages.LanguageConfiguration;
-type ILanguage = languages.IMonarchLanguage;
+type IRichLanguageConfiguration = monaco.languages.LanguageConfiguration;
+type ILanguage = monaco.languages.IMonarchLanguage;
 
 export const richLanguageConfiguration: IRichLanguageConfiguration = {
   comments: {
@@ -67,6 +67,6 @@ export const monarchLanguage = <ILanguage>{
 
 export const languageID = 'due#';
 
-export const languageExtensionPoint: languages.ILanguageExtensionPoint = {
+export const languageExtensionPoint: monaco.languages.ILanguageExtensionPoint = {
   id: languageID
 };
