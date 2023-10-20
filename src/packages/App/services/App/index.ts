@@ -4,6 +4,7 @@ import Store from '../Store';
 import ErrorHandler from '../Error/handler';
 import Debugger from '../Debugger';
 import Ui from '../Ui';
+import { LOCAL_STORAGE_KEY_CODE } from '../../constants';
 
 export default class App implements IApp {
   $debug: boolean;
@@ -61,11 +62,19 @@ export default class App implements IApp {
 
         this.$ui.setOk();
 
-        localStorage.setItem('due#editor', editorCode || '');
+        this.saveInLocalStorage(LOCAL_STORAGE_KEY_CODE, editorCode);
       }
     } catch (e: any) {
       this.$ui.setError();
       throw Error(`Error in proxy composer. ${e.message}`);
     }
+  }
+
+  saveInLocalStorage (key: string, value: any) {
+    localStorage.setItem(key, value || '');
+  }
+
+  getFromLocalStorage (key: string): any {
+    return localStorage.getItem(key);
   }
 }

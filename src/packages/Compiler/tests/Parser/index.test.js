@@ -1,5 +1,5 @@
 import { describe, afterEach, it, expect, vi, beforeEach } from 'vitest';
-import Parser from '~/src/packages/Compiler/Parser';
+import Parser from '~/src/packages/Compiler/services/Parser';
 
 const mockApp = {
   $valueFactory: {

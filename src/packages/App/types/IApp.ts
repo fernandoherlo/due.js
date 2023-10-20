@@ -20,4 +20,7 @@ export interface IApp {
 
   start: () => void;
   compile: () => void;
+
+  saveInLocalStorage: (key: string, value: any) => void;
+  getFromLocalStorage: (key: string) => any;
 }

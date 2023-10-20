@@ -1,9 +1,9 @@
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
 
-import { IApp } from '~/src/vite-env';
-import { richLanguageConfiguration, monarchLanguage, languageID, languageExtensionPoint } from './language';
-import { IEditor } from '../../types/IEditor';
-import { themeDue } from './theme';
+import { IApp, IEditor } from '~/src/vite-env';
+import { LOCAL_STORAGE_KEY_CODE } from '~/src/packages/App/constants';
+import { richLanguageConfiguration, monarchLanguage, languageID, languageExtensionPoint } from '../../constants/language';
+import { themeDue } from '../../constants/theme';
 
 export default class Editor implements IEditor {
   _app: IApp;
@@ -22,7 +22,7 @@ export default class Editor implements IEditor {
     });
 
     this._monaco = monaco.editor.create(document.body, {
-      value: localStorage.getItem('due#editor') || undefined,
+      value: this._app.getFromLocalStorage(LOCAL_STORAGE_KEY_CODE) || undefined,
       language: 'due#',
       fontFamily: 'Fira Code',
       fontSize: 26,
