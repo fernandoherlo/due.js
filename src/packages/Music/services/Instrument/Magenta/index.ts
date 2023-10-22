@@ -1,4 +1,3 @@
-import * as mm from '@magenta/music/es6';
 import { IInstrument, IMagenta } from '~/src/vite-env';
 import { TYPE_VALUE } from '~/src/packages/Compiler/constants';
 import Note from '../../Note';
@@ -37,6 +36,7 @@ export default class Magenta extends Sampler implements IMagenta {
       }
     };
 
+    const { default: mm } = await import('@magenta/music/es6');
     const model = new mm.MusicVAE('https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_2bar_small', VAEspec);
     // 'https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/trio_4bar'
 
