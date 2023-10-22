@@ -24,13 +24,13 @@ export default class App implements IApp {
   $variablesLive: any = {};
   $variablesLiveMap: any = {};
 
-  constructor (debug: boolean = true, debuggerHtmlId: string = 'debugger') {
+  constructor (debug: boolean = true) {
     this.$debug = debug;
 
     this.$logger = new Logger(this);
     this.$store = new Store(this);
     this.$error = new ErrorHandler(this);
-    this.$debugger = new Debugger(this, debuggerHtmlId);
+    this.$debugger = new Debugger(this);
     this.$ui = new Ui(this);
   }
 

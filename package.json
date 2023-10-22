@@ -25,14 +25,16 @@
     "shelljs": "^0.8.5",
     "typescript": "^5.0.2",
     "vite": "^4.4.5",
-    "vite-plugin-monaco-editor": "^1.1.0",
     "vite-plugin-pwa": "^0.16.5",
     "vitest": "^0.34.5"
   },
   "dependencies": {
+    "@codemirror/language": "^6.9.1",
+    "@codemirror/state": "^6.3.1",
+    "@codemirror/theme-one-dark": "^6.1.2",
+    "@codemirror/view": "^6.21.3",
     "@magenta/music": "^1.23.1",
     "flatted": "^3.2.9",
-    "monaco-editor": "^0.43.0",
     "tone": "^14.7.77",
     "webmidi": "^3.1.6"
   }

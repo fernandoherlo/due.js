@@ -1,53 +1,50 @@
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
+import { EditorState } from '@codemirror/state';
+import { EditorView } from '@codemirror/view';
+import { defaultHighlightStyle, syntaxHighlighting } from '@codemirror/language';
+import { oneDark } from '@codemirror/theme-one-dark';
 
 import { IApp, IEditor } from '~/src/vite-env';
 import { LOCAL_STORAGE_KEY_CODE } from '~/src/packages/App/constants';
-import { richLanguageConfiguration, monarchLanguage, languageID, languageExtensionPoint } from '../../constants/language';
-import { themeDue } from '../../constants/theme';
 
 export default class Editor implements IEditor {
   _app: IApp;
-  _monaco: monaco.editor.IStandaloneCodeEditor | null;
+  _editor: any | null;
 
   constructor (app: IApp) {
     this._app = app;
-    this._monaco = null;
+    this._editor = null;
   }
 
   create () {
-    monaco.languages.register(languageExtensionPoint);
-    monaco.languages.onLanguage(languageID, () => {
-      monaco.languages.setMonarchTokensProvider(languageID, monarchLanguage);
-      monaco.languages.setLanguageConfiguration(languageID, richLanguageConfiguration);
-    });
+    const code = this._app.getFromLocalStorage(LOCAL_STORAGE_KEY_CODE) || undefined;
 
-    this._monaco = monaco.editor.create(document.body, {
-      value: this._app.getFromLocalStorage(LOCAL_STORAGE_KEY_CODE) || undefined,
-      language: 'due#',
-      fontFamily: 'Fira Code',
-      fontSize: 26,
-      minimap: { enabled: false },
-      automaticLayout: true
-    });
-    this._monaco.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, this._app.compile.bind(this._app));
-    if (this._app.$music) {
-      this._monaco.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyD, this._app.$music.toggle.bind(this._app.$music));
-    }
-
-    monaco.editor.defineTheme('due', themeDue);
-    monaco.editor.setTheme('due');
-
-    const container = window || {};
-    container.onresize = () => {
-      if (this._monaco) {
-        this._monaco.layout();
+    const theme = EditorView.theme({
+      '.cm-content': {
+        fontSize: '20pt',
+        fontFamily: 'Fira Code',
+        color: '#edecee',
+        background: '#15141b'
       }
-    };
+    });
+
+    const startState = EditorState.create({
+      doc: code,
+      extensions: [
+        oneDark,
+        theme,
+        syntaxHighlighting(defaultHighlightStyle)
+      ]
+    });
+
+    this._editor = new EditorView({
+      state: startState
+    });
+
+    const editorViewElement: HTMLDivElement | null = document.getElementById('editor-view') as HTMLDivElement;
+    editorViewElement.append(this._editor.dom);
   }
 
   getCode (): string | undefined {
-    if (this._monaco) {
-      return this._monaco.getValue();
-    }
+    return this._editor.state.doc.toString();
   }
 }

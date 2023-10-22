@@ -1,10 +1,10 @@
+import { splitVendorChunkPlugin } from 'vite';
 import { fileURLToPath } from 'url';
 import { VitePWA } from 'vite-plugin-pwa';
-import monacoEditorPlugin, { type IMonacoEditorOpts } from 'vite-plugin-monaco-editor';
-const monacoEditorPluginDefault = ((monacoEditorPlugin as any).default) as (options: IMonacoEditorOpts) => any;
 
 export default {
   plugins: [
+    splitVendorChunkPlugin(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
@@ -26,11 +26,20 @@ export default {
           }
         ]
       }
-    }),
-    monacoEditorPluginDefault({
-      languageWorkers: ['editorWorkerService']
     })
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks (id: string) {
+          // creating a chunk to @magenta
+          if (id.includes('@magenta')) {
+            return '@magenta';
+          }
+        }
+      }
+    }
+  },
   test: {
     coverage: {
       provider: 'istanbul',

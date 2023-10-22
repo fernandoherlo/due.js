@@ -8,6 +8,7 @@ $orange: #ffca85;
 $pink: #f694ff;
 $blue: #82e2ff;
 $red: 	#ff6767;
+
 $topbar_height: 40px;
 
 :root {
@@ -34,22 +35,21 @@ body {
   min-height: 100vh;
 }
 
-.progress-bar {
+.wrapper-progress-bar {
   position: fixed;
   top: 0;
-  bottom: 0;
+  bottom: auto;
   right: 0;
   left: 0;
   background-color: $purple-fading;
   width: 100%;
-  height: 10px;
-  top: 30px;
-  bottom: auto;
+  height: $topbar_height;
+  z-index: 1;
 
-  #editor-progress-bar {
+  #progress-bar {
     background-color: $purple;
     width: 0%;
-    height: 10px;
+    height: $topbar_height;
 
     &.error {
       background-color: $red;
@@ -63,7 +63,7 @@ body {
   }
 }
 
-.monaco-editor {
+#editor-view {
   position: absolute !important;
   width: 100% !important;
   height: 80% !important;
@@ -77,7 +77,7 @@ body {
   bottom: 0;
   right: 0;
   left: 0;
-  color: $gray;
+  color: $purple;
   top: calc(80% + $topbar_height);
   height: calc(20% - ($topbar_height + ($topbar_height /2)) - 1px);
   bottom: 0;
@@ -86,30 +86,45 @@ body {
   font-size: 12px;
   overflow-y: scroll;
   border-top: 1px dashed $purple-fading;
+  background-color: $purple-fading;
+  display: none;
+  &.show {
+    display: block;
+  }
 }
 
 #toggle,
-#save {
-  background-color: $purple;
+#save,
+#menu,
+#debug {
+  position: fixed;
+  top: 0;
+  z-index: 100;
+  height: $topbar_height;
+  background-color: $purple-fading;
   color: antiquewhite;
-  padding: 7px 18px;
+  padding: 3px 18px;
   font-weight: 600;
   font-size: 14px;
   border: 0;
   cursor: pointer;
   &:hover {
-    background-color: $purple-fading; 
+    background-color: $purple; 
   }
 }
 
 #toggle {
-  position: fixed;
-  top: 0;
   left: 0;
 }
 
 #save {
-  position: fixed;
-  top: 0;
-  left: 100px;
+  left: 60px;
+}
+
+#debug {
+  right: 60px;
+}
+
+#menu {
+  right: 0;
 }

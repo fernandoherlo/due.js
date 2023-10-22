@@ -2,17 +2,15 @@ import { IApp, IUi } from '~/src/vite-env';
 
 export default class Ui implements IUi {
   _app: IApp;
-  _htmlId: string;
   _htmlIdProgressBar: string;
   _idTimeoutValid: number | undefined;
 
   _steps: number;
   _totalSteps: number;
 
-  constructor (app: IApp, htmlId: string = 'editor') {
+  constructor (app: IApp) {
     this._app = app;
-    this._htmlId = htmlId;
-    this._htmlIdProgressBar = `${this._htmlId}-progress-bar`;
+    this._htmlIdProgressBar = 'progress-bar';
     this._idTimeoutValid = undefined;
 
     this._steps = 1;
@@ -30,6 +28,16 @@ export default class Ui implements IUi {
     const save: HTMLDivElement | null = document.getElementById('save') as HTMLDivElement;
     save.onclick = async () => {
       await this._app.compile();
+    };
+
+    const menu: HTMLDivElement | null = document.getElementById('menu') as HTMLDivElement;
+    menu.onclick = async () => {
+    };
+
+    const debug: HTMLDivElement | null = document.getElementById('debug') as HTMLDivElement;
+    debug.onclick = async () => {
+      const debuggerElement: HTMLDivElement | null = document.getElementById('debugger') as HTMLDivElement;
+      debuggerElement.classList.toggle('show');
     };
   }
 

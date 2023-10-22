@@ -6,10 +6,10 @@ export default class Debugger implements IDebugger {
   _debug: boolean;
   _htmlId: string;
 
-  constructor (app: IApp, htmlId: string) {
+  constructor (app: IApp) {
     this._app = app;
     this._debug = this._app.$debug;
-    this._htmlId = htmlId;
+    this._htmlId = 'debugger';
 
     const container = window || {};
     if (this._debug && container) {
