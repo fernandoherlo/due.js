@@ -32,8 +32,12 @@ export default {
     rollupOptions: {
       output: {
         manualChunks (id: string) {
+          // creating a chunk to tone
+          if (id.includes('tone/') || id.includes('standardized-audio-context/')) {
+            return '@1tone'; // 1...first or error in magenta
+          }
           // creating a chunk to @magenta
-          if (id.includes('@magenta')) {
+          if (id.includes('@magenta') || id.includes('@tensorflow')) {
             return '@magenta';
           }
         }
