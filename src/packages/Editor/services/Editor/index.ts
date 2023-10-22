@@ -1,5 +1,5 @@
 import { EditorState } from '@codemirror/state';
-import { EditorView } from '@codemirror/view';
+import { EditorView, lineNumbers } from '@codemirror/view';
 import { syntaxHighlighting } from '@codemirror/language';
 import { sassLanguage } from '@codemirror/lang-sass';
 
@@ -25,6 +25,7 @@ export default class Editor implements IEditor {
     const startState = EditorState.create({
       doc: code,
       extensions: [
+        lineNumbers(),
         sassLanguage,
         theme,
         syntaxHighlighting(DueThemeHighlightStyle)

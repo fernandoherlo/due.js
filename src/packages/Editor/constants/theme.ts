@@ -23,7 +23,12 @@ export const DueTheme: any = {
     caretColor: $purple
   },
   '.cm-cursor, .cm-dropCursor': { borderLeftColor: $purple },
-  '&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection': { backgroundColor: $purpleFading }
+  '&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection': { backgroundColor: $purpleFading },
+  '.cm-gutters': {
+    backgroundColor: $black,
+    color: $purpleFading,
+    border: 'none'
+  }
 };
 
 export const DueThemeHighlightStyle = HighlightStyle.define([
