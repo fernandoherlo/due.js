@@ -1,7 +1,9 @@
 import { EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
-import { defaultHighlightStyle, syntaxHighlighting } from '@codemirror/language';
-import { oneDark } from '@codemirror/theme-one-dark';
+import { syntaxHighlighting } from '@codemirror/language';
+import { sassLanguage } from '@codemirror/lang-sass';
+
+import { DueTheme, DueThemeHighlightStyle } from '../../constants/theme';
 
 import { IApp, IEditor } from '~/src/vite-env';
 import { LOCAL_STORAGE_KEY_CODE } from '~/src/packages/App/constants';
@@ -18,21 +20,14 @@ export default class Editor implements IEditor {
   create () {
     const code = this._app.getFromLocalStorage(LOCAL_STORAGE_KEY_CODE) || undefined;
 
-    const theme = EditorView.theme({
-      '.cm-content': {
-        fontSize: '20pt',
-        fontFamily: 'Fira Code',
-        color: '#edecee',
-        background: '#15141b'
-      }
-    });
+    const theme = EditorView.theme(DueTheme);
 
     const startState = EditorState.create({
       doc: code,
       extensions: [
-        oneDark,
+        sassLanguage,
         theme,
-        syntaxHighlighting(defaultHighlightStyle)
+        syntaxHighlighting(DueThemeHighlightStyle)
       ]
     });
 
