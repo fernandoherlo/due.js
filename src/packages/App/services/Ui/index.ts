@@ -1,12 +1,12 @@
 import { IApp, IUi } from '~/src/vite-env';
 
 export default class Ui implements IUi {
-  _app: IApp;
-  _htmlIdProgressBar: string;
-  _idTimeoutValid: number | undefined;
+  private _app: IApp;
+  private _htmlIdProgressBar: string;
+  private _idTimeoutValid: number | undefined;
 
-  _steps: number;
-  _totalSteps: number;
+  private _steps: number;
+  private _totalSteps: number;
 
   constructor (app: IApp) {
     this._app = app;
@@ -83,7 +83,7 @@ export default class Ui implements IUi {
     }
   }
 
-  _updateProgressBar (width: number) {
+  private _updateProgressBar (width: number) {
     const progressBarEditorElement: HTMLDivElement | null = document.getElementById(this._htmlIdProgressBar) as HTMLDivElement;
     progressBarEditorElement.style.width = `${width}%`;
   }

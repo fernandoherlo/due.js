@@ -1,4 +1,4 @@
-import { ICompiler, IDebugger, IMusic, IEditor, IErrorHandler, ILogger, IStore, IUi, IValueFactory } from '~/src/vite-env';
+import { ICompiler, IDebugger, IMusic, IEditor, IErrorHandler, ILogger, IStore, IUi, IValueFactory, IMidiIn } from '~/src/vite-env';
 
 export interface IApp {
   $debug: boolean;
@@ -14,13 +14,13 @@ export interface IApp {
 
   $valueFactory: IValueFactory | undefined;
 
-  $variables: any;
-  $variablesLive: any;
-  $variablesLiveMap: any;
+  $variables: Record<string, string>;
+  $variablesLive: Record<string, IMidiIn>;
+  $variablesLiveMap: Record<string, any>;
 
-  start: () => void;
-  compile: () => void;
+  start: () => Promise<void>;
+  compile: () => Promise<void>;
 
   saveInLocalStorage: (key: string, value: any) => void;
-  getFromLocalStorage: (key: string) => any;
+  getFromLocalStorage: (key: string) => string | null;
 }

@@ -1,13 +1,13 @@
 import { IApp, IInstruction, IInterpreter } from '~/src/vite-env';
 
 export default class Interpreter implements IInterpreter {
-  _app: IApp;
+  private _app: IApp;
 
   constructor (app: IApp) {
     this._app = app;
   }
 
-  exec (lexical: Array<IInstruction>): any {
+  exec (lexical: IInstruction[]): IInstruction[] {
     if (!Array.isArray(lexical)) {
       throw Error('"lexical" is not array.');
     }
@@ -16,7 +16,7 @@ export default class Interpreter implements IInterpreter {
     return instructions;
   }
 
-  _groupLexical (lexical: Array<IInstruction>): any {
+  private _groupLexical (lexical: IInstruction[]): IInstruction[] {
     const instructions: any = {};
 
     let actualElement;

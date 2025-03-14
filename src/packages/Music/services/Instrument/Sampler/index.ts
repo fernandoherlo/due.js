@@ -1,13 +1,18 @@
 import * as Tone from 'tone';
-import { IInstrument, ISampler } from '~/src/vite-env';
+import { IInstrument, ISampler, IApp } from '~/src/vite-env';
 import { compareInstructions } from '~/src/packages/Compiler/services/Instruction/compare';
 import samples from '../../../constants/samples.json';
 import Instrument from '..';
 import { SAMPLER_MAP } from '../../../constants';
 
 export default class Sampler extends Instrument implements ISampler {
-  _instrument: Tone.Sampler | null = null;
-  _canUpdate: boolean = true;
+  protected _instrument: Tone.Sampler | null = null;
+
+  constructor (data: any, app: IApp) {
+    super(data, app);
+
+    this._canUpdate = true;
+  }
 
   async start (): Promise<void> {
     let connect: any | null = null;

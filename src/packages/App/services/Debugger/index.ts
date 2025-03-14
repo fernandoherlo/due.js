@@ -2,9 +2,9 @@ import { stringify } from 'flatted';
 import { IDebugger, IApp } from '~/src/vite-env';
 
 export default class Debugger implements IDebugger {
-  _app: IApp;
-  _debug: boolean;
-  _htmlId: string;
+  private _app: IApp;
+  private _debug: boolean;
+  private _htmlId: string;
 
   constructor (app: IApp) {
     this._app = app;
@@ -28,7 +28,7 @@ export default class Debugger implements IDebugger {
     }
   }
 
-  _getDate () {
+  private _getDate () {
     return new Date();
   }
 }

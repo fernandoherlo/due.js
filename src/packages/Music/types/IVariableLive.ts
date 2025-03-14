@@ -1,7 +1,6 @@
-import { IApp, IInstruction } from '~/src/vite-env';
+import { IInstruction } from '~/src/vite-env';
 
 export interface IVariableLive extends IInstruction {
-  _app: IApp;
   value: any;
 
   start: () => Promise<void>;

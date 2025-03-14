@@ -4,9 +4,9 @@ export interface IInstruction {
   name: string;
   element: string;
   key: string;
-  type: string;
   modifier: string | any;
-  value: INote | Array<INote>;
+  value: INote | INote[] | any;
   typeValue: string;
-  actions: Array<IInstruction>;
+  actions: Array<any>;
+  type?: string;
 }

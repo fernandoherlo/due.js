@@ -1,7 +1,7 @@
 import { IApp, IErrorHandler } from '~/src/vite-env';
 
 export default class Handler implements IErrorHandler {
-  _app: IApp;
+  private _app: IApp;
 
   constructor (app: IApp) {
     this._app = app;
@@ -13,7 +13,7 @@ export default class Handler implements IErrorHandler {
     };
   }
 
-  _catchError (args: any[]) {
+  private _catchError (args: any[]) {
     this._app.$logger.error(args);
   }
 }

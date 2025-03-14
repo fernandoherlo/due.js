@@ -9,8 +9,8 @@ import { IApp, IEditor } from '~/src/vite-env';
 import { LOCAL_STORAGE_KEY_CODE } from '~/src/packages/App/constants';
 
 export default class Editor implements IEditor {
-  _app: IApp;
-  _editor: any | null;
+  private _app: IApp;
+  private _editor: any | null;
 
   constructor (app: IApp) {
     this._app = app;

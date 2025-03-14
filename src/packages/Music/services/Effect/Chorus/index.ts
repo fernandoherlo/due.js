@@ -1,12 +1,16 @@
 import * as Tone from 'tone';
-import { IChorus } from '~/src/vite-env';
+import { IChorus, IApp } from '~/src/vite-env';
 import Effect from '..';
 
 export default class Reverb extends Effect implements IChorus {
-  _effect: Tone.Chorus | null = null;
-  _canUpdate: boolean = true;
-  _min: number = 0;
-  _max: number = 30;
+  protected _effect: Tone.Chorus | null = null;
+
+  constructor (data: any, app: IApp) {
+    super(data, app);
+
+    this._canUpdate = true;
+    this._max = 30;
+  }
 
   create () {
     this._effect = new Tone.Chorus();

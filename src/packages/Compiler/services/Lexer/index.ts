@@ -3,8 +3,8 @@ import Instruction from '../Instruction';
 import { COMMANDS_MAP } from '../../constants';
 
 export default class Lexer implements ILexer {
-  _app: IApp;
-  _parser: IParser;
+  private _app: IApp;
+  private _parser: IParser;
 
   constructor (app: IApp, parser: IParser) {
     this._app = app;
@@ -19,11 +19,13 @@ export default class Lexer implements ILexer {
       throw Error('Code is not string.');
     }
 
+    this._app.$logger.log(code);
+
     const newCode = code.replace(' ', '');
     return this._generateLexical(newCode);
   }
 
-  _generateLexical (code: string) {
+  private _generateLexical (code: string) {
     const lines = code.split('\n');
     const lexicalGroup: Array<IInstruction> = [];
 
@@ -44,7 +46,7 @@ export default class Lexer implements ILexer {
     return lexicalGroup;
   }
 
-  _parseLine (line: string) {
+  private _parseLine (line: string) {
     const lexicals: Array<IInstruction> = [];
     const commands = this._parser.line(line);
 
@@ -63,7 +65,7 @@ export default class Lexer implements ILexer {
     return lexicals;
   }
 
-  _newLexical (commandParsed: any) {
+  private _newLexical (commandParsed: any) {
     return new Instruction({
       name: commandParsed.name,
       element: commandParsed.element,

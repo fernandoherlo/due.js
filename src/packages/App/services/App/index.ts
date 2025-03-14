@@ -1,4 +1,4 @@
-import { IApp, ILogger, IStore, IErrorHandler, IDebugger, IMusic, ICompiler, IEditor, IUi, IValueFactory } from '~/src/vite-env';
+import { IApp, ILogger, IStore, IErrorHandler, IDebugger, IMusic, ICompiler, IEditor, IUi, IValueFactory, IMidiIn } from '~/src/vite-env';
 import Logger from '../Logger';
 import Store from '../Store';
 import ErrorHandler from '../Error/handler';
@@ -20,15 +20,15 @@ export default class App implements IApp {
 
   $valueFactory: IValueFactory | undefined;
 
-  $variables: any = {};
-  $variablesLive: any = {};
-  $variablesLiveMap: any = {};
+  $variables: Record<string, string> = {};
+  $variablesLive: Record<string, IMidiIn> = {};
+  $variablesLiveMap: Record<string, any> = {};
 
   constructor (debug: boolean = true) {
     this.$debug = debug;
 
     this.$logger = new Logger(this);
-    this.$store = new Store(this);
+    this.$store = new Store();
     this.$error = new ErrorHandler(this);
     this.$debugger = new Debugger(this);
     this.$ui = new Ui(this);
@@ -74,7 +74,7 @@ export default class App implements IApp {
     localStorage.setItem(key, value || '');
   }
 
-  getFromLocalStorage (key: string): any {
+  getFromLocalStorage (key: string) {
     return localStorage.getItem(key);
   }
 }

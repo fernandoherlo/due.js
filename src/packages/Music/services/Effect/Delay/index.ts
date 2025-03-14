@@ -1,12 +1,16 @@
 import * as Tone from 'tone';
-import { IDelay } from '~/src/vite-env';
+import { IDelay, IApp } from '~/src/vite-env';
 import Effect from '..';
 
 export default class Delay extends Effect implements IDelay {
-  _effect: Tone.FeedbackDelay | null = null;
-  _canUpdate: boolean = true;
-  _min: number = 0;
-  _max: number = 3;
+  protected _effect: Tone.FeedbackDelay | null = null;
+
+  constructor (data: any, app: IApp) {
+    super(data, app);
+
+    this._canUpdate = true;
+    this._max = 3;
+  }
 
   create () {
     this._effect = new Tone.FeedbackDelay();

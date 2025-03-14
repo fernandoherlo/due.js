@@ -2,11 +2,11 @@ import { IApp, ILexer, IInterpreter, ICompiler, IInstruction } from '~/src/vite-
 import { compareInstructions } from '../Instruction/compare';
 
 export default class Compiler implements ICompiler {
-  _app: IApp;
-  _lexer: ILexer;
-  _interpreter: IInterpreter;
+  private _app: IApp;
+  private _lexer: ILexer;
+  private _interpreter: IInterpreter;
 
-  _lastInstructions: any;
+  private _lastInstructions: any;
 
   constructor (app: IApp, lexer: ILexer, interpreter: IInterpreter) {
     this._app = app;
@@ -21,22 +21,22 @@ export default class Compiler implements ICompiler {
 
     this._resetVariables();
 
-    const lexical: Array<IInstruction> = this._lexer.exec(code);
-    const instructions = this._interpreter.exec(lexical);
-    const calculatedInstructions: Array<Array<IInstruction>> = this._calculateInstructions(instructions);
+    const lexical: IInstruction[] = this._lexer.exec(code);
+    const instructions: IInstruction[] = this._interpreter.exec(lexical);
+    const calculatedInstructions: Array<IInstruction[]> = this._calculateInstructions(instructions);
 
     this._lastInstructions = instructions;
     return [instructions, ...calculatedInstructions];
   }
 
-  _resetVariables () {
+  private _resetVariables (): void {
     this._app.$variables = {};
   }
 
-  _calculateInstructions (instructions: any) {
-    const addedInstructions: Array<IInstruction> = [];
-    const updatedInstructions: Array<IInstruction> = [];
-    const deletedInstructions: Array<IInstruction> = [];
+  private _calculateInstructions (instructions: IInstruction[]): Array<IInstruction[]> {
+    const addedInstructions: IInstruction[] = [];
+    const updatedInstructions: IInstruction[] = [];
+    const deletedInstructions: IInstruction[] = [];
 
     for (const key in instructions) {
       if (instructions[key] && this._lastInstructions) {

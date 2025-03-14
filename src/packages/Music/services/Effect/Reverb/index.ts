@@ -1,12 +1,16 @@
 import * as Tone from 'tone';
-import { IReverb } from '~/src/vite-env';
+import { IReverb, IApp } from '~/src/vite-env';
 import Effect from '..';
 
 export default class Reverb extends Effect implements IReverb {
-  _effect: Tone.Reverb | null = null;
-  _canUpdate: boolean = true;
-  _min: number = 0;
-  _max: number = 20;
+  protected _effect: Tone.Reverb | null = null;
+
+  constructor (data: any, app: IApp) {
+    super(data, app);
+
+    this._canUpdate = true;
+    this._max = 20;
+  }
 
   create () {
     this._effect = new Tone.Reverb();

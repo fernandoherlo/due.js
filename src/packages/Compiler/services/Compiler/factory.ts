@@ -1,13 +1,13 @@
-import { IApp, ICompiler } from '~/src/vite-env';
+import { IApp, ICompiler, IInterpreter, ILexer, IParser } from '~/src/vite-env';
 import Parser from '../Parser';
 import Lexer from '../Lexer';
 import Interpreter from '../Interpreter';
 import Compiler from './';
 
 export default function CompilerFactory (app: IApp): ICompiler {
-  const parser = new Parser(app);
-  const lexer = new Lexer(app, parser);
-  const interpreter = new Interpreter(app);
+  const parser: IParser = new Parser(app);
+  const lexer: ILexer = new Lexer(app, parser);
+  const interpreter: IInterpreter = new Interpreter(app);
 
   return new Compiler(app, lexer, interpreter);
 }

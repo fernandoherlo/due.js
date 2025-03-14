@@ -7,6 +7,10 @@ $low=-1
 $xlow=-3
 $high=5
 
+// $$test=mi0#(1@)
+$$test=mi0(1@5) // midiIn, input0, channel1, nota5
+// n1(A3;0.5;1):v($$test)
+
 // mo1#1([C3>G3>E3>C3>G3>E3];8;8)
 
 sam3#tom([A2>C2>B2>D3];[1-3];[11-18]):r(20):d(0.8):v($low)

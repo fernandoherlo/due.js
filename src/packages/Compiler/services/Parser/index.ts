@@ -1,14 +1,14 @@
-import { IApp, IParser } from '~/src/vite-env';
+import { IApp, IInstruction, IParser } from '~/src/vite-env';
 import { COMMANDS, TYPE_VALUE } from '~/src/packages/Compiler/constants';
 
 export default class Parser implements IParser {
-  _app: IApp;
+  private _app: IApp;
 
   constructor (app: IApp) {
     this._app = app;
   }
 
-  line (line: string): Array<string> {
+  line (line: string) {
     if (!line) {
       throw Error('Line is empty.');
     }
@@ -26,7 +26,7 @@ export default class Parser implements IParser {
     return [...commands, `con(${connect})`];
   }
 
-  command (command: string): undefined | object {
+  command (command: string): undefined | IInstruction {
     if (!command) {
       throw Error('Command is empty.');
     }
@@ -39,15 +39,16 @@ export default class Parser implements IParser {
       const modifier = variable.replace(COMMANDS.$$, '');
       const [commandIdRaw, value] = variableValue.slice(0, -1).split('(');
       const [commandId] = commandIdRaw.split('#');
-      const { element } = this._commandId(commandId);
+      const { element = '' } = this._commandId(commandId);
 
       return {
         name: COMMANDS.$$,
         element,
-        modifier,
         key: COMMANDS.$$ + modifier,
+        modifier,
         value,
-        typeValue: TYPE_VALUE.normal
+        typeValue: TYPE_VALUE.normal,
+        actions: []
       };
     }
 
@@ -66,20 +67,22 @@ export default class Parser implements IParser {
 
     const [commandId, modifier] = commandIdRaw.split('#');
 
-    const { name, element } = this._commandId(commandId);
+    const { name = '', element = '' } = this._commandId(commandId);
     const newValueRaw = this._app.$valueFactory && this._app.$valueFactory.adapt(valueRaw, this._app.$variables);
     const [value, typeValue] = this._valueRaw(newValueRaw, !!element);
 
     return {
       name,
       element,
+      key: modifier,
       modifier,
       value,
-      typeValue
+      typeValue,
+      actions: []
     };
   }
 
-  _commandId (commandId: string) {
+  private _commandId (commandId: string) {
     if (!commandId) {
       throw Error('"commandId" is empty.');
     }
@@ -95,7 +98,7 @@ export default class Parser implements IParser {
     return { name, element };
   }
 
-  _valueRaw (valueRaw: string, defaults: boolean) {
+  private _valueRaw (valueRaw: string, defaults: boolean) {
     const [value, value2, value3] = valueRaw.trim().split(';');
 
     let typeValue = TYPE_VALUE.normal;
@@ -121,14 +124,14 @@ export default class Parser implements IParser {
     return [this._createValue(value, value2, value3, defaults), typeValue];
   }
 
-  _createValue (value: string | Array<any>, value2: string | undefined, value3: string | undefined, defaults: boolean) {
+  private _createValue (value: string | Array<any>, value2: string | undefined, value3: string | undefined, defaults: boolean) {
     const value2Parse = this._calculateValue(value2);
     const value3Parse = this._calculateValue(value3);
 
     return this._app.$valueFactory && this._app.$valueFactory.create({ value, value2: value2Parse, value3: value3Parse }, defaults);
   }
 
-  _calculateValue (valueRaw: string | undefined): number | Array<number> | any | undefined {
+  private _calculateValue (valueRaw: string | undefined): number | Array<number> | any | undefined {
     if (!valueRaw) {
       return;
     }

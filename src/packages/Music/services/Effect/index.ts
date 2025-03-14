@@ -1,12 +1,17 @@
-import { IEffect } from '~/src/vite-env';
+import { IEffect, IApp } from '~/src/vite-env';
 import Instrument from '../Instrument';
 import { COMMANDS } from '~/src/packages/Compiler/constants';
 
 export default class Effect extends Instrument implements IEffect {
-  _effect: any | null = null;
-  _canUpdate: boolean = true;
-  _min: number = 0;
-  _max: number = 0;
+  protected _effect: any | null = null;
+  protected _min: number = 0;
+  protected _max: number = 0;
+
+  constructor (data: any, app: IApp) {
+    super(data, app);
+
+    this._canUpdate = true;
+  }
 
   create () {
     if (this._effect) {
@@ -33,7 +38,7 @@ export default class Effect extends Instrument implements IEffect {
     }
   }
 
-  _getValue (value: any) {
+  protected _getValue (value: any) {
     if (value && typeof value === 'string' && value.startsWith(COMMANDS.$$)) {
       this._app.$variablesLiveMap[value] = this;
       return 0; // default, set on live midi in
@@ -42,7 +47,7 @@ export default class Effect extends Instrument implements IEffect {
     return this._mapValue(value);
   }
 
-  _mapValue (value: number) {
+  private _mapValue (value: number) {
     const { min: fromMin, max: fromMax } = { min: 0, max: 127 };
     const { min: toMin, max: toMax } = { min: this._min, max: this._max };
     // Determine how wide the ranges are

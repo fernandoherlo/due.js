@@ -1,10 +1,15 @@
 import * as Tone from 'tone';
-import { ISynth } from '~/src/vite-env';
+import { ISynth, IApp } from '~/src/vite-env';
 import Instrument from '..';
 
 export default class Synth extends Instrument implements ISynth {
-  _instrument: Tone.Synth<Tone.SynthOptions> | null = null;
-  _canUpdate: boolean = true;
+  protected _instrument: Tone.Synth<Tone.SynthOptions> | null = null;
+
+  constructor (data: any, app: IApp) {
+    super(data, app);
+
+    this._canUpdate = true;
+  }
 
   async start (): Promise<void> {
     let connect: any | null = null;

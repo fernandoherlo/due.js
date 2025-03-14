@@ -6,11 +6,11 @@ import TriggerAttack from './triggerAttack';
 import { COMMANDS_ELEMENT_MAP } from '../../constants';
 
 export default class Instrument extends Instruction implements IInstrument {
-  _app: IApp;
-  _instrument: any | null = null;
-  _canUpdate: boolean = false;
-  _loop: Tone.Loop<Tone.LoopOptions> | null = null;
-  _valueStep: number = 0;
+  protected _app: IApp;
+  protected _instrument: any | null = null;
+  protected _canUpdate: boolean = false;
+  private _loop: Tone.Loop<Tone.LoopOptions> | null = null;
+  private _valueStep: number = 0;
 
   constructor (data: any, app: IApp) {
     super(data);
