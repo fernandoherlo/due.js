@@ -3,8 +3,8 @@ import { IApp, IMidiIn } from '~/src/vite-env';
 import Instruction from '~/src/packages/Compiler/services/Instruction';
 
 export default class MidiIn extends Instruction implements IMidiIn {
-  _app: IApp;
-  _midi: any | null = null;
+  private _app: IApp;
+  private _midi: any | null = null;
 
   constructor (data: any, app: IApp) {
     super(data);

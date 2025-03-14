@@ -6,13 +6,11 @@ import ValueFactory from '~/src/packages/Music/services/Music/valueFactory';
 import { COMMANDS_ELEMENT_MAP, SAMPLER_MAP } from '../../constants';
 
 export default class Music implements IMusic {
-  _app: IApp;
-  _debug: boolean;
-  _instructions: any;
+  private _app: IApp;
+  private _instructions: any;
 
   constructor (app: IApp) {
     this._app = app;
-    this._debug = this._app.$debug;
     this._instructions = {};
 
     this._app.$valueFactory = new ValueFactory();

@@ -12,7 +12,7 @@ export default class Synth extends Instrument implements ISynth {
   }
 
   async start (): Promise<void> {
-    let connect: any | null = null;
+    let connect: any | null;
     if (this.actions.length) {
       connect = await this.startActions();
     }

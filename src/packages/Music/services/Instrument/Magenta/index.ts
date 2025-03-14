@@ -5,9 +5,6 @@ import Sampler from '../Sampler';
 import TriggerAttack from '../triggerAttack';
 
 export default class Magenta extends Sampler implements IMagenta {
-  _instrument: any | null = null;
-  _canUpdate: boolean = true;
-
   async start (): Promise<void> {
     this.value = await this._getNotes();
     this.typeValue = TYPE_VALUE.sequence;
@@ -22,7 +19,7 @@ export default class Magenta extends Sampler implements IMagenta {
     this.typeValue = TYPE_VALUE.sequence;
   }
 
-  async _getNotes () {
+  private async _getNotes () {
     const VAEspec: any = {
       type: 'MusicVAE',
       dataConverter: {

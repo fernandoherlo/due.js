@@ -4,8 +4,7 @@ import { COMMANDS } from '~/src/packages/Compiler/constants';
 import { COMMANDS_ELEMENT_MAP } from '../../constants';
 
 export default class VariableLive extends Instruction implements IVariableLive {
-  _app: IApp;
-  declare value: any;
+  private _app: IApp;
 
   constructor (data: any, app: IApp) {
     super(data);

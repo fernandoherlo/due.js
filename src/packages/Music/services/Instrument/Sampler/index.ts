@@ -69,7 +69,7 @@ export default class Sampler extends Instrument implements ISampler {
     this.typeValue = newInstrument.typeValue;
   }
 
-  _pathUrl (notes: any, sound: string): any {
+  private _pathUrl (notes: any, sound: string): any {
     const pathNotes: any = {};
 
     Object.keys(notes).forEach((note) => {

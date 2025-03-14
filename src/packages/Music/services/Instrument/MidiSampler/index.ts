@@ -3,7 +3,7 @@ import { IInstrument, IMidiSampler } from '~/src/vite-env';
 import Sampler from '../Sampler';
 
 export default class MidiSampler extends Sampler implements IMidiSampler {
-  _midi: any | null;
+  private _midi: any | null;
 
   async start (): Promise<void> {
     WebMidi.inputs.forEach(input => this._app.$logger.log(input.name));
