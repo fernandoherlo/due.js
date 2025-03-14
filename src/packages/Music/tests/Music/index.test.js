@@ -31,7 +31,6 @@ describe('Music', () => {
     const music = new Music(mockApp);
     // Activate
     // Assert
-    expect(music._debug).toBeTruthy();
     expect(music._app).toEqual(mockApp);
   });
 

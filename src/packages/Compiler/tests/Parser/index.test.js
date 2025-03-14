@@ -94,7 +94,8 @@ describe('Parser', () => {
       ['foo', undefined],
       ['//', undefined],
       ['foo(bar)', {
-        element: undefined,
+        element: '',
+        key: undefined,
         modifier: undefined,
         name: 'foo',
         typeValue: 'normal',
@@ -102,33 +103,39 @@ describe('Parser', () => {
           value: 'bar',
           value2: undefined,
           value3: undefined
-        }
+        },
+        actions: []
       }],
       ['foo1(bar)', {
         element: '1',
         name: 'foo',
+        key: undefined,
         modifier: undefined,
         typeValue: 'normal',
         value: {
           value: 'bar',
           value2: undefined,
           value3: undefined
-        }
+        },
+        actions: []
       }],
       ['foo1(bar;2;3)', {
         element: '1',
         name: 'foo',
+        key: undefined,
         modifier: undefined,
         typeValue: 'normal',
         value: {
           value: 'bar',
           value2: '2',
           value3: '3'
-        }
+        },
+        actions: []
       }],
       ['foo1([bar,ter])', {
         element: '1',
         name: 'foo',
+        key: undefined,
         modifier: undefined,
         typeValue: 'random',
         value: [{
@@ -140,11 +147,13 @@ describe('Parser', () => {
           value: 'ter',
           value2: undefined,
           value3: undefined
-        }]
+        }],
+        actions: []
       }],
       ['foo1([bar,ter];0;1)', {
         element: '1',
         name: 'foo',
+        key: undefined,
         modifier: undefined,
         typeValue: 'random',
         value: [{
@@ -156,11 +165,13 @@ describe('Parser', () => {
           value: 'ter',
           value2: '0',
           value3: '1'
-        }]
+        }],
+        actions: []
       }],
       ['foo1([bar>ter];3;10)', {
         element: '1',
         name: 'foo',
+        key: undefined,
         modifier: undefined,
         typeValue: 'sequence',
         value: [{
@@ -172,11 +183,13 @@ describe('Parser', () => {
           value: 'ter',
           value2: '3',
           value3: '10'
-        }]
+        }],
+        actions: []
       }],
       ['foo3#mod([bar,ter];[1,3];[1-10])', {
         element: '3',
         name: 'foo',
+        key: 'mod',
         modifier: 'mod',
         typeValue: 'random',
         value: [{
@@ -188,11 +201,13 @@ describe('Parser', () => {
           value: 'ter',
           value2: ['1', '3'],
           value3: { min: '1', max: '10' }
-        }]
+        }],
+        actions: []
       }],
       ['foo3#mod([bar=ter,tor=bor];1;2)', {
         element: '3',
         name: 'foo',
+        key: 'mod',
         modifier: 'mod',
         typeValue: 'random',
         value: [{
@@ -204,11 +219,13 @@ describe('Parser', () => {
           value: 'tor=bor',
           value2: '1',
           value3: '2'
-        }]
+        }],
+        actions: []
       }],
       ['foo2([bar|ter>tor|bor];1;2)', {
         element: '2',
         name: 'foo',
+        key: undefined,
         modifier: undefined,
         typeValue: 'sequence',
         value: [{
@@ -220,29 +237,34 @@ describe('Parser', () => {
           value: 'tor|bor',
           value2: '1',
           value3: '2'
-        }]
+        }],
+        actions: []
       }],
       ['foo1(bar;[1-2];[1,2,3])', {
         element: '1',
         name: 'foo',
+        key: undefined,
         modifier: undefined,
         typeValue: 'normal',
         value: {
           value: 'bar',
           value2: { min: '1', max: '2' },
           value3: ['1', '2', '3']
-        }
+        },
+        actions: []
       }],
       ['foo1([bar|ter])', {
         element: '1',
         name: 'foo',
+        key: undefined,
         modifier: undefined,
         typeValue: 'multi',
         value: {
           value: '[bar|ter]',
           value2: undefined,
           value3: undefined
-        }
+        },
+        actions: []
       }]
     ])('should parse command `%s`', (command, expected) => {
       // Arrange
