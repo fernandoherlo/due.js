@@ -23,8 +23,7 @@ export default class Reverb extends Effect implements IReverb {
 
   async update (value: any): Promise<void> {
     if (this._canUpdate && this._effect) {
-      const decay = this._getValue(value);
-      this._effect.decay = decay;
+      this._effect.decay = this._getValue(value);
     }
   }
 }

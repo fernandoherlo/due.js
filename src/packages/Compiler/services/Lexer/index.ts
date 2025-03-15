@@ -11,7 +11,7 @@ export default class Lexer implements ILexer {
     this._parser = parser;
   }
 
-  exec (code: string): Array<IInstruction> {
+  exec (code: string): IInstruction[] {
     if (!code) {
       throw Error('Code is empty.');
     }
@@ -25,9 +25,9 @@ export default class Lexer implements ILexer {
     return this._generateLexical(newCode);
   }
 
-  private _generateLexical (code: string) {
+  private _generateLexical (code: string): IInstruction[] {
     const lines = code.split('\n');
-    const lexicalGroup: Array<IInstruction> = [];
+    const lexicalGroup: IInstruction[] = [];
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
@@ -46,9 +46,9 @@ export default class Lexer implements ILexer {
     return lexicalGroup;
   }
 
-  private _parseLine (line: string) {
-    const lexicals: Array<IInstruction> = [];
-    const commands = this._parser.line(line);
+  private _parseLine (line: string): IInstruction[] {
+    const lexicals: IInstruction[] = [];
+    const commands: string[] = this._parser.line(line);
 
     if (!Array.isArray(commands)) {
       throw Error('"commands" is not array.');
@@ -65,7 +65,7 @@ export default class Lexer implements ILexer {
     return lexicals;
   }
 
-  private _newLexical (commandParsed: any) {
+  private _newLexical (commandParsed: Record<string, any>): IInstruction {
     return new Instruction({
       name: commandParsed.name,
       element: commandParsed.element,

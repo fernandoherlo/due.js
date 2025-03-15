@@ -23,8 +23,7 @@ export default class Reverb extends Effect implements IChorus {
 
   async update (value: any): Promise<void> {
     if (this._canUpdate && this._effect) {
-      const frequency = this._getValue(value);
-      this._effect.frequency.value = frequency;
+      this._effect.frequency.value = this._getValue(value);
     }
   }
 }

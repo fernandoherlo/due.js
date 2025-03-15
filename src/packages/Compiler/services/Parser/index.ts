@@ -8,7 +8,7 @@ export default class Parser implements IParser {
     this._app = app;
   }
 
-  line (line: string) {
+  line (line: string): string[] {
     if (!line) {
       throw Error('Line is empty.');
     }

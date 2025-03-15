@@ -1,31 +1,32 @@
 import { stringify, parse } from 'flatted';
+import { IInstruction } from '~/src/vite-env';
 
-export function compareInstructions (newInst: any, lastInst: any) {
-  const newInstClone = { ...newInst };
-  const lastInstClone = { ...lastInst };
+export function compareInstructions (newInst: IInstruction, lastInst: IInstruction): boolean {
+  const newInstCloned = { ...newInst };
+  const lastInstCloned = { ...lastInst };
 
-  const newInstCleared = _clearInstruction(newInstClone);
-  const lastInstCleared = _clearInstruction(lastInstClone);
+  const newInstCleared = _clearInstruction(newInstCloned);
+  const lastInstCleared = _clearInstruction(lastInstCloned);
 
   return stringify(newInstCleared) !== stringify(lastInstCleared);
 }
 
-function _clearInstruction (instruction: any) {
-  const clone = parse(stringify(instruction));
+function _clearInstruction (instruction: IInstruction): any {
+  const clonedInstruction = parse(stringify(instruction));
 
-  delete clone._instrument;
-  delete clone._midi;
-  delete clone._effect;
-  delete clone._app;
-  delete clone._canUpdate;
-  delete clone._loop;
-  delete clone._valueStep;
+  delete clonedInstruction._instrument;
+  delete clonedInstruction._midi;
+  delete clonedInstruction._effect;
+  delete clonedInstruction._app;
+  delete clonedInstruction._canUpdate;
+  delete clonedInstruction._loop;
+  delete clonedInstruction._valueStep;
 
-  if (clone?.actions?.length) {
-    clone.actions = clone.actions.map((action: any) => {
+  if (clonedInstruction?.actions?.length) {
+    clonedInstruction.actions = clonedInstruction.actions.map((action: IInstruction) => {
       return _clearInstruction(action);
     });
   }
 
-  return clone;
+  return clonedInstruction;
 }

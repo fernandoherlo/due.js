@@ -38,7 +38,7 @@ export default class Effect extends Instrument implements IEffect {
     }
   }
 
-  protected _getValue (value: any) {
+  protected _getValue (value: any): number {
     if (value && typeof value === 'string' && value.startsWith(COMMANDS.$$)) {
       this._app.$variablesLiveMap[value] = this;
       return 0; // default, set on live midi in
@@ -47,16 +47,17 @@ export default class Effect extends Instrument implements IEffect {
     return this._mapValue(value);
   }
 
-  private _mapValue (value: number) {
-    const { min: fromMin, max: fromMax } = { min: 0, max: 127 };
-    const { min: toMin, max: toMax } = { min: this._min, max: this._max };
+  private _mapValue (value: number): number {
+    const { min: fromMin, max: fromMax }: { min: number, max: number } = { min: 0, max: 127 };
+    const { min: toMin, max: toMax }: { min: number, max: number } = { min: this._min, max: this._max };
+
     // Determine how wide the ranges are
-    const fromSize = fromMax - fromMin;
-    const toSize = toMax - toMin;
+    const fromSize: number = fromMax - fromMin;
+    const toSize: number = toMax - toMin;
     // Get the percentage of the original range `value` represents, ignoring the minimum value
-    const fromPercent = (value - fromMin) / fromSize;
+    const fromPercent: number = (value - fromMin) / fromSize;
     // Get the corresponding percentage of the new range, plus its minimum value
-    const result = (fromPercent * toSize) + toMin;
+    const result: number = (fromPercent * toSize) + toMin;
 
     return result;
   }

@@ -31,7 +31,7 @@ export const DueTheme: any = {
   }
 };
 
-export const DueThemeHighlightStyle = HighlightStyle.define([
+export const DueThemeHighlightStyle: HighlightStyle = HighlightStyle.define([
   {
     tag: t.keyword,
     color: $purple

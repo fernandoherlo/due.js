@@ -24,8 +24,7 @@ export default class Volumen extends Effect implements IVolumen {
 
   async update (value: any): Promise<void> {
     if (this._canUpdate && this._effect) {
-      const volume = this._getValue(value);
-      this._effect.volume.value = volume;
+      this._effect.volume.value = this._getValue(value);
     }
   }
 }

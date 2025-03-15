@@ -10,7 +10,7 @@ import { LOCAL_STORAGE_KEY_CODE } from '~/src/packages/App/constants';
 
 export default class Editor implements IEditor {
   private _app: IApp;
-  private _editor: any | null;
+  private _editor: EditorView | null;
 
   constructor (app: IApp) {
     this._app = app;
@@ -41,6 +41,6 @@ export default class Editor implements IEditor {
   }
 
   getCode (): string | undefined {
-    return this._editor.state.doc.toString();
+    return this._editor?.state.doc.toString();
   }
 }
