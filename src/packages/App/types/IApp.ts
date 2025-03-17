@@ -1,7 +1,8 @@
 import { ICompiler, IDebugger, IMusic, IEditor, IErrorHandler, ILogger, IStore, IUi, IValueFactory, IMidiIn } from '~/src/vite-env';
 
 export interface IApp {
-  $debug: boolean;
+  $debugEnabled: boolean;
+  $logEnabled: boolean;
   $logger: ILogger;
   $store: IStore;
   $error: IErrorHandler

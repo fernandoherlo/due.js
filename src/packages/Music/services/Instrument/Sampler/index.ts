@@ -32,7 +32,7 @@ export default class Sampler extends Instrument implements ISampler {
     });
 
     this._instrument = (await samplerPromise);
-    this._instrument.debug = this._app.$debug;
+    this._instrument.debug = this._app.$debugEnabled;
 
     if (connect) {
       this._instrument.connect(connect._effect);

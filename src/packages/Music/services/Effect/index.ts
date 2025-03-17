@@ -15,7 +15,7 @@ export default class Effect extends Instrument implements IEffect {
 
   create () {
     if (this._effect) {
-      this._effect.debug = this._app.$debug;
+      this._effect.debug = this._app.$debugEnabled;
     }
   }
 

@@ -2,23 +2,28 @@ import { INote } from '~/src/vite-env';
 import { TYPE_VALUE } from '~/src/packages/Compiler/constants';
 
 export default class TriggerAttack {
-  static play (value: any, typeValue: string, valueStep: number, instrument: any) {
+  static play (value: any, typeValue: string, valueStep: number, instrument: any): any[] | undefined {
     const note: INote = TriggerAttack.getValue(value, typeValue, valueStep);
     if (note.value) {
+      const duration = parseFloat(TriggerAttack.getValue(note.duration));
+
       if (this._isChord(note.value, typeValue)) {
         if (!Array.isArray(note.value)) {
-          instrument.triggerAttackRelease(this._createChord(note.value), parseFloat(TriggerAttack.getValue(note.duration)));
+          instrument.triggerAttackRelease(this._createChord(note.value), duration);
         } else {
-          instrument.triggerAttackRelease(note.value, parseFloat(TriggerAttack.getValue(note.duration)));
+          instrument.triggerAttackRelease(note.value, duration);
         }
       } else {
-        instrument.triggerAttackRelease(note.value, parseFloat(TriggerAttack.getValue(note.duration)));
+        instrument.triggerAttackRelease(note.value, duration);
       }
+
+      return [note.value, duration];
     }
   }
 
   static getValue (values: any | Array<any>, typeValue?: string | undefined, valueStep: number | undefined = 0) {
     let value;
+
     if (Array.isArray(values)) {
       if (typeValue === TYPE_VALUE.sequence) {
         value = values[valueStep % values.length];

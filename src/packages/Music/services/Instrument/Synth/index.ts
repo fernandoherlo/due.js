@@ -18,7 +18,7 @@ export default class Synth extends Instrument implements ISynth {
     }
 
     this._instrument = new Tone.Synth();
-    this._instrument.debug = this._app.$debug;
+    this._instrument.debug = this._app.$debugEnabled;
 
     if (connect) {
       this._instrument.connect(connect._effect);

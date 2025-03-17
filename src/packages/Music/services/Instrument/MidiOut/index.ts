@@ -19,7 +19,7 @@ export default class MidiOut extends Instrument implements IMidiOut {
         channel.playNote(value, { duration: duration * 1000 });
       }
     };
-    this._instrument.debug = this._app.$debug;
+    this._instrument.debug = this._app.$debugEnabled;
 
     await super.start();
   }

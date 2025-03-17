@@ -7,7 +7,8 @@ import Ui from '../Ui';
 import { LOCAL_STORAGE_KEY_CODE } from '../../constants';
 
 export default class App implements IApp {
-  $debug: boolean;
+  $debugEnabled: boolean;
+  $logEnabled: boolean;
   $logger: ILogger;
   $store: IStore;
   $error: IErrorHandler;
@@ -25,7 +26,8 @@ export default class App implements IApp {
   $variablesLiveMap: Record<string, any> = {};
 
   constructor (debug: boolean = true) {
-    this.$debug = debug;
+    this.$debugEnabled = debug;
+    this.$logEnabled = true;
 
     this.$logger = new Logger(this);
     this.$store = new Store();

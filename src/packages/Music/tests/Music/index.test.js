@@ -12,7 +12,7 @@ vi.mock('~/src/packages/Music/constants', () => {
 });
 
 const mockApp = {
-  $debug: true,
+  $debugEnabled: true,
   $logger: {
     log: vi.fn()
   },

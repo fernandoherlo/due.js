@@ -7,7 +7,7 @@ import Editor from '~/src/packages/Editor/services/Editor';
 
 // TODO: dependency injector https://github.com/typestack/typedi
 
-const app = new App();
+const app = new App(false);
 
 const compiler = CompilerFactory(app);
 const editor = new Editor(app);

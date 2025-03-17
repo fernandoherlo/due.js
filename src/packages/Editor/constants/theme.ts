@@ -14,7 +14,7 @@ const $red = '#ff6767';
 
 export const DueTheme: any = {
   '&': {
-    fontSize: '20pt',
+    fontSize: '18pt',
     fontFamily: 'Fira Code',
     color: $white,
     background: $black

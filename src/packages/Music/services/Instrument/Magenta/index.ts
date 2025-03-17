@@ -1,4 +1,4 @@
-import { IInstrument, IMagenta } from '~/src/vite-env';
+import { IInstrument, IMagenta, INote } from '~/src/vite-env';
 import { TYPE_VALUE } from '~/src/packages/Compiler/constants';
 import Note from '../../Note';
 import Sampler from '../Sampler';
@@ -19,7 +19,7 @@ export default class Magenta extends Sampler implements IMagenta {
     this.typeValue = TYPE_VALUE.sequence;
   }
 
-  private async _getNotes () {
+  private async _getNotes (): Promise<INote[]> {
     const VAEspec: any = {
       type: 'MusicVAE',
       dataConverter: {
@@ -54,14 +54,18 @@ export default class Magenta extends Sampler implements IMagenta {
     const samples = await model.sample(1, temperature, controlArgs, stepsPerQuarter, numSteps);
     const notes = samples[0].notes;
 
-    const value: any = this.value;
-
-    const newValue: any = [];
-    notes?.forEach((note) => {
-      newValue.push(new Note({ value: note.pitch, value2: ((note.quantizedEndStep || 0) - (note.quantizedStartStep || 0)), value3: TriggerAttack.getValue(value).interval }, true));
-    });
-
     await model.dispose();
+
+    const value: any = this.value;
+    const newValue: INote[] = [];
+
+    notes?.forEach((note) => {
+      newValue.push(new Note({
+        value: note.pitch,
+        value2: ((note.quantizedEndStep || 0) - (note.quantizedStartStep || 0)),
+        value3: TriggerAttack.getValue(value).interval
+      }, true));
+    });
 
     return newValue;
   }
