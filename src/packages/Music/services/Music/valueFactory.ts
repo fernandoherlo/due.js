@@ -1,4 +1,4 @@
-import { INote, IValueFactory } from '~/src/vite-env';
+import type { INote, IValueFactory } from '~/src/types';
 import Note from '../Note';
 import getter from '../Variable/getter';
 

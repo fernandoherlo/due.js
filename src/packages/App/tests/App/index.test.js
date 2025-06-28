@@ -19,7 +19,7 @@ describe('App', () => {
     const app = new App(true);
     // Activate
     // Assert
-    expect(app.$debugEnabled).toBeTruthy();
+    expect(app.__debugEnabled).toBeTruthy();
   });
 
   it('Should throw error on start if not has services', async () => {

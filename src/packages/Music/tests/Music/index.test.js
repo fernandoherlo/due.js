@@ -12,7 +12,7 @@ vi.mock('~/src/packages/Music/constants', () => {
 });
 
 const mockApp = {
-  $debugEnabled: true,
+  __debugEnabled: true,
   $logger: {
     log: vi.fn()
   },
@@ -31,7 +31,7 @@ describe('Music', () => {
     const music = new Music(mockApp);
     // Activate
     // Assert
-    expect(music._app).toEqual(mockApp);
+    expect(music.app).toEqual(mockApp);
   });
 
   describe('Instructions', () => {
@@ -43,7 +43,7 @@ describe('Music', () => {
       await music.add(instructions);
       // Assert
       expect(mockApp.$debugger.add).toHaveBeenCalledWith('ADD', expect.anything());
-      expect(music._instructions).toHaveProperty('bar');
+      expect(music.instructions).toHaveProperty('bar');
     });
 
     it('Add empty', async () => {
@@ -65,7 +65,7 @@ describe('Music', () => {
       await music.update(instructions);
       // Assert
       expect(mockApp.$debugger.add).toHaveBeenCalledWith('UPDATE', expect.anything());
-      expect(music._instructions.bar.update).toHaveBeenCalled();
+      expect(music.instructions.bar.update).toHaveBeenCalled();
     });
 
     it('Update empty', async () => {
@@ -86,7 +86,7 @@ describe('Music', () => {
       await music.delete(instructions);
       // Assert
       expect(mockApp.$debugger.add).toHaveBeenCalledWith('DELETE', expect.anything());
-      expect(music._instructions).not.toHaveProperty('bar');
+      expect(music.instructions).not.toHaveProperty('bar');
     });
 
     it('Delete empty', async () => {

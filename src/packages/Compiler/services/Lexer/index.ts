@@ -1,14 +1,14 @@
-import { IApp, IParser, ILexer, IInstruction } from '~/src/vite-env';
+import type { IApp, IParser, ILexer, IInstruction } from '~/src/types';
 import Instruction from '../Instruction';
 import { COMMANDS_MAP } from '../../constants';
 
 export default class Lexer implements ILexer {
-  private _app: IApp;
-  private _parser: IParser;
+  private app: IApp;
+  private parser: IParser;
 
   constructor (app: IApp, parser: IParser) {
-    this._app = app;
-    this._parser = parser;
+    this.app = app;
+    this.parser = parser;
   }
 
   exec (code: string): IInstruction[] {
@@ -19,13 +19,13 @@ export default class Lexer implements ILexer {
       throw Error('Code is not string.');
     }
 
-    this._app.$logger.log(code);
+    this.app.$logger.log(code);
 
     const newCode = code.replace(' ', '');
-    return this._generateLexical(newCode);
+    return this.generateLexical(newCode);
   }
 
-  private _generateLexical (code: string): IInstruction[] {
+  private generateLexical (code: string): IInstruction[] {
     const lines = code.split('\n');
     const lexicalGroup: IInstruction[] = [];
 
@@ -35,7 +35,7 @@ export default class Lexer implements ILexer {
         continue;
       }
 
-      const lexicals = this._parseLine(line);
+      const lexicals = this.parseLine(line);
       if (lexicals) {
         lexicals.forEach(lexical => {
           lexicalGroup.push(lexical);
@@ -46,18 +46,18 @@ export default class Lexer implements ILexer {
     return lexicalGroup;
   }
 
-  private _parseLine (line: string): IInstruction[] {
+  private parseLine (line: string): IInstruction[] {
     const lexicals: IInstruction[] = [];
-    const commands: string[] = this._parser.line(line);
+    const commands: string[] = this.parser.line(line);
 
     if (!Array.isArray(commands)) {
       throw Error('"commands" is not array.');
     }
 
     commands.forEach((command) => {
-      const commandParsed = this._parser.command(command);
+      const commandParsed = this.parser.command(command);
       if (commandParsed) {
-        const lexical = this._newLexical(commandParsed);
+        const lexical = this.newLexical(commandParsed);
         lexicals.push(lexical);
       }
     });
@@ -65,7 +65,7 @@ export default class Lexer implements ILexer {
     return lexicals;
   }
 
-  private _newLexical (commandParsed: Record<string, any>): IInstruction {
+  private newLexical (commandParsed: Record<string, any>): IInstruction {
     return new Instruction({
       name: commandParsed.name,
       element: commandParsed.element,

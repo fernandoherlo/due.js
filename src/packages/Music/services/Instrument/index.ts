@@ -1,5 +1,5 @@
 import * as Tone from 'tone';
-import { IApp, IInstruction, IInstrument, INote } from '~/src/vite-env';
+import type { IApp, IInstruction, IInstrument, INote } from '~/src/types';
 import Instruction from '~/src/packages/Compiler/services/Instruction';
 import { TYPE_VALUE } from '~/src/packages/Compiler/constants';
 import TriggerAttack from './triggerAttack';
@@ -7,16 +7,17 @@ import LogInstrument from './logInstrument';
 import { COMMANDS_ELEMENT_MAP } from '../../constants';
 
 export default class Instrument extends Instruction implements IInstrument {
-  protected _app: IApp;
-  protected _instrument: any | null = null;
-  protected _canUpdate: boolean = false;
-  private _loop: Tone.Loop<Tone.LoopOptions> | null = null;
-  private _valueStep: number = 0;
+  protected app: IApp;
+  protected instrument: any | null = null;
+  protected canUpdate: boolean = false;
+
+  private loop: Tone.Loop<Tone.LoopOptions> | null = null;
+  private valueStep: number = 0;
 
   constructor (data: any, app: IApp) {
     super(data);
 
-    this._app = app;
+    this.app = app;
   }
 
   async start (): Promise<void> {
@@ -29,7 +30,7 @@ export default class Instrument extends Instruction implements IInstrument {
     for (let i = 0; i < this.actions.length; i++) {
       const action: IInstruction = this.actions[i];
 
-      const element = COMMANDS_ELEMENT_MAP[action.name](action, this._app);
+      const element = COMMANDS_ELEMENT_MAP[action.name](action, this.app);
       await element.create();
       this.actions[i] = element;
 
@@ -50,30 +51,30 @@ export default class Instrument extends Instruction implements IInstrument {
   async play (): Promise<void> {
     const note: INote = TriggerAttack.getValue(this.value);
 
-    if (this._loop) {
-      await this._loop.cancel();
-      await this._loop.dispose();
+    if (this.loop) {
+      await this.loop.cancel();
+      await this.loop.dispose();
     }
 
-    this._loop = new Tone.Loop((/* time: number */) => {
-      if (this._instrument) {
-        const logNote = TriggerAttack.play(this.value, this.typeValue, this._valueStep, this._instrument);
-        LogInstrument.log(this._app.$logger, this, logNote);
+    this.loop = new Tone.Loop((/* time: number */) => {
+      if (this.instrument) {
+        const logNote = TriggerAttack.play(this.value, this.typeValue, this.valueStep, this.instrument);
+        LogInstrument.log(this.app.$logger, this, logNote);
 
-        if (this._loop) {
-          this._loop.interval = parseFloat(TriggerAttack.getValue(note.interval));
+        if (this.loop) {
+          this.loop.interval = parseFloat(TriggerAttack.getValue(note.interval));
         }
         if (this.typeValue === TYPE_VALUE.sequence) {
-          this._valueStep++;
+          this.valueStep++;
         }
       }
     }, parseFloat(TriggerAttack.getValue(note.interval))).start(0);
   }
 
   async end (): Promise<void> {
-    if (this._loop) {
-      await this._loop.cancel();
-      await this._loop.dispose();
+    if (this.loop) {
+      await this.loop.cancel();
+      await this.loop.dispose();
     }
 
     if (this.actions) {
@@ -82,14 +83,14 @@ export default class Instrument extends Instruction implements IInstrument {
       }
     }
 
-    if (this._instrument) {
-      await this._instrument.disconnect();
-      await this._instrument.dispose();
+    if (this.instrument) {
+      await this.instrument.disconnect();
+      await this.instrument.dispose();
     }
   }
 
   async update (newInstrument: IInstrument): Promise<void> {
-    if (this._canUpdate) {
+    if (this.canUpdate) {
       this.value = newInstrument.value;
       this.typeValue = newInstrument.typeValue;
       this.modifier = newInstrument.modifier;

@@ -1,14 +1,14 @@
 import * as Tone from 'tone';
-import { ISynth, IApp } from '~/src/vite-env';
+import type { ISynth, IApp } from '~/src/types';
 import Instrument from '..';
 
 export default class Synth extends Instrument implements ISynth {
-  protected _instrument: Tone.Synth<Tone.SynthOptions> | null = null;
+  protected instrument: Tone.Synth<Tone.SynthOptions> | null = null;
 
   constructor (data: any, app: IApp) {
     super(data, app);
 
-    this._canUpdate = true;
+    this.canUpdate = true;
   }
 
   async start (): Promise<void> {
@@ -17,13 +17,13 @@ export default class Synth extends Instrument implements ISynth {
       connect = await this.startActions();
     }
 
-    this._instrument = new Tone.Synth();
-    this._instrument.debug = this._app.$debugEnabled;
+    this.instrument = new Tone.Synth();
+    this.instrument.debug = this.app.__debugEnabled;
 
     if (connect) {
-      this._instrument.connect(connect._effect);
+      this.instrument.connect(connect._effect);
     } else {
-      this._instrument.toDestination();
+      this.instrument.toDestination();
     }
 
     await super.start();

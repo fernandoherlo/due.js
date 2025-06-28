@@ -1,4 +1,4 @@
-import { IInstrument, IMagenta, INote } from '~/src/vite-env';
+import type { IInstrument, IMagenta, INote } from '~/src/types';
 import { TYPE_VALUE } from '~/src/packages/Compiler/constants';
 import Note from '../../Note';
 import Sampler from '../Sampler';

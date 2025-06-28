@@ -1,25 +1,25 @@
 import { WebMidi } from 'webmidi';
-import { IInstrument, IMidiSampler } from '~/src/vite-env';
+import type { IInstrument, IMidiSampler } from '~/src/types';
 import Sampler from '../Sampler';
 
 export default class MidiSampler extends Sampler implements IMidiSampler {
-  private _midi: any | null;
+  private midi: any | null;
 
   async start (): Promise<void> {
-    WebMidi.inputs.forEach(input => this._app.$logger.log(input.name));
+    WebMidi.inputs.forEach(input => this.app.$logger.log(input.name));
 
     const input = WebMidi.inputs[parseInt(this.element)];
     const channelRaw: any = this.value;
-    this._midi = input.channels[parseInt(channelRaw.value)];
+    this.midi = input.channels[parseInt(channelRaw.value)];
 
-    this._midi.addListener('noteon', (e: any) => {
-      if (this._instrument) {
-        this._instrument.triggerAttack(e.note.identifier);
+    this.midi.addListener('noteon', (e: any) => {
+      if (this.instrument) {
+        this.instrument.triggerAttack(e.note.identifier);
       }
     });
-    this._midi.addListener('noteoff', (e: any) => {
-      if (this._instrument) {
-        this._instrument.triggerRelease(e.note.identifier);
+    this.midi.addListener('noteoff', (e: any) => {
+      if (this.instrument) {
+        this.instrument.triggerRelease(e.note.identifier);
       }
     });
 
@@ -29,7 +29,7 @@ export default class MidiSampler extends Sampler implements IMidiSampler {
   async play (): Promise<void> {}
 
   async update (newInstrument: IInstrument): Promise<void> {
-    if (this._canUpdate) {
+    if (this.canUpdate) {
       if (
         this.value !== newInstrument.value
       ) {
@@ -44,8 +44,8 @@ export default class MidiSampler extends Sampler implements IMidiSampler {
   }
 
   async end (): Promise<void> {
-    this._midi.removeListener('noteon');
-    this._midi.removeListener('noteoff');
+    this.midi.removeListener('noteon');
+    this.midi.removeListener('noteoff');
 
     await super.end();
   }

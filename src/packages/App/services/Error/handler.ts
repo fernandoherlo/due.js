@@ -1,19 +1,19 @@
-import { IApp, IErrorHandler } from '~/src/vite-env';
+import type { IApp, IErrorHandler } from '~/src/types';
 
 export default class Handler implements IErrorHandler {
-  private _app: IApp;
+  private app: IApp;
 
   constructor (app: IApp) {
-    this._app = app;
+    this.app = app;
 
     const container = window || {};
     container.onerror = (...args) => {
-      this._catchError(args);
+      this.catchError(args);
       return true;
     };
   }
 
-  private _catchError (args: any[]) {
-    this._app.$logger.error(args);
+  private catchError (args: any[]) {
+    this.app.$logger.error(args);
   }
 }

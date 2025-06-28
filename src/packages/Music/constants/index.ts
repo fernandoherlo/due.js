@@ -1,4 +1,4 @@
-import { IApp, IInstruction } from '~/src/vite-env';
+import type { IApp, IInstruction } from '~/src/types';
 import { COMMANDS } from '~/src/packages/Compiler/constants';
 
 import Synth from '../services/Instrument/Synth';
@@ -13,7 +13,7 @@ import Delay from '../services/Effect/Delay';
 import VariableLive from '../services/VariableLive';
 import MidiIn from '../services/MidiIn';
 
-export const COMMANDS_ELEMENT_MAP: any = {
+export const COMMANDS_ELEMENT_MAP: Record<typeof COMMANDS[keyof typeof COMMANDS], (instruction: IInstruction, app: IApp) => any> = {
   [COMMANDS.n]: (instruction: IInstruction, app: IApp) => new Synth(instruction, app),
   [COMMANDS.sam]: (instruction: IInstruction, app: IApp) => new Sampler(instruction, app),
   [COMMANDS.misam]: (instruction: IInstruction, app: IApp) => new MidiSampler(instruction, app),
@@ -27,7 +27,7 @@ export const COMMANDS_ELEMENT_MAP: any = {
   [COMMANDS.ai]: (instruction: IInstruction, app: IApp) => new Magenta(instruction, app)
 };
 
-export const SAMPLER_MAP: any = {
+export const SAMPLER_MAP: Record<string, string> = {
   piano: 'vsco2-piano-mf',
   glock: 'vsco2-glock',
   bowls: 'kasper-singing-bowls',

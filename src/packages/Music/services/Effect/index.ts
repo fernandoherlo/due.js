@@ -1,55 +1,55 @@
-import { IEffect, IApp } from '~/src/vite-env';
+import type { IEffect, IApp } from '~/src/types';
 import Instrument from '../Instrument';
 import { COMMANDS } from '~/src/packages/Compiler/constants';
 
 export default class Effect extends Instrument implements IEffect {
-  protected _effect: any | null = null;
-  protected _min: number = 0;
-  protected _max: number = 0;
+  protected effect: any | null = null;
+  protected min: number = 0;
+  protected max: number = 0;
 
   constructor (data: any, app: IApp) {
     super(data, app);
 
-    this._canUpdate = true;
+    this.canUpdate = true;
   }
 
   create () {
-    if (this._effect) {
-      this._effect.debug = this._app.$debugEnabled;
+    if (this.effect) {
+      this.effect.debug = this.app.__debugEnabled;
     }
   }
 
   toDestination () {
-    if (this._effect) {
-      this._effect.toDestination();
+    if (this.effect) {
+      this.effect.toDestination();
     }
   }
 
   connect (action: any) {
-    if (this._effect) {
-      this._effect.connect(action._effect);
+    if (this.effect) {
+      this.effect.connect(action.effect);
     }
   }
 
   async end (): Promise<void> {
-    if (this._effect) {
-      await this._effect.disconnect();
-      await this._effect.dispose();
+    if (this.effect) {
+      await this.effect.disconnect();
+      await this.effect.dispose();
     }
   }
 
-  protected _getValue (value: any): number {
+  protected getValue (value: any): number {
     if (value && typeof value === 'string' && value.startsWith(COMMANDS.$$)) {
-      this._app.$variablesLiveMap[value] = this;
+      this.app.$variablesLiveMap[value] = this;
       return 0; // default, set on live midi in
     }
 
-    return this._mapValue(value);
+    return this.mapValue(value);
   }
 
-  private _mapValue (value: number): number {
+  private mapValue (value: number): number {
     const { min: fromMin, max: fromMax }: { min: number, max: number } = { min: 0, max: 127 };
-    const { min: toMin, max: toMax }: { min: number, max: number } = { min: this._min, max: this._max };
+    const { min: toMin, max: toMax }: { min: number, max: number } = { min: this.min, max: this.max };
 
     // Determine how wide the ranges are
     const fromSize: number = fromMax - fromMin;

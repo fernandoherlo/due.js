@@ -1,4 +1,4 @@
-import { IApp, ILogger, IStore, IErrorHandler, IDebugger, IMusic, ICompiler, IEditor, IUi, IValueFactory, IMidiIn } from '~/src/vite-env';
+import type { IApp, ILogger, IStore, IErrorHandler, IDebugger, IMusic, ICompiler, IEditor, IUi, IValueFactory, IMidiIn } from '~/src/types';
 import Logger from '../Logger';
 import Store from '../Store';
 import ErrorHandler from '../Error/handler';
@@ -7,8 +7,9 @@ import Ui from '../Ui';
 import { LOCAL_STORAGE_KEY_CODE } from '../../constants';
 
 export default class App implements IApp {
-  $debugEnabled: boolean;
-  $logEnabled: boolean;
+  __debugEnabled: boolean;
+  __logEnabled: boolean;
+
   $logger: ILogger;
   $store: IStore;
   $error: IErrorHandler;
@@ -26,8 +27,8 @@ export default class App implements IApp {
   $variablesLiveMap: Record<string, any> = {};
 
   constructor (debug: boolean = true) {
-    this.$debugEnabled = debug;
-    this.$logEnabled = true;
+    this.__debugEnabled = debug;
+    this.__logEnabled = true;
 
     this.$logger = new Logger(this);
     this.$store = new Store();

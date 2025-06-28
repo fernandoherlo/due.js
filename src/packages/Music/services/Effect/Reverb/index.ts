@@ -1,5 +1,5 @@
 import * as Tone from 'tone';
-import { IReverb, IApp } from '~/src/vite-env';
+import type { IReverb, IApp } from '~/src/types';
 import Effect from '..';
 
 export default class Reverb extends Effect implements IReverb {
@@ -8,22 +8,22 @@ export default class Reverb extends Effect implements IReverb {
   constructor (data: any, app: IApp) {
     super(data, app);
 
-    this._canUpdate = true;
-    this._max = 20;
+    this.canUpdate = true;
+    this.max = 20;
   }
 
   create () {
     this._effect = new Tone.Reverb();
     if (!Array.isArray(this.value)) {
-      this._effect.decay = this._getValue(this.value.value);
+      this._effect.decay = this.getValue(this.value.value);
     }
 
     super.create();
   }
 
   async update (value: any): Promise<void> {
-    if (this._canUpdate && this._effect) {
-      this._effect.decay = this._getValue(value);
+    if (this.canUpdate && this._effect) {
+      this._effect.decay = this.getValue(value);
     }
   }
 }

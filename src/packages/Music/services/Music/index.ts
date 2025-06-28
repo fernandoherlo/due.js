@@ -1,19 +1,19 @@
 import * as Tone from 'tone';
 import { WebMidi } from 'webmidi';
 
-import { IApp, IMusic, IInstruction } from '~/src/vite-env';
+import type { IApp, IMusic, IInstruction } from '~/src/types';
 import ValueFactory from '~/src/packages/Music/services/Music/valueFactory';
 import { COMMANDS_ELEMENT_MAP, SAMPLER_MAP } from '../../constants';
 
 export default class Music implements IMusic {
-  private _app: IApp;
-  private _instructions: any;
+  private app: IApp;
+  private instructions: any;
 
   constructor (app: IApp) {
-    this._app = app;
-    this._instructions = {};
+    this.app = app;
+    this.instructions = {};
 
-    this._app.$valueFactory = new ValueFactory();
+    this.app.$valueFactory = new ValueFactory();
   }
 
   async start () {
@@ -21,10 +21,10 @@ export default class Music implements IMusic {
 
     Tone.Transport.scheduleRepeat(async (time) => {
       Tone.Draw.schedule(() => {
-        this._app.$ui.updateLoopTime();
+        this.app.$ui.updateLoopTime();
       }, time);
 
-      this._app.$ui.updateSteps();
+      this.app.$ui.updateSteps();
     }, 1);
   }
 
@@ -34,49 +34,49 @@ export default class Music implements IMusic {
   }
 
   samples () {
-    this._app.$logger.log(SAMPLER_MAP);
+    this.app.$logger.log(SAMPLER_MAP);
   }
 
   async add (instructions: Array<IInstruction>) {
     if (instructions.length) {
-      this._app.$debugger.add('ADD', instructions);
+      this.app.$debugger.add('ADD', instructions);
     }
 
     for (let i = 0; i < instructions.length; i++) {
       const instruction: IInstruction = instructions[i];
-      if (!this._instructions[instruction.key]) {
-        const element = COMMANDS_ELEMENT_MAP[instruction.name](instruction, this._app);
+      if (!this.instructions[instruction.key]) {
+        const element = COMMANDS_ELEMENT_MAP[instruction.name](instruction, this.app);
         await element.start();
 
-        this._instructions[instruction.key] = element;
+        this.instructions[instruction.key] = element;
       }
     }
   }
 
   async update (instructions: Array<IInstruction>) {
     if (instructions.length) {
-      this._app.$debugger.add('UPDATE', instructions);
+      this.app.$debugger.add('UPDATE', instructions);
     }
 
     for (let i = 0; i < instructions.length; i++) {
       const instruction: IInstruction = instructions[i];
-      if (this._instructions[instruction.key]) {
-        await this._instructions[instruction.key].update(instruction);
+      if (this.instructions[instruction.key]) {
+        await this.instructions[instruction.key].update(instruction);
       }
     }
   }
 
   async delete (instructions: Array<IInstruction>) {
     if (instructions.length) {
-      this._app.$debugger.add('DELETE', instructions);
+      this.app.$debugger.add('DELETE', instructions);
     }
 
     for (let i = 0; i < instructions.length; i++) {
       const instruction: IInstruction = instructions[i];
-      if (this._instructions[instruction.key]) {
-        await this._instructions[instruction.key].end();
+      if (this.instructions[instruction.key]) {
+        await this.instructions[instruction.key].end();
 
-        delete this._instructions[instruction.key];
+        delete this.instructions[instruction.key];
       }
     }
   }

@@ -1,19 +1,17 @@
 import { stringify } from 'flatted';
-import { IDebugger, IApp } from '~/src/vite-env';
+import type { IDebugger, IApp } from '~/src/types';
 
 export default class Debugger implements IDebugger {
-  private _app: IApp;
-  private _debugEnabled: boolean;
-  private _htmlId: string;
+  private app: IApp;
+  private htmlId: string;
 
   constructor (app: IApp) {
-    this._app = app;
-    this._debugEnabled = this._app.$debugEnabled;
-    this._htmlId = 'debugger';
+    this.app = app;
+    this.htmlId = 'debugger';
 
     const container = window || {};
-    if (this._debugEnabled && container) {
-      container.App = this._app;
+    if (this.app.__debugEnabled && container) {
+      container.App = this.app;
     }
   }
 
@@ -22,8 +20,8 @@ export default class Debugger implements IDebugger {
       return;
     }
 
-    if (this._debugEnabled) {
-      const debuggerElement: HTMLDivElement | null = document.getElementById(this._htmlId) as HTMLDivElement;
+    if (this.app.__debugEnabled) {
+      const debuggerElement: HTMLDivElement | null = document.getElementById(this.htmlId) as HTMLDivElement;
       debuggerElement.innerHTML = `${this._getDate()} | ${title} | ${stringify(text, null, 2)}<br><br>---<br><br>` + debuggerElement.innerHTML;
     }
   }

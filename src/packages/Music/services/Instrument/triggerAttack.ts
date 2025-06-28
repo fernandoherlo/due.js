@@ -1,4 +1,4 @@
-import { INote } from '~/src/vite-env';
+import type { INote } from '~/src/types';
 import { TYPE_VALUE } from '~/src/packages/Compiler/constants';
 
 export default class TriggerAttack {

@@ -1,4 +1,4 @@
-export const COMMANDS: any = {
+export const COMMANDS: Record<string, string> = {
   p: 'p',
   n: 'n',
   seq: 'seq',
@@ -17,9 +17,9 @@ export const COMMANDS: any = {
   con: 'con',
   $: '$',
   $$: '$$'
-};
+} as const;
 
-export const COMMANDS_MAP: any = {
+export const COMMANDS_MAP: Record<typeof COMMANDS[keyof typeof COMMANDS], string> = {
   [COMMANDS.p]: 'piece',
   [COMMANDS.n]: 'notes',
   [COMMANDS.seq]: 'sequencer',
@@ -40,7 +40,7 @@ export const COMMANDS_MAP: any = {
   [COMMANDS.$$]: '1_live_variable_'
 };
 
-export const TYPE_VALUE: any = {
+export const TYPE_VALUE: Record<string, string> = {
   normal: 'normal',
   random: 'random',
   sequence: 'sequence',

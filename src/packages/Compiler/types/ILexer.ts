@@ -1,4 +1,4 @@
-import { IInstruction } from '~/src/vite-env';
+import type { IInstruction } from '~/src/types';
 
 export interface ILexer {
   exec: (code: string) => IInstruction[];

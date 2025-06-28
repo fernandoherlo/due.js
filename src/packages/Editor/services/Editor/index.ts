@@ -5,20 +5,20 @@ import { sassLanguage } from '@codemirror/lang-sass';
 
 import { DueTheme, DueThemeHighlightStyle } from '../../constants/theme';
 
-import { IApp, IEditor } from '~/src/vite-env';
+import type { IApp, IEditor } from '~/src/types';
 import { LOCAL_STORAGE_KEY_CODE } from '~/src/packages/App/constants';
 
 export default class Editor implements IEditor {
-  private _app: IApp;
-  private _editor: EditorView | null;
+  private app: IApp;
+  private editor: EditorView | null;
 
   constructor (app: IApp) {
-    this._app = app;
-    this._editor = null;
+    this.app = app;
+    this.editor = null;
   }
 
   create () {
-    const code = this._app.getFromLocalStorage(LOCAL_STORAGE_KEY_CODE) || undefined;
+    const code = this.app.getFromLocalStorage(LOCAL_STORAGE_KEY_CODE) || undefined;
 
     const theme = EditorView.theme(DueTheme);
 
@@ -32,15 +32,15 @@ export default class Editor implements IEditor {
       ]
     });
 
-    this._editor = new EditorView({
+    this.editor = new EditorView({
       state: startState
     });
 
     const editorViewElement: HTMLDivElement | null = document.getElementById('editor-view') as HTMLDivElement;
-    editorViewElement.append(this._editor.dom);
+    editorViewElement.append(this.editor.dom);
   }
 
   getCode (): string | undefined {
-    return this._editor?.state.doc.toString();
+    return this.editor?.state.doc.toString();
   }
 }

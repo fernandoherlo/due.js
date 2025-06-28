@@ -18,7 +18,7 @@ describe('Parser', () => {
     const parser = new Parser(mockApp);
     // Activate
     // Assert
-    expect(parser._app).toEqual(mockApp);
+    expect(parser.app).toEqual(mockApp);
   });
 
   describe('line', () => {

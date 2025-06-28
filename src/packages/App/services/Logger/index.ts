@@ -1,12 +1,10 @@
-import { IApp, ILogger } from '~/src/vite-env';
+import type { IApp, ILogger } from '~/src/types';
 
 export default class Logger implements ILogger {
-  private _app: IApp;
-  private _logEnabled: boolean;
+  private app: IApp;
 
   constructor (app: IApp) {
-    this._app = app;
-    this._logEnabled = this._app.$logEnabled;
+    this.app = app;
   }
 
   log (...messages: any | any[] | string) {
@@ -14,13 +12,13 @@ export default class Logger implements ILogger {
     const normal: string = 'font-weight: normal; font-size: 1em;';
     const italic: string = 'font-style: italic; font-size: 0.8em;';
 
-    if (this._logEnabled) {
+    if (this.app.__logEnabled) {
       console.log(...messages, bold, normal, italic);
     }
   }
 
   error (...messages: any | any[] | string) {
-    if (this._logEnabled) {
+    if (this.app.__logEnabled) {
       console.error(...messages);
     }
   }

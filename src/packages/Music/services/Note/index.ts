@@ -1,4 +1,4 @@
-import { INote } from '~/src/vite-env';
+import type { INote } from '~/src/types';
 
 export default class Note implements INote {
   value: string | Array<string> | any;

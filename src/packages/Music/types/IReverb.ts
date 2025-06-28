@@ -1,4 +1,4 @@
-import { IEffect } from '~/src/vite-env';
+import type { IEffect } from '~/src/types';
 
 export interface IReverb extends IEffect {
 }

@@ -1,58 +1,58 @@
-import { IApp, ILexer, IInterpreter, ICompiler, IInstruction } from '~/src/vite-env';
-import { compareInstructions } from '../Instruction/compare';
+import type { IApp, ILexer, IInterpreter, ICompiler, IInstruction } from '~/src/types';
+import { areDifferentInstructions } from '../Instruction/compare';
 
 export default class Compiler implements ICompiler {
-  private _app: IApp;
-  private _lexer: ILexer;
-  private _interpreter: IInterpreter;
+  private app: IApp;
+  private lexer: ILexer;
+  private interpreter: IInterpreter;
 
-  private _lastInstructions: any;
+  private lastInstructions: any;
 
   constructor (app: IApp, lexer: ILexer, interpreter: IInterpreter) {
-    this._app = app;
-    this._lexer = lexer;
-    this._interpreter = interpreter;
+    this.app = app;
+    this.lexer = lexer;
+    this.interpreter = interpreter;
 
-    this._lastInstructions = {};
+    this.lastInstructions = {};
   }
 
   exec (code: string) {
-    this._app.$logger.log(code);
+    this.app.$logger.log(code);
 
-    this._resetVariables();
+    this.resetVariables();
 
-    const lexical: IInstruction[] = this._lexer.exec(code);
-    const instructions: IInstruction[] = this._interpreter.exec(lexical);
-    const calculatedInstructions: Array<IInstruction[]> = this._calculateInstructions(instructions);
+    const lexical: IInstruction[] = this.lexer.exec(code);
+    const instructions: IInstruction[] = this.interpreter.exec(lexical);
+    const calculatedInstructions: Array<IInstruction[]> = this.calculateInstructions(instructions);
 
-    this._lastInstructions = instructions;
+    this.lastInstructions = instructions;
     return [instructions, ...calculatedInstructions];
   }
 
-  private _resetVariables (): void {
-    this._app.$variables = {};
+  private resetVariables (): void {
+    this.app.$variables = {};
   }
 
-  private _calculateInstructions (instructions: IInstruction[]): Array<IInstruction[]> {
+  private calculateInstructions (instructions: IInstruction[]): Array<IInstruction[]> {
     const addedInstructions: IInstruction[] = [];
     const updatedInstructions: IInstruction[] = [];
     const deletedInstructions: IInstruction[] = [];
 
     for (const key in instructions) {
-      if (instructions[key] && this._lastInstructions) {
-        if (!Object.keys(this._lastInstructions).includes(key)) {
+      if (instructions[key] && this.lastInstructions) {
+        if (!Object.keys(this.lastInstructions).includes(key)) {
           addedInstructions.push(instructions[key]);
         } else {
-          if (compareInstructions(instructions[key], this._lastInstructions[key])) {
+          if (areDifferentInstructions(instructions[key], this.lastInstructions[key])) {
             updatedInstructions.push(instructions[key]);
           }
         }
       }
     }
 
-    for (const key in this._lastInstructions) {
-      if (this._lastInstructions[key] && instructions && !Object.keys(instructions).includes(key)) {
-        deletedInstructions.push(this._lastInstructions[key]);
+    for (const key in this.lastInstructions) {
+      if (this.lastInstructions[key] && instructions && !Object.keys(instructions).includes(key)) {
+        deletedInstructions.push(this.lastInstructions[key]);
       }
     }
 

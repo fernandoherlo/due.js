@@ -1,4 +1,4 @@
-import { IInstrument } from '~/src/vite-env';
+import type { IInstrument } from '~/src/types';
 
 export interface IEffect extends IInstrument {
   create: () => void;

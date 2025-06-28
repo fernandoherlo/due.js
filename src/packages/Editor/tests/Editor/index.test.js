@@ -16,6 +16,6 @@ describe('Editor', () => {
     const editor = new Editor(mockApp);
     // Activate
     // Assert
-    expect(editor._editor).toBeNull();
+    expect(editor.editor).toBeNull();
   });
 });

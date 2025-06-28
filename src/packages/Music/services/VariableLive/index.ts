@@ -1,31 +1,31 @@
-import { IApp, IVariableLive } from '~/src/vite-env';
+import type { IApp, IVariableLive } from '~/src/types';
 import Instruction from '~/src/packages/Compiler/services/Instruction';
 import { COMMANDS } from '~/src/packages/Compiler/constants';
 import { COMMANDS_ELEMENT_MAP } from '../../constants';
 
 export default class VariableLive extends Instruction implements IVariableLive {
-  private _app: IApp;
+  private app: IApp;
 
   constructor (data: any, app: IApp) {
     super(data);
 
-    this._app = app;
+    this.app = app;
   }
 
   async start (): Promise<void> {
-    this._app.$variablesLive[this.key] = COMMANDS_ELEMENT_MAP[COMMANDS.mi](this, this._app);
+    this.app.$variablesLive[this.key] = COMMANDS_ELEMENT_MAP[COMMANDS.mi](this, this.app);
 
-    await this._app.$variablesLive[this.key].start();
+    await this.app.$variablesLive[this.key].start();
   }
 
   async end (): Promise<void> {
-    if (this._app.$variablesLive[this.key]) {
-      await this._app.$variablesLive[this.key].end();
-      delete this._app.$variablesLive[this.key];
+    if (this.app.$variablesLive[this.key]) {
+      await this.app.$variablesLive[this.key].end();
+      delete this.app.$variablesLive[this.key];
     }
   }
 
-  async update (newVariable: IVariableLive) {
+  async update (newVariable: IVariableLive): Promise<void> {
     this.value = newVariable.value;
     this.typeValue = newVariable.typeValue;
     this.modifier = newVariable.modifier;

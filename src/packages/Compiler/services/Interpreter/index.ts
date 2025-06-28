@@ -1,10 +1,10 @@
-import { IApp, IInstruction, IInterpreter } from '~/src/vite-env';
+import type { IApp, IInstruction, IInterpreter } from '~/src/types';
 
 export default class Interpreter implements IInterpreter {
-  private _app: IApp;
+  private app: IApp;
 
   constructor (app: IApp) {
-    this._app = app;
+    this.app = app;
   }
 
   exec (lexical: IInstruction[]): IInstruction[] {
@@ -12,11 +12,10 @@ export default class Interpreter implements IInterpreter {
       throw Error('"lexical" is not array.');
     }
 
-    const instructions = this._groupLexical(lexical);
-    return instructions;
+    return this.groupLexical(lexical);
   }
 
-  private _groupLexical (lexical: IInstruction[]): IInstruction[] {
+  private groupLexical (lexical: IInstruction[]): IInstruction[] {
     const instructions: any = {};
 
     let actualElement;
@@ -34,7 +33,7 @@ export default class Interpreter implements IInterpreter {
         continue;
       }
 
-      this._app.$logger.log(instruction);
+      this.app.$logger.log(instruction);
 
       throw Error('Can`t interprete command');
     }

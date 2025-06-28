@@ -1,4 +1,4 @@
-import { IInstruction, INote } from '~/src/vite-env';
+import type { IInstruction, INote } from '~/src/types';
 
 export default class Instruction implements IInstruction {
   name: string;

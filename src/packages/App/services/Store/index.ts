@@ -1,4 +1,4 @@
-import { IStore } from '~/src/vite-env';
+import type { IStore } from '~/src/types';
 
 export default class Store implements IStore {
   state: any;

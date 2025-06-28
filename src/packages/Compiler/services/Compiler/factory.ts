@@ -1,4 +1,4 @@
-import { IApp, ICompiler, IInterpreter, ILexer, IParser } from '~/src/vite-env';
+import type { IApp, ICompiler, IInterpreter, ILexer, IParser } from '~/src/types';
 import Parser from '../Parser';
 import Lexer from '../Lexer';
 import Interpreter from '../Interpreter';

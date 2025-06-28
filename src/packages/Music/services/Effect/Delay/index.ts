@@ -1,5 +1,5 @@
 import * as Tone from 'tone';
-import { IDelay, IApp } from '~/src/vite-env';
+import type { IDelay, IApp } from '~/src/types';
 import Effect from '..';
 
 export default class Delay extends Effect implements IDelay {
@@ -8,14 +8,14 @@ export default class Delay extends Effect implements IDelay {
   constructor (data: any, app: IApp) {
     super(data, app);
 
-    this._canUpdate = true;
-    this._max = 3;
+    this.canUpdate = true;
+    this.max = 3;
   }
 
   create () {
     this._effect = new Tone.FeedbackDelay();
     if (!Array.isArray(this.value)) {
-      const delay: number = this._getValue(this.value.value);
+      const delay: number = this.getValue(this.value.value);
       const feedback: number = parseFloat(this.value.duration);
 
       this._effect.delayTime.value = delay;
@@ -26,8 +26,8 @@ export default class Delay extends Effect implements IDelay {
   }
 
   async update (value: any): Promise<void> {
-    if (this._canUpdate && this._effect) {
-      this._effect.delayTime.value = this._getValue(value);
+    if (this.canUpdate && this._effect) {
+      this._effect.delayTime.value = this.getValue(value);
     }
   }
 }
