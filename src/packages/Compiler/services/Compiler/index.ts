@@ -6,14 +6,14 @@ export default class Compiler implements ICompiler {
   private lexer: ILexer;
   private interpreter: IInterpreter;
 
-  private lastInstructions: any;
+  private previousInstructions: Record<string, IInstruction>;
 
   constructor (app: IApp, lexer: ILexer, interpreter: IInterpreter) {
     this.app = app;
     this.lexer = lexer;
     this.interpreter = interpreter;
 
-    this.lastInstructions = {};
+    this.previousInstructions = {};
   }
 
   exec (code: string) {
@@ -22,40 +22,45 @@ export default class Compiler implements ICompiler {
     this.resetVariables();
 
     const lexical: IInstruction[] = this.lexer.exec(code);
-    const instructions: IInstruction[] = this.interpreter.exec(lexical);
-    const calculatedInstructions: Array<IInstruction[]> = this.calculateInstructions(instructions);
-
-    this.lastInstructions = instructions;
-    return [instructions, ...calculatedInstructions];
+    const instructions: Record<string, IInstruction> = this.interpreter.exec(lexical);
+    const calculatedInstructions: Record<string, IInstruction[]> = this.calculateInstructions(instructions);
+    
+    this.previousInstructions = instructions;
+  
+    return calculatedInstructions;
   }
 
   private resetVariables (): void {
     this.app.$variables = {};
   }
 
-  private calculateInstructions (instructions: IInstruction[]): Array<IInstruction[]> {
+  private calculateInstructions (instructions: Record<string, IInstruction>): Record<string, IInstruction[]> {
     const addedInstructions: IInstruction[] = [];
     const updatedInstructions: IInstruction[] = [];
     const deletedInstructions: IInstruction[] = [];
 
     for (const key in instructions) {
-      if (instructions[key] && this.lastInstructions) {
-        if (!Object.keys(this.lastInstructions).includes(key)) {
+      if (instructions[key] && this.previousInstructions) {
+        if (!Object.keys(this.previousInstructions).includes(key)) {
           addedInstructions.push(instructions[key]);
         } else {
-          if (areDifferentInstructions(instructions[key], this.lastInstructions[key])) {
+          if (areDifferentInstructions(instructions[key], this.previousInstructions[key])) {
             updatedInstructions.push(instructions[key]);
           }
         }
       }
     }
 
-    for (const key in this.lastInstructions) {
-      if (this.lastInstructions[key] && instructions && !Object.keys(instructions).includes(key)) {
-        deletedInstructions.push(this.lastInstructions[key]);
+    for (const key in this.previousInstructions) {
+      if (this.previousInstructions[key] && instructions && !Object.keys(instructions).includes(key)) {
+        deletedInstructions.push(this.previousInstructions[key]);
       }
     }
 
-    return [addedInstructions, updatedInstructions, deletedInstructions];
+    return {
+      addedInstructions,
+      updatedInstructions,
+      deletedInstructions
+    };
   }
 }

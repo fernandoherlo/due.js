@@ -57,7 +57,7 @@ export default class App implements IApp {
       const editorCode = this.$editor.getCode();
 
       if (editorCode) {
-        const [, addedInstructions, updatedInstructions, deletedInstructions] = this.$compiler.exec(editorCode);
+        const { addedInstructions, updatedInstructions, deletedInstructions } = this.$compiler.exec(editorCode);
 
         await this.$music.add(addedInstructions);
         await this.$music.update(updatedInstructions);

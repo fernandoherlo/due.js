@@ -7,7 +7,7 @@ export default class Interpreter implements IInterpreter {
     this.app = app;
   }
 
-  exec (lexical: IInstruction[]): IInstruction[] {
+  exec (lexical: IInstruction[]): Record<string, IInstruction> {
     if (!Array.isArray(lexical)) {
       throw Error('"lexical" is not array.');
     }
@@ -15,7 +15,7 @@ export default class Interpreter implements IInterpreter {
     return this.groupLexical(lexical);
   }
 
-  private groupLexical (lexical: IInstruction[]): IInstruction[] {
+  private groupLexical (lexical: IInstruction[]): Record<string, IInstruction> {
     const instructions: any = {};
 
     let actualElement;
@@ -38,7 +38,7 @@ export default class Interpreter implements IInterpreter {
       throw Error('Can`t interprete command');
     }
 
-    const orderedInstructions: IInstruction[] = Object.keys(instructions).sort().reduce(
+    const orderedInstructions: Record<string, IInstruction> = Object.keys(instructions).sort().reduce(
       (obj: any, key) => {
         obj[key] = instructions[key];
         return obj;
