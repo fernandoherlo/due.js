@@ -22,6 +22,6 @@ export default class Instruction implements IInstruction {
     this.modifier = data.modifier;
     this.value = data.value;
     this.typeValue = data.typeValue;
-    this.actions = data.actions;
+    this.actions = data.actions || [];
   }
 }

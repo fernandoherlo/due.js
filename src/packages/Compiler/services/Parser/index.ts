@@ -1,6 +1,7 @@
 import type { IApp, IInstruction, IParser } from '~/src/types';
 import { COMMANDS, TYPE_VALUE, COMMANDS_MAP } from '~/src/packages/Compiler/constants';
 import Instruction from '~/src/packages/Compiler/services/Instruction';
+import Value from './value';
 
 export default class Parser implements IParser {
   private app: IApp;
@@ -35,43 +36,27 @@ export default class Parser implements IParser {
       throw Error('Command is not string.');
     }
 
-    if (command.startsWith(COMMANDS.$$) && command.includes('=')) {
-      const [variable, variableValue] = command.split('=');
-      const modifier = variable.replace(COMMANDS.$$, '');
-      const [commandIdRaw, value] = variableValue.slice(0, -1).split('(');
-      const [commandId] = commandIdRaw.split('#');
-      const { element = '' } = this.commandId(commandId);
+    const isComment = command.startsWith('//');
+    const isLiveVariable = command.startsWith(COMMANDS.$$);
+    const isVariable = command.startsWith(COMMANDS.$);
+    const hasValue = command.includes('=');
+    const isInvalidCommand = !command.endsWith(')');
 
-      return new Instruction({
-        name: COMMANDS.$$,
-        element,
-        key: COMMANDS.$$ + modifier,
-        modifier,
-        value,
-        type: COMMANDS_MAP[COMMANDS.$$],
-        typeValue: TYPE_VALUE.normal,
-        actions: []
-      });
+    if (isComment) {
+      return;
     }
-
-    if (command.startsWith(COMMANDS.$) && command.includes('=')) {
-      const [variable, variableValue] = command.split('=');
-      this.app.$variables[variable] = this.app.$valueFactory && this.app.$valueFactory.adapt(variableValue, this.app.$variables);
-
+    if (hasValue && (isLiveVariable || isVariable)) {
+      return this.parseVariable(command, isLiveVariable);
+    }
+    if (isInvalidCommand) {
       return;
     }
 
-    if (command.startsWith('//') || !command.endsWith(')')) {
-      return;
-    }
-
-    const [commandIdRaw, valueRaw] = command.slice(0, -1).split('(');
-
-    const [commandId, modifier] = commandIdRaw.split('#');
-
+    const [commandIdRaw, valueRaw] = this.getRawValues(command);
+    const [commandId, modifier] = this.getIds(commandIdRaw);
     const { name = '', element = '' } = this.commandId(commandId);
     const newValueRaw = this.app.$valueFactory && this.app.$valueFactory.adapt(valueRaw, this.app.$variables);
-    const [value, typeValue] = this.valueRaw(newValueRaw, !!element);
+    const [value, typeValue] = Value.valueRaw(this.app, newValueRaw, !!element);
 
     return new Instruction({
       name,
@@ -79,10 +64,33 @@ export default class Parser implements IParser {
       key: modifier,
       modifier,
       value,
-        type: COMMANDS_MAP[name],
-      typeValue: String(typeValue),
-      actions: []
+      type: COMMANDS_MAP[name],
+      typeValue: String(typeValue)
     });
+  }
+
+  private parseVariable (command: string, isLiveVariable: boolean): undefined | IInstruction {
+    const [variable, variableValue] = command.split('=');
+
+    if (isLiveVariable) {
+      const [commandIdRaw, valueRaw] = this.getRawValues(variableValue);
+      const [commandId] = this.getIds(commandIdRaw);
+      const modifier = variable.replace(COMMANDS.$$, '');
+      const { element = '' } = this.commandId(commandId);
+
+      return new Instruction({
+        name: COMMANDS.$$,
+        element,
+        key: COMMANDS.$$ + modifier,
+        modifier,
+        value: valueRaw,
+        type: COMMANDS_MAP[COMMANDS.$$],
+        typeValue: TYPE_VALUE.normal
+      });
+    }
+
+    this.app.$variables[variable] = this.app.$valueFactory && this.app.$valueFactory.adapt(variableValue, this.app.$variables);
+    return;
   }
 
   private commandId (commandId: string) {
@@ -101,58 +109,19 @@ export default class Parser implements IParser {
     return { name, element };
   }
 
-  private valueRaw (valueRaw: string, defaults: boolean) {
-    const [value, value2, value3] = valueRaw.trim().split(';');
-
-    let typeValue = TYPE_VALUE.normal;
-
-    if (value && value.startsWith('[') && value.endsWith(']')) {
-      const valueArray = value.replace(/\[|\]/g, '');
-
-      let values: any[] = [];
-      if (valueArray.includes(',')) {
-        typeValue = TYPE_VALUE.random;
-        values = valueArray.trim().split(',');
-      } else if (valueArray.includes('>')) {
-        typeValue = TYPE_VALUE.sequence;
-        values = valueArray.trim().split('>');
-      } else if (valueArray.includes('|')) {
-        typeValue = TYPE_VALUE.multi;
-        return [this.createValue(value, value2, value3, defaults), typeValue];
-      }
-
-      return [values.map(v => this.createValue(v, value2, value3, defaults)), typeValue];
+  private getRawValues (command: string) {
+    if (!command) {
+      throw Error('"command" is empty.');
     }
-
-    return [this.createValue(value, value2, value3, defaults), typeValue];
+  
+    return command.slice(0, -1).split('(');
   }
 
-  private createValue (value: string | Array<any>, value2: string | undefined, value3: string | undefined, defaults: boolean) {
-    const value2Parse = this.calculateValue(value2);
-    const value3Parse = this.calculateValue(value3);
-
-    return this.app.$valueFactory && this.app.$valueFactory.create({ value, value2: value2Parse, value3: value3Parse }, defaults);
-  }
-
-  private calculateValue (valueRaw: string | undefined): number | Array<number> | any | undefined {
-    if (!valueRaw) {
-      return;
+  private getIds (rawValue: string) {
+    if (!rawValue) {
+      throw Error('"rawValue" is empty.');
     }
-
-    if (valueRaw && valueRaw.startsWith('[') && valueRaw.endsWith(']')) {
-      const valueArray = valueRaw.replace(/\[|\]/g, '');
-
-      if (valueArray.includes(',')) {
-        const values = valueArray.trim().split(',');
-        return values.map(v => v);
-      } else if (valueArray.includes('-')) {
-        const values = valueArray.trim().split('-');
-        return {
-          min: values[0],
-          max: values[1]
-        };
-      }
-    }
-    return valueRaw;
+  
+    return rawValue.split('#');
   }
 }
