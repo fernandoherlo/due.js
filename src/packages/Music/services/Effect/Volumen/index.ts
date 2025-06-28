@@ -3,7 +3,7 @@ import * as Tone from 'tone';
 import Effect from '..';
 
 export default class Volumen extends Effect implements IVolumen {
-  protected _effect: Tone.Volume | null = null;
+  protected effect: Tone.Volume | null = null;
 
   constructor (data: any, app: IApp) {
     super(data, app);
@@ -14,17 +14,17 @@ export default class Volumen extends Effect implements IVolumen {
   }
 
   create () {
-    this._effect = new Tone.Volume();
+    this.effect = new Tone.Volume();
     if (!Array.isArray(this.value)) {
-      this._effect.volume.value = this.getValue(this.value.value);
+      this.effect.volume.value = this.getValue(this.value.value);
     }
 
     super.create();
   }
 
   async update (value: any): Promise<void> {
-    if (this.canUpdate && this._effect) {
-      this._effect.volume.value = this.getValue(value);
+    if (this.canUpdate && this.effect) {
+      this.effect.volume.value = this.getValue(value);
     }
   }
 }

@@ -22,7 +22,7 @@ export default class Debugger implements IDebugger {
 
     if (this.app.__debugEnabled) {
       const debuggerElement: HTMLDivElement | null = document.getElementById(this.htmlId) as HTMLDivElement;
-      debuggerElement.innerHTML = `${this._getDate()} | ${title} | ${stringify(text, null, 2)}<br><br>---<br><br>` + debuggerElement.innerHTML;
+      debuggerElement.innerHTML = `${this._getDate()} | ${title} | ${stringify(text, undefined, 2)}<br><br>---<br><br>` + debuggerElement.innerHTML;
     }
   }
 

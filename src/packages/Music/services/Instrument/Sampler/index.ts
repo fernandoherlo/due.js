@@ -35,7 +35,7 @@ export default class Sampler extends Instrument implements ISampler {
     this.instrument.debug = this.app.__debugEnabled;
 
     if (connect) {
-      this.instrument.connect(connect._effect);
+      this.instrument.connect(connect.effect);
     } else {
       this.instrument.toDestination();
     }

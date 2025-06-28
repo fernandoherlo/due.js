@@ -19,8 +19,8 @@ export default class Music implements IMusic {
   async start () {
     await WebMidi.enable();
 
-    Tone.Transport.scheduleRepeat(async (time) => {
-      Tone.Draw.schedule(() => {
+    Tone.getTransport().scheduleRepeat(async (time) => {
+      Tone.getDraw().schedule(() => {
         this.app.$ui.updateLoopTime();
       }, time);
 
@@ -30,7 +30,7 @@ export default class Music implements IMusic {
 
   async toggle () {
     await Tone.start();
-    Tone.Transport.toggle();
+    Tone.getTransport().toggle();
   }
 
   samples () {

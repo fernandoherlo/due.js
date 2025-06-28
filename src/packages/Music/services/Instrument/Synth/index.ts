@@ -21,7 +21,7 @@ export default class Synth extends Instrument implements ISynth {
     this.instrument.debug = this.app.__debugEnabled;
 
     if (connect) {
-      this.instrument.connect(connect._effect);
+      this.instrument.connect(connect.effect);
     } else {
       this.instrument.toDestination();
     }

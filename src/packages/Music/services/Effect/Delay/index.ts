@@ -3,7 +3,7 @@ import * as Tone from 'tone';
 import Effect from '..';
 
 export default class Delay extends Effect implements IDelay {
-  protected _effect: Tone.FeedbackDelay | null = null;
+  protected effect: Tone.FeedbackDelay | null = null;
 
   constructor (data: any, app: IApp) {
     super(data, app);
@@ -13,21 +13,21 @@ export default class Delay extends Effect implements IDelay {
   }
 
   create () {
-    this._effect = new Tone.FeedbackDelay();
+    this.effect = new Tone.FeedbackDelay();
     if (!Array.isArray(this.value)) {
       const delay: number = this.getValue(this.value.value);
       const feedback: number = parseFloat(this.value.duration);
 
-      this._effect.delayTime.value = delay;
-      this._effect.feedback.value = feedback || 0.5;
+      this.effect.delayTime.value = delay;
+      this.effect.feedback.value = feedback || 0.5;
     }
 
     super.create();
   }
 
   async update (value: any): Promise<void> {
-    if (this.canUpdate && this._effect) {
-      this._effect.delayTime.value = this.getValue(value);
+    if (this.canUpdate && this.effect) {
+      this.effect.delayTime.value = this.getValue(value);
     }
   }
 }
