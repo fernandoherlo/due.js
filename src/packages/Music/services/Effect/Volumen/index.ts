@@ -1,5 +1,5 @@
-import * as Tone from 'tone';
 import type { IVolumen, IApp } from '~/src/types';
+import * as Tone from 'tone';
 import Effect from '..';
 
 export default class Volumen extends Effect implements IVolumen {

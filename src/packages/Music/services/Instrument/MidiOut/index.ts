@@ -1,5 +1,5 @@
-import { WebMidi } from 'webmidi';
 import type { IMidiOut, IApp } from '~/src/types';
+import { WebMidi } from 'webmidi';
 import Instrument from '..';
 
 export default class MidiOut extends Instrument implements IMidiOut {

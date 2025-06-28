@@ -1,5 +1,5 @@
-import * as Tone from 'tone';
 import type { ISynth, IApp } from '~/src/types';
+import * as Tone from 'tone';
 import Instrument from '..';
 
 export default class Synth extends Instrument implements ISynth {

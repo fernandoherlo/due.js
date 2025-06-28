@@ -1,5 +1,5 @@
-import * as Tone from 'tone';
 import type { IReverb, IApp } from '~/src/types';
+import * as Tone from 'tone';
 import Effect from '..';
 
 export default class Reverb extends Effect implements IReverb {

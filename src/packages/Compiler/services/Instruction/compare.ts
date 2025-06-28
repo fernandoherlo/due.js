@@ -1,5 +1,5 @@
-import { stringify, parse } from 'flatted';
 import type { IInstruction } from '~/src/types';
+import { stringify, parse } from 'flatted';
 
 export function areDifferentInstructions (newInst: IInstruction, lastInst: IInstruction): boolean {
   const newInstCloned = { ...newInst };

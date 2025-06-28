@@ -1,5 +1,5 @@
-import * as Tone from 'tone';
 import type { IDelay, IApp } from '~/src/types';
+import * as Tone from 'tone';
 import Effect from '..';
 
 export default class Delay extends Effect implements IDelay {

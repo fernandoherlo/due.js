@@ -1,5 +1,5 @@
-import { WebMidi } from 'webmidi';
 import type { IInstrument, IMidiSampler } from '~/src/types';
+import { WebMidi } from 'webmidi';
 import Sampler from '../Sampler';
 
 export default class MidiSampler extends Sampler implements IMidiSampler {

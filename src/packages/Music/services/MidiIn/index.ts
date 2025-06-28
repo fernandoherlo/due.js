@@ -1,5 +1,5 @@
-import { WebMidi } from 'webmidi';
 import type { IApp, IMidiIn } from '~/src/types';
+import { WebMidi } from 'webmidi';
 import Instruction from '~/src/packages/Compiler/services/Instruction';
 
 export default class MidiIn extends Instruction implements IMidiIn {

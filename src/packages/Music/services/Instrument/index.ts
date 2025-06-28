@@ -1,5 +1,5 @@
-import * as Tone from 'tone';
 import type { IApp, IInstruction, IInstrument, INote } from '~/src/types';
+import * as Tone from 'tone';
 import Instruction from '~/src/packages/Compiler/services/Instruction';
 import { TYPE_VALUE } from '~/src/packages/Compiler/constants';
 import TriggerAttack from './triggerAttack';

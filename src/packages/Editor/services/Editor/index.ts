@@ -1,3 +1,5 @@
+import type { IApp, IEditor } from '~/src/types';
+
 import { EditorState } from '@codemirror/state';
 import { EditorView, lineNumbers } from '@codemirror/view';
 import { syntaxHighlighting } from '@codemirror/language';
@@ -5,7 +7,6 @@ import { sassLanguage } from '@codemirror/lang-sass';
 
 import { DueTheme, DueThemeHighlightStyle } from '../../constants/theme';
 
-import type { IApp, IEditor } from '~/src/types';
 import { LOCAL_STORAGE_KEY_CODE } from '~/src/packages/App/constants';
 
 export default class Editor implements IEditor {

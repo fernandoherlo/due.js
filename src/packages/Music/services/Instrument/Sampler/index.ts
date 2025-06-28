@@ -1,5 +1,5 @@
-import * as Tone from 'tone';
 import type { IInstrument, ISampler, IApp } from '~/src/types';
+import * as Tone from 'tone';
 import { areDifferentInstructions } from '~/src/packages/Compiler/services/Instruction/compare';
 import samples from '../../../constants/samples.json';
 import Instrument from '..';

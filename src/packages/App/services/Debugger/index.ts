@@ -1,5 +1,5 @@
-import { stringify } from 'flatted';
 import type { IDebugger, IApp } from '~/src/types';
+import { stringify } from 'flatted';
 
 export default class Debugger implements IDebugger {
   private app: IApp;
