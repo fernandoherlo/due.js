@@ -1,6 +1,4 @@
 import type { IApp, IParser, ILexer, IInstruction } from '~/src/types';
-import Instruction from '../Instruction';
-import { COMMANDS_MAP } from '../../constants';
 
 export default class Lexer implements ILexer {
   private app: IApp;
@@ -22,12 +20,12 @@ export default class Lexer implements ILexer {
     this.app.$logger.log(code);
 
     const newCode = code.replace(' ', '');
-    return this.generateLexical(newCode);
+    return this.generateLexerInstructions(newCode);
   }
 
-  private generateLexical (code: string): IInstruction[] {
+  private generateLexerInstructions (code: string): IInstruction[] {
     const lines = code.split('\n');
-    const lexicalGroup: IInstruction[] = [];
+    const instructionsGroup: IInstruction[] = [];
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
@@ -35,19 +33,17 @@ export default class Lexer implements ILexer {
         continue;
       }
 
-      const lexicals = this.parseLine(line);
-      if (lexicals) {
-        lexicals.forEach(lexical => {
-          lexicalGroup.push(lexical);
-        });
+      const instructions = this.parseLine(line);
+      if (instructions) {
+        instructionsGroup.push(...instructions);
       }
     }
 
-    return lexicalGroup;
+    return instructionsGroup;
   }
 
   private parseLine (line: string): IInstruction[] {
-    const lexicals: IInstruction[] = [];
+    const instructions: IInstruction[] = [];
     const commands: string[] = this.parser.line(line);
 
     if (!Array.isArray(commands)) {
@@ -55,30 +51,12 @@ export default class Lexer implements ILexer {
     }
 
     commands.forEach((command) => {
-      const commandParsed = this.parser.command(command);
-      if (commandParsed) {
-        const lexical = this.newLexical(commandParsed);
-        lexicals.push(lexical);
+      const instruction = this.parser.command(command);
+      if (instruction) {
+        instructions.push(instruction);
       }
     });
 
-    return lexicals;
-  }
-
-  private newLexical (commandParsed: Record<string, any>): IInstruction {
-    return new Instruction({
-      name: commandParsed.name,
-      element: commandParsed.element,
-      key: commandParsed.key
-        ? commandParsed.key
-        : commandParsed.element
-          ? `${commandParsed.name}${commandParsed.element}`
-          : commandParsed.name,
-      type: COMMANDS_MAP[commandParsed.name],
-      modifier: commandParsed.modifier,
-      value: commandParsed.value,
-      typeValue: commandParsed.typeValue,
-      actions: []
-    });
+    return instructions;
   }
 }

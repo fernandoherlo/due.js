@@ -13,7 +13,11 @@ export default class Instruction implements IInstruction {
   constructor (data: Record<string, any>) {
     this.name = data.name;
     this.element = data.element;
-    this.key = data.key;
+    this.key = data.key
+      ? data.key
+      : data.element
+        ? `${data.name}${data.element}`
+        : data.name,
     this.type = data.type;
     this.modifier = data.modifier;
     this.value = data.value;

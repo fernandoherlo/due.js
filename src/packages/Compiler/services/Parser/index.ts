@@ -1,5 +1,6 @@
 import type { IApp, IInstruction, IParser } from '~/src/types';
-import { COMMANDS, TYPE_VALUE } from '~/src/packages/Compiler/constants';
+import { COMMANDS, TYPE_VALUE, COMMANDS_MAP } from '~/src/packages/Compiler/constants';
+import Instruction from '~/src/packages/Compiler/services/Instruction';
 
 export default class Parser implements IParser {
   private app: IApp;
@@ -41,15 +42,16 @@ export default class Parser implements IParser {
       const [commandId] = commandIdRaw.split('#');
       const { element = '' } = this.commandId(commandId);
 
-      return {
+      return new Instruction({
         name: COMMANDS.$$,
         element,
         key: COMMANDS.$$ + modifier,
         modifier,
         value,
+        type: COMMANDS_MAP[COMMANDS.$$],
         typeValue: TYPE_VALUE.normal,
         actions: []
-      };
+      });
     }
 
     if (command.startsWith(COMMANDS.$) && command.includes('=')) {
@@ -71,15 +73,16 @@ export default class Parser implements IParser {
     const newValueRaw = this.app.$valueFactory && this.app.$valueFactory.adapt(valueRaw, this.app.$variables);
     const [value, typeValue] = this.valueRaw(newValueRaw, !!element);
 
-    return {
+    return new Instruction({
       name,
       element,
       key: modifier,
       modifier,
       value,
+        type: COMMANDS_MAP[name],
       typeValue: String(typeValue),
       actions: []
-    };
+    });
   }
 
   private commandId (commandId: string) {
