@@ -1,14 +1,20 @@
-import type { IApp } from '~/src/types';
+import type { IApp, IValueParser } from '~/src/types';
 import { TYPE_VALUE } from '~/src/packages/Compiler/constants';
 
-export default class Value {
-  static valueRaw (app:IApp, valueRaw: string, defaults: boolean) {
+export default class ValueParser implements IValueParser {
+  private app: IApp;
+
+  constructor (app: IApp) {
+    this.app = app;
+  }
+
+  exec (valueRaw: string, defaults: boolean) {
     const [value, value2, value3] = valueRaw.trim().split(';');
 
     let typeValue = TYPE_VALUE.normal;
 
-    if (Value.hasMultipleValues(value)) {
-      const valueArray = Value.getArrayValue(value);
+    if (this.hasMultipleValues(value)) {
+      const valueArray = this.getArrayValue(value);
 
       let values: string[] = [];
       if (valueArray.includes(',')) {
@@ -19,29 +25,29 @@ export default class Value {
         values = valueArray.trim().split('>');
       } else if (valueArray.includes('|')) {
         typeValue = TYPE_VALUE.multi;
-        return [Value.createValue(app, value, value2, value3, defaults), typeValue];
+        return [this.createValue(value, value2, value3, defaults), typeValue];
       }
 
-      return [values.map(v => Value.createValue(app, v, value2, value3, defaults)), typeValue];
+      return [values.map(v => this.createValue(v, value2, value3, defaults)), typeValue];
     }
 
-    return [Value.createValue(app, value, value2, value3, defaults), typeValue];
+    return [this.createValue(value, value2, value3, defaults), typeValue];
   }
 
-  private static createValue (app: IApp, value: string | Array<any>, value2: string | undefined, value3: string | undefined, defaults: boolean) {
-    const value2Parse = Value.calculateValue(value2);
-    const value3Parse = Value.calculateValue(value3);
+  private createValue (value: string | Array<any>, value2: string | undefined, value3: string | undefined, defaults: boolean) {
+    const value2Parse = this.calculateValue(value2);
+    const value3Parse = this.calculateValue(value3);
 
-    return app.$valueFactory && app.$valueFactory.create({ value, value2: value2Parse, value3: value3Parse }, defaults);
+    return this.app.$valueFactory && this.app.$valueFactory.create({ value, value2: value2Parse, value3: value3Parse }, defaults);
   }
 
-  private static calculateValue (valueRaw: string | undefined): number | Array<number> | any | undefined {
+  private calculateValue (valueRaw: string | undefined): number | Array<number> | any | undefined {
     if (!valueRaw) {
       return;
     }
 
-    if (Value.hasMultipleValues(valueRaw)) {
-      const valueArray = Value.getArrayValue(valueRaw);
+    if (this.hasMultipleValues(valueRaw)) {
+      const valueArray = this.getArrayValue(valueRaw);
 
       let values: string[] = [];
       if (valueArray.includes(',')) {
@@ -55,14 +61,15 @@ export default class Value {
         };
       }
     }
+  
     return valueRaw;
   }
   
-  private static hasMultipleValues (value: string) {
+  private hasMultipleValues (value: string) {
     return value && value.startsWith('[') && value.endsWith(']');
   }
 
-  private static getArrayValue (stringArray: string) {
+  private getArrayValue (stringArray: string) {
     return stringArray.replace(/\[|\]/g, '');
   }
 }

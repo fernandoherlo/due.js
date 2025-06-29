@@ -1,13 +1,14 @@
-import type { IApp, IInstruction, IParser } from '~/src/types';
+import type { IApp, IInstruction, IParser, IValueParser } from '~/src/types';
 import { COMMANDS, TYPE_VALUE, COMMANDS_MAP } from '~/src/packages/Compiler/constants';
 import Instruction from '~/src/packages/Compiler/services/Instruction';
-import Value from './value';
 
 export default class Parser implements IParser {
   private app: IApp;
+  private valueParser: IValueParser;
 
-  constructor (app: IApp) {
+  constructor (app: IApp, valueParser: IValueParser) {
     this.app = app;
+    this.valueParser = valueParser;
   }
 
   line (line: string): string[] {
@@ -56,7 +57,7 @@ export default class Parser implements IParser {
     const [commandId, modifier] = this.getIds(commandIdRaw);
     const { name = '', element = '' } = this.commandId(commandId);
     const newValueRaw = this.app.$valueFactory && this.app.$valueFactory.adapt(valueRaw, this.app.$variables);
-    const [value, typeValue] = Value.valueRaw(this.app, newValueRaw, !!element);
+    const [value, typeValue] = this.valueParser.exec(newValueRaw, !!element);
 
     return new Instruction({
       name,

@@ -7,6 +7,7 @@ export type { IApp } from '~/src/packages/App/types/IApp';
 
 export type { IEditor } from '~/src/packages/Editor/types/IEditor';
 
+export type { IValueParser } from '~/src/packages/Compiler/types/IValueParser';
 export type { IParser } from '~/src/packages/Compiler/types/IParser';
 export type { ILexer } from '~/src/packages/Compiler/types/ILexer';
 export type { IInterpreter } from '~/src/packages/Compiler/types/IInterpreter';
