@@ -39,7 +39,7 @@ export default class Interpreter implements IInterpreter {
     }
 
     const orderedInstructions: Record<string, IInstruction> = Object.keys(instructions).sort().reduce(
-      (obj: any, key) => {
+      (obj: Record<string, IInstruction>, key) => {
         obj[key] = instructions[key];
         return obj;
       },
