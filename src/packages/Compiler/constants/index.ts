@@ -46,3 +46,20 @@ export const TYPE_VALUE: Record<string, string> = {
   sequence: 'sequence',
   multi: 'multi'
 };
+
+export const CHARACTERS_INSTRUCTIONS = {
+  CONNECT: '=>',
+  CONCATENATE_COMMANDS: ':',
+  COMMENT: '//',
+  EQUAL: '=',
+  INIT_VALUE_COMMAND: '(',
+  END_VALUE_COMMAND: ')',
+  INIT_MULTIPLE_VALUES: '[',
+  END_MULTIPLE_VALUES: ']',
+  IDENTIFIER: '#',
+  SEPARATE_TYPE_VALUES: ';',
+  SEPARATE_DIFERRENT_VALUES: ',',
+  SEPARATE_PROGRESSION_VALUES: '>',
+  SEPARATE_CHORD_VALUES: '|',
+  SEPARATE_MIN_MAX_VALUES: '-'
+}

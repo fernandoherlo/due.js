@@ -1,5 +1,5 @@
 import type { IApp, IValueParser } from '~/src/types';
-import { TYPE_VALUE } from '~/src/packages/Compiler/constants';
+import { TYPE_VALUE, CHARACTERS_INSTRUCTIONS } from '~/src/packages/Compiler/constants';
 
 export default class ValueParser implements IValueParser {
   private app: IApp;
@@ -9,7 +9,7 @@ export default class ValueParser implements IValueParser {
   }
 
   exec (valueRaw: string, defaults: boolean) {
-    const [value, value2, value3] = valueRaw.trim().split(';');
+    const [value, value2, value3] = valueRaw.trim().split(CHARACTERS_INSTRUCTIONS.SEPARATE_TYPE_VALUES);
 
     let typeValue = TYPE_VALUE.normal;
 
@@ -17,13 +17,13 @@ export default class ValueParser implements IValueParser {
       const valueArray = this.getArrayValue(value);
 
       let values: string[] = [];
-      if (valueArray.includes(',')) {
+      if (valueArray.includes(CHARACTERS_INSTRUCTIONS.SEPARATE_DIFERRENT_VALUES)) {
         typeValue = TYPE_VALUE.random;
-        values = valueArray.trim().split(',');
-      } else if (valueArray.includes('>')) {
+        values = valueArray.trim().split(CHARACTERS_INSTRUCTIONS.SEPARATE_DIFERRENT_VALUES);
+      } else if (valueArray.includes(CHARACTERS_INSTRUCTIONS.SEPARATE_PROGRESSION_VALUES)) {
         typeValue = TYPE_VALUE.sequence;
-        values = valueArray.trim().split('>');
-      } else if (valueArray.includes('|')) {
+        values = valueArray.trim().split(CHARACTERS_INSTRUCTIONS.SEPARATE_PROGRESSION_VALUES);
+      } else if (valueArray.includes(CHARACTERS_INSTRUCTIONS.SEPARATE_CHORD_VALUES)) {
         typeValue = TYPE_VALUE.multi;
         return [this.createValue(value, value2, value3, defaults), typeValue];
       }
@@ -50,11 +50,11 @@ export default class ValueParser implements IValueParser {
       const valueArray = this.getArrayValue(valueRaw);
 
       let values: string[] = [];
-      if (valueArray.includes(',')) {
-        values = valueArray.trim().split(',');
+      if (valueArray.includes(CHARACTERS_INSTRUCTIONS.SEPARATE_DIFERRENT_VALUES)) {
+        values = valueArray.trim().split(CHARACTERS_INSTRUCTIONS.SEPARATE_DIFERRENT_VALUES);
         return values;
-      } else if (valueArray.includes('-')) {
-        values = valueArray.trim().split('-');
+      } else if (valueArray.includes(CHARACTERS_INSTRUCTIONS.SEPARATE_MIN_MAX_VALUES)) {
+        values = valueArray.trim().split(CHARACTERS_INSTRUCTIONS.SEPARATE_MIN_MAX_VALUES);
         return {
           min: values[0],
           max: values[1]
@@ -66,7 +66,9 @@ export default class ValueParser implements IValueParser {
   }
   
   private hasMultipleValues (value: string) {
-    return value && value.startsWith('[') && value.endsWith(']');
+    return value
+      && value.startsWith(CHARACTERS_INSTRUCTIONS.INIT_MULTIPLE_VALUES)
+      && value.endsWith(CHARACTERS_INSTRUCTIONS.END_MULTIPLE_VALUES);
   }
 
   private getArrayValue (stringArray: string) {

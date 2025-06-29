@@ -1,5 +1,5 @@
 import type { IApp, IInstruction, IParser, IValueParser } from '~/src/types';
-import { COMMANDS, TYPE_VALUE, COMMANDS_MAP } from '~/src/packages/Compiler/constants';
+import { COMMANDS, TYPE_VALUE, COMMANDS_MAP, CHARACTERS_INSTRUCTIONS } from '~/src/packages/Compiler/constants';
 import Instruction from '~/src/packages/Compiler/services/Instruction';
 
 export default class Parser implements IParser {
@@ -19,14 +19,14 @@ export default class Parser implements IParser {
       throw Error('Line is not string.');
     }
 
-    const [groupCommands, connect] = line.trim().split('=>').map(value => value.trim());
-    const commands = groupCommands.split(':');
+    const [groupCommands, connect] = line.trim().split(CHARACTERS_INSTRUCTIONS.CONNECT).map(value => value.trim());
+    const commands = groupCommands.split(CHARACTERS_INSTRUCTIONS.CONCATENATE_COMMANDS);
 
     if (!connect) {
       return commands;
     }
 
-    return [...commands, `con(${connect})`];
+    return [...commands, `${COMMANDS.con}(${connect})`];
   }
 
   command (command: string): undefined | IInstruction {
@@ -37,11 +37,11 @@ export default class Parser implements IParser {
       throw Error('Command is not string.');
     }
 
-    const isComment = command.startsWith('//');
+    const isComment = command.startsWith(CHARACTERS_INSTRUCTIONS.COMMENT);
     const isLiveVariable = command.startsWith(COMMANDS.$$);
     const isVariable = command.startsWith(COMMANDS.$);
-    const hasValue = command.includes('=');
-    const isInvalidCommand = !command.endsWith(')');
+    const hasValue = command.includes(CHARACTERS_INSTRUCTIONS.EQUAL);
+    const isInvalidCommand = !command.endsWith(CHARACTERS_INSTRUCTIONS.END_VALUE_COMMAND);
 
     if (isComment) {
       return;
@@ -71,7 +71,7 @@ export default class Parser implements IParser {
   }
 
   private parseVariable (command: string, isLiveVariable: boolean): undefined | IInstruction {
-    const [variable, variableValue] = command.split('=');
+    const [variable, variableValue] = command.split(CHARACTERS_INSTRUCTIONS.EQUAL);
 
     if (isLiveVariable) {
       const [commandIdRaw, valueRaw] = this.getRawValues(variableValue);
@@ -115,7 +115,7 @@ export default class Parser implements IParser {
       throw Error('"command" is empty.');
     }
   
-    return command.slice(0, -1).split('(');
+    return command.slice(0, -1).split(CHARACTERS_INSTRUCTIONS.INIT_VALUE_COMMAND);
   }
 
   private getIds (rawValue: string) {
@@ -123,6 +123,6 @@ export default class Parser implements IParser {
       throw Error('"rawValue" is empty.');
     }
   
-    return rawValue.split('#');
+    return rawValue.split(CHARACTERS_INSTRUCTIONS.IDENTIFIER);
   }
 }

@@ -1,4 +1,6 @@
 import type { IApp, IParser, ILexer, IInstruction } from '~/src/types';
+import { CHARACTERS_INSTRUCTIONS } from '~/src/packages/Compiler/constants';
+
 
 export default class Lexer implements ILexer {
   private app: IApp;
@@ -29,7 +31,7 @@ export default class Lexer implements ILexer {
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      if (!line || !line.trim() || line.startsWith('//')) {
+      if (!line || !line.trim() || line.startsWith(CHARACTERS_INSTRUCTIONS.COMMENT)) {
         continue;
       }
 
