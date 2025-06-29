@@ -1,31 +1,38 @@
 import { describe, afterEach, it, expect, vi, beforeEach } from 'vitest';
 import Parser from '~/src/packages/Compiler/services/Parser';
+import Instruction from '~/src/packages/Compiler/services/Instruction';
 
 const mockApp = {
   $valueFactory: {
-    create: (value) => value,
-    adapt: (value) => value
-  }
+    create: vi.fn().mockReturnValue((value) => value),
+    adapt: vi.fn().mockReturnValue((value) => value)
+  },
+  $variables: vi.fn()
 };
 
 describe('Parser', () => {
+  let parser, mockValueParser;
+
+  beforeEach(() => {
+    mockValueParser = {
+      exec: vi.fn()
+    };
+    parser = new Parser(mockApp, mockValueParser);
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
   it('Create new instance', () => {
     // Arrange
-    const parser = new Parser(mockApp);
     // Activate
     // Assert
     expect(parser.app).toEqual(mockApp);
+    expect(parser.valueParser).toEqual(mockValueParser);
   });
 
   describe('line', () => {
-    let parser;
-    beforeEach(() => {
-      parser = new Parser(mockApp);
-    });
     it('should throw error if line is empty', () => {
       // Arrange
       const line = '';
@@ -59,10 +66,6 @@ describe('Parser', () => {
   });
 
   describe('command', () => {
-    let parser;
-    beforeEach(() => {
-      parser = new Parser(mockApp);
-    });
     it('should throw error if command is empty', () => {
       // Arrange
       const command = '';
@@ -95,9 +98,10 @@ describe('Parser', () => {
       ['//', undefined],
       ['foo(bar)', {
         element: '',
-        key: undefined,
+        key: 'foo',
         modifier: undefined,
         name: 'foo',
+        type: undefined,
         typeValue: 'normal',
         value: {
           value: 'bar',
@@ -109,8 +113,9 @@ describe('Parser', () => {
       ['foo1(bar)', {
         element: '1',
         name: 'foo',
-        key: undefined,
+        key: 'foo1',
         modifier: undefined,
+        type: undefined,
         typeValue: 'normal',
         value: {
           value: 'bar',
@@ -124,6 +129,7 @@ describe('Parser', () => {
         name: 'foo',
         key: undefined,
         modifier: undefined,
+        type: undefined,
         typeValue: 'normal',
         value: {
           value: 'bar',
@@ -137,6 +143,7 @@ describe('Parser', () => {
         name: 'foo',
         key: undefined,
         modifier: undefined,
+        type: undefined,
         typeValue: 'random',
         value: [{
           value: 'bar',
@@ -155,6 +162,7 @@ describe('Parser', () => {
         name: 'foo',
         key: undefined,
         modifier: undefined,
+        type: undefined,
         typeValue: 'random',
         value: [{
           value: 'bar',
@@ -173,6 +181,7 @@ describe('Parser', () => {
         name: 'foo',
         key: undefined,
         modifier: undefined,
+        type: undefined,
         typeValue: 'sequence',
         value: [{
           value: 'bar',
@@ -191,6 +200,7 @@ describe('Parser', () => {
         name: 'foo',
         key: 'mod',
         modifier: 'mod',
+        type: undefined,
         typeValue: 'random',
         value: [{
           value: 'bar',
@@ -209,6 +219,7 @@ describe('Parser', () => {
         name: 'foo',
         key: 'mod',
         modifier: 'mod',
+        type: undefined,
         typeValue: 'random',
         value: [{
           value: 'bar=ter',
@@ -225,8 +236,9 @@ describe('Parser', () => {
       ['foo2([bar|ter>tor|bor];1;2)', {
         element: '2',
         name: 'foo',
-        key: undefined,
+        key: 'foo2',
         modifier: undefined,
+        type: undefined,
         typeValue: 'sequence',
         value: [{
           value: 'bar|ter',
@@ -245,6 +257,7 @@ describe('Parser', () => {
         name: 'foo',
         key: undefined,
         modifier: undefined,
+        type: undefined,
         typeValue: 'normal',
         value: {
           value: 'bar',
@@ -258,6 +271,7 @@ describe('Parser', () => {
         name: 'foo',
         key: undefined,
         modifier: undefined,
+        type: undefined,
         typeValue: 'multi',
         value: {
           value: '[bar|ter]',
@@ -268,34 +282,33 @@ describe('Parser', () => {
       }]
     ])('should parse command `%s`', (command, expected) => {
       // Arrange
+      mockValueParser.exec.mockReturnValue([expected?.value, expected?.typeValue]);
       // Activate
       const result = parser.command(command);
       // Assert
-      expect(result).toStrictEqual(expected);
+      expect(result).toStrictEqual(expected ? new Instruction(expected): undefined);
     });
   });
 
   it('should call factory with defaults false', () => {
     // Arrange
-    const parser = new Parser(mockApp);
-    mockApp.$valueFactory.create = vi.fn();
+    mockValueParser.exec.mockReturnValue(['', '']);
 
     const command = 'foo(1)';
     // Activate
     parser.command(command);
     // Assert
-    expect(mockApp.$valueFactory.create).toHaveBeenCalledWith(expect.anything(), false);
+    expect(mockApp.$valueFactory.adapt).toHaveBeenCalledWith('1', mockApp.$variables);
   });
 
   it('should call factory with defaults true', () => {
     // Arrange
-    const parser = new Parser(mockApp);
-    mockApp.$valueFactory.create = vi.fn();
+    mockValueParser.exec.mockReturnValue(['', '']);
 
-    const command = 'foo1(1)';
+    const command = 'foo1(2)';
     // Activate
     parser.command(command);
     // Assert
-    expect(mockApp.$valueFactory.create).toHaveBeenCalledWith(expect.anything(), true);
+    expect(mockApp.$valueFactory.adapt).toHaveBeenCalledWith('2', mockApp.$variables);
   });
 });

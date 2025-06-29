@@ -1,10 +1,6 @@
-// import { splitVendorChunkPlugin } from 'vite';
 import { fileURLToPath } from 'url';
 
 export default {
-  plugins: [
-    // splitVendorChunkPlugin(),
-  ],
   build: {
     rollupOptions: {
       output: {

@@ -10,7 +10,7 @@ export default class Instruction implements IInstruction {
   typeValue: string;
   actions: Array<any>;
 
-  constructor (data: Record<string, any>) {
+  constructor (data: Record<string, any> = {}) {
     this.name = data.name;
     this.element = data.element;
     this.key = data.key
