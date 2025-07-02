@@ -17,7 +17,7 @@ export default class Instruction implements IInstruction {
       ? data.key
       : data.element
         ? `${data.name}${data.element}`
-        : data.name,
+        : data.name;
     this.type = data.type;
     this.modifier = data.modifier;
     this.value = data.value;

@@ -23,6 +23,5 @@ export interface IApp {
   start: () => Promise<void>;
   compile: () => Promise<void>;
 
-  saveInLocalStorage: (key: string, value: any) => void;
   getFromLocalStorage: (key: string) => string | null;
 }

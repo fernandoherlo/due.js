@@ -1,7 +1,7 @@
 import * as Tone from 'tone';
 import { WebMidi } from 'webmidi';
 
-import type { IApp, IMusic, IInstruction } from '~/src/types';
+import type { IApp, IMusic, IInstruction, IInstrument } from '~/src/types';
 import ValueFactory from '~/src/packages/Music/services/Music/valueFactory';
 import { COMMANDS_ELEMENT_MAP, SAMPLER_MAP } from '../../constants';
 
@@ -45,7 +45,7 @@ export default class Music implements IMusic {
     for (let i = 0; i < instructions.length; i++) {
       const instruction: IInstruction = instructions[i];
       if (!this.instructions[instruction.key]) {
-        const element = COMMANDS_ELEMENT_MAP[instruction.name](instruction, this.app);
+        const element = COMMANDS_ELEMENT_MAP[instruction.name](instruction, this.app) as IInstrument;
         await element.start();
 
         this.instructions[instruction.key] = element;

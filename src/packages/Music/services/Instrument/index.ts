@@ -1,4 +1,4 @@
-import type { IApp, IInstruction, IInstrument, INote } from '~/src/types';
+import type { IApp, IEffect, IInstruction, IInstrument, INote } from '~/src/types';
 import * as Tone from 'tone';
 import Instruction from '~/src/packages/Compiler/services/Instruction';
 import { TYPE_VALUE } from '~/src/packages/Compiler/constants';
@@ -30,8 +30,8 @@ export default class Instrument extends Instruction implements IInstrument {
     for (let i = 0; i < this.actions.length; i++) {
       const action: IInstruction = this.actions[i];
 
-      const element = COMMANDS_ELEMENT_MAP[action.name](action, this.app);
-      await element.create();
+      const element = COMMANDS_ELEMENT_MAP[action.name](action, this.app) as IEffect;
+      element.create();
       this.actions[i] = element;
 
       if (i === 0) {

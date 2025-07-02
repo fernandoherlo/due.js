@@ -13,7 +13,7 @@ export default class Handler implements IErrorHandler {
     };
   }
 
-  private catchError (args: any[]) {
+  private catchError (args: unknown[]) {
     this.app.$logger.error(args);
   }
 }

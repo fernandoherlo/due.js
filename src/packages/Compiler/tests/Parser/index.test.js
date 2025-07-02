@@ -286,7 +286,7 @@ describe('Parser', () => {
       // Activate
       const result = parser.command(command);
       // Assert
-      expect(result).toStrictEqual(expected ? new Instruction(expected): undefined);
+      expect(result).toStrictEqual(expected ? new Instruction(expected) : undefined);
     });
   });
 

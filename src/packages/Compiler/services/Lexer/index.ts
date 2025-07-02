@@ -1,7 +1,6 @@
 import type { IApp, IParser, ILexer, IInstruction } from '~/src/types';
 import { CHARACTERS_INSTRUCTIONS } from '~/src/packages/Compiler/constants';
 
-
 export default class Lexer implements ILexer {
   private app: IApp;
   private parser: IParser;

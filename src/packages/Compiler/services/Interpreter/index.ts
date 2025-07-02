@@ -16,7 +16,7 @@ export default class Interpreter implements IInterpreter {
   }
 
   private groupLexical (lexical: IInstruction[]): Record<string, IInstruction> {
-    const instructions: any = {};
+    const instructions: Record<string, IInstruction> = {};
 
     let actualElement;
     for (let i = 0; i < lexical.length; i++) {

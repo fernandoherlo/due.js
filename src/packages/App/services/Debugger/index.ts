@@ -15,7 +15,7 @@ export default class Debugger implements IDebugger {
     }
   }
 
-  add (title: string, text: any) {
+  add (title: string, text: unknown) {
     if (!title || !text) {
       return;
     }

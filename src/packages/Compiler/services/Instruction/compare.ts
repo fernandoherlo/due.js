@@ -11,7 +11,7 @@ export function areDifferentInstructions (newInst: IInstruction, lastInst: IInst
   return stringify(newInstCleared) !== stringify(lastInstCleared);
 }
 
-function _clearInstruction (instruction: IInstruction): any {
+function _clearInstruction (instruction: IInstruction): Partial<IInstruction> {
   const clonedInstruction = parse(stringify(instruction));
 
   delete clonedInstruction.instrument;

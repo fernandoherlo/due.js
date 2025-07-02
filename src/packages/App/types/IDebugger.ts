@@ -1,3 +1,3 @@
 export interface IDebugger {
-  add: (title: string, text: any) => void;
+  add: (title: string, text: unknown) => void;
 }

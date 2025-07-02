@@ -1,3 +1,4 @@
+import type { StyleSpec } from 'style-mod';
 import { HighlightStyle } from '@codemirror/language';
 import { tags as t } from '@lezer/highlight';
 
@@ -12,7 +13,7 @@ const $pink = '#f694ff';
 const $blue = '#82e2ff';
 const $red = '#ff6767';
 
-export const DueTheme: any = {
+export const DueTheme: { [selector: string]: StyleSpec } = {
   '&': {
     fontSize: '18pt',
     fontFamily: 'Fira Code',

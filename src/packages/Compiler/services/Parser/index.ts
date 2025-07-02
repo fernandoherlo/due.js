@@ -91,7 +91,6 @@ export default class Parser implements IParser {
     }
 
     this.app.$variables[variable] = this.app.$valueFactory && this.app.$valueFactory.adapt(variableValue, this.app.$variables);
-    return;
   }
 
   private commandId (commandId: string) {
@@ -114,7 +113,7 @@ export default class Parser implements IParser {
     if (!command) {
       throw Error('"command" is empty.');
     }
-  
+
     return command.slice(0, -1).split(CHARACTERS_INSTRUCTIONS.INIT_VALUE_COMMAND);
   }
 
@@ -122,7 +121,7 @@ export default class Parser implements IParser {
     if (!rawValue) {
       throw Error('"rawValue" is empty.');
     }
-  
+
     return rawValue.split(CHARACTERS_INSTRUCTIONS.IDENTIFIER);
   }
 }

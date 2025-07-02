@@ -1,4 +1,5 @@
 import type { IInstrument, IMagenta, INote } from '~/src/types';
+import type { MusicVAESpec } from '@magenta/music/esm/music_vae/model';
 import { TYPE_VALUE } from '~/src/packages/Compiler/constants';
 import Note from '../../Note';
 import Sampler from '../Sampler';
@@ -20,7 +21,7 @@ export default class Magenta extends Sampler implements IMagenta {
   }
 
   private async _getNotes (): Promise<INote[]> {
-    const VAEspec: any = {
+    const VAEspec: MusicVAESpec = {
       type: 'MusicVAE',
       dataConverter: {
         type: 'MelodyConverter',
@@ -30,7 +31,9 @@ export default class Magenta extends Sampler implements IMagenta {
           maxPitch: 108,
           ignorePolyphony: true
         }
-      }
+      },
+      useBooleanDecoder: true,
+      conditionOnKey: false
     };
 
     const mm = await import('@magenta/music/es6');

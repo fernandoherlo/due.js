@@ -24,9 +24,9 @@ export default class Compiler implements ICompiler {
     const lexical: IInstruction[] = this.lexer.exec(code);
     const instructions: Record<string, IInstruction> = this.interpreter.exec(lexical);
     const calculatedInstructions: Record<string, IInstruction[]> = this.calculateInstructions(instructions);
-    
+
     this.previousInstructions = instructions;
-  
+
     return calculatedInstructions;
   }
 

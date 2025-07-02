@@ -61,14 +61,14 @@ export default class ValueParser implements IValueParser {
         };
       }
     }
-  
+
     return valueRaw;
   }
-  
+
   private hasMultipleValues (value: string) {
-    return value
-      && value.startsWith(CHARACTERS_INSTRUCTIONS.INIT_MULTIPLE_VALUES)
-      && value.endsWith(CHARACTERS_INSTRUCTIONS.END_MULTIPLE_VALUES);
+    return value &&
+      value.startsWith(CHARACTERS_INSTRUCTIONS.INIT_MULTIPLE_VALUES) &&
+      value.endsWith(CHARACTERS_INSTRUCTIONS.END_MULTIPLE_VALUES);
   }
 
   private getArrayValue (stringArray: string) {
