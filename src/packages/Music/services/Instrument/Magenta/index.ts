@@ -32,7 +32,7 @@ export default class Magenta extends Sampler implements IMagenta {
           ignorePolyphony: true
         }
       },
-      useBooleanDecoder: true,
+      useBooleanDecoder: false,
       conditionOnKey: false
     };
 
