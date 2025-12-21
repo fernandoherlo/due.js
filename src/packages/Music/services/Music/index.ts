@@ -26,6 +26,8 @@ export default class Music implements IMusic {
 
       this.app.$ui.updateSteps();
     }, 1);
+
+    Tone.getTransport().bpm.value = 120;
   }
 
   async toggle () {
