@@ -108,4 +108,24 @@ describe('Compiler integration', () => {
     expect(instruction.actions[0].value.duration).toBeUndefined();
     expect(instruction.actions[0].value.interval).toBeUndefined();
   });
+
+  it.each([
+    [',', TYPE_VALUE.random],
+    ['>', TYPE_VALUE.sequence]
+  ])('supports chords inside a %s pattern', (separator, typeValue) => {
+    const compiler = createCompiler();
+    const source = '$low=24\nsam7#piano([A2|C2|B2' + separator +
+      'D2|A2|G2];[7-8];[8-10]):r(17):d(0.2):v($low)';
+
+    const plan = compiler.prepare(source);
+    const instruction = plan.addedInstructions[0];
+
+    expect(instruction.typeValue).toBe(typeValue);
+    expect(instruction.value).toMatchObject([
+      { value: 'A2|C2|B2', duration: { min: '7', max: '8' }, interval: { min: '8', max: '10' } },
+      { value: 'D2|A2|G2', duration: { min: '7', max: '8' }, interval: { min: '8', max: '10' } }
+    ]);
+    expect(instruction.actions.map(action => action.name)).toEqual([COMMANDS.r, COMMANDS.d, COMMANDS.v]);
+    expect(instruction.actions[2].value.value).toBe('24');
+  });
 });

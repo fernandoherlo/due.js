@@ -13,9 +13,9 @@ export default class VariableLive extends Instruction implements IVariableLive {
   }
 
   async start (): Promise<void> {
-    this.app.$variablesLive[this.key] = COMMANDS_ELEMENT_MAP[COMMANDS.mi](this, this.app) as IMidiIn;
-
-    await this.app.$variablesLive[this.key].start();
+    const midiIn = COMMANDS_ELEMENT_MAP[COMMANDS.mi](this, this.app) as IMidiIn;
+    await midiIn.start();
+    this.app.$variablesLive[this.key] = midiIn;
   }
 
   async end (): Promise<void> {

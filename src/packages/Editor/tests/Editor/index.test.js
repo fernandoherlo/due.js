@@ -111,4 +111,14 @@ describe('Editor', () => {
 
     expect(getDiagnostics(corrected)).toEqual([]);
   });
+
+  it('does not report random chord patterns as syntax errors', () => {
+    const state = EditorState.create({
+      doc: '$low=24\nsam7#piano([A2|C2|B2,D2|A2|G2];[7-8];[8-10]):r(17):d(0.2):v($low)'
+    });
+
+    const diagnostics = getDiagnostics(state);
+
+    expect(diagnostics).toEqual([]);
+  });
 });

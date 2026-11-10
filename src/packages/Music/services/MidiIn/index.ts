@@ -16,10 +16,17 @@ export default class MidiIn extends Instruction implements IMidiIn {
     WebMidi.inputs.forEach(input => this.app.$logger.log(input.name));
 
     const [channelRaw, controllerRaw] = this.value.split('@');
-    const channel = parseInt(channelRaw);
-    const controller = controllerRaw === undefined ? undefined : parseInt(controllerRaw);
+    const channel = Number.parseInt(channelRaw);
+    const controller = controllerRaw === undefined ? undefined : Number.parseInt(controllerRaw);
 
-    const input = WebMidi.inputs[parseInt(this.element)];
+    const input = WebMidi.inputs[Number.parseInt(this.element)];
+    if (!input) {
+      this.app.$logger.log(`MIDI input ${this.element} is not available; ${this.key} will remain inactive.`);
+      return;
+    }
+    if (!input.channels[channel]) {
+      throw new Error(`MIDI channel ${channelRaw} is not available on input ${this.element}. Use a channel from 1 to 16.`);
+    }
     this.midi = input.channels[channel];
 
     this.midi.addListener('midimessage', (e: any) => {
@@ -41,7 +48,8 @@ export default class MidiIn extends Instruction implements IMidiIn {
   }
 
   async end (): Promise<void> {
-    this.midi.removeListener('midimessage');
+    this.midi?.removeListener('midimessage');
+    this.midi = null;
   }
 
   async update (/* newMidi: IMidiIn */): Promise<void> {

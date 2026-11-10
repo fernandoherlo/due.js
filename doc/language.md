@@ -43,6 +43,8 @@ Para el primer argumento, las listas usan estos separadores:
 
 La coma elige un valor al azar en cada repetición; `>` recorre los valores en orden y vuelve al inicio; `|` toca las notas como acorde.
 
+Las opciones pueden ser acordes: `[A2|C2|B2,D2|A2|G2]` elige al azar entre dos acordes y `[A2|C2|B2>D2|A2|G2]` los recorre en orden. Los corchetes rodean el patrón completo.
+
 Los campos de duración e intervalo también admiten listas o rangos:
 
 ```text
@@ -70,6 +72,10 @@ sam1#piano(C4;0.25;1):v($$control)
 ```
 
 `mi0` selecciona la entrada MIDI de índice `0`; `1` indica el canal y `5`, el número de controlador MIDI CC. La implementación actual acepta únicamente mensajes CC del canal seleccionado y, si se indicó, del controlador `5`. El valor recibido puede controlar un efecto que use esa variable.
+
+Una entrada MIDI ausente no bloquea la compilación: se registra un aviso, la variable queda inactiva
+y los demás instrumentos continúan. Un canal no disponible en una entrada presente sigue siendo un error.
+No hay reconexión automática si el dispositivo se conecta después.
 
 ## Comandos conectados actualmente
 

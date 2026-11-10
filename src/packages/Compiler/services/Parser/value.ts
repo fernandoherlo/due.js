@@ -11,6 +11,15 @@ const COLLECTION_SEPARATORS = [
 export function parseExpression (rawValue: string, location: ISourceLocation): IAstValueExpression {
   let column = location.column;
   const values = rawValue.split(CHAR.SEPARATE_TYPE_VALUES).map((argument) => {
+    const source = argument.trim();
+    const bracketed = source.startsWith(CHAR.INIT_MULTIPLE_VALUES) && source.endsWith(CHAR.END_MULTIPLE_VALUES);
+    const invalid = (bracketed ? /[()[\]]/ : /[()[\],>|]/).exec(bracketed ? source.slice(1, -1) : source);
+    if (invalid) {
+      throw new ParseError({
+        line: location.line,
+        column: column + argument.length - argument.trimStart().length + invalid.index + (bracketed ? 1 : 0)
+      }, 'Invalid value structure: use [values] for lists and ; between arguments');
+    }
     const node = parseValue(argument, { line: location.line, column });
     column += argument.length + CHAR.SEPARATE_TYPE_VALUES.length;
     return node;
@@ -25,14 +34,6 @@ function parseValue (source: string, location: ISourceLocation): IAstValue {
     location: { line: location.line, column: location.column + source.length - source.trimStart().length }
   };
   const bracketed = rawValue.startsWith(CHAR.INIT_MULTIPLE_VALUES) && rawValue.endsWith(CHAR.END_MULTIPLE_VALUES);
-  const valueSource = bracketed ? source.trim().slice(1, -1) : source.trim();
-  const invalid = (bracketed ? /[()[\]]/ : /[()[\],>|]/).exec(valueSource);
-  if (invalid) {
-    throw new ParseError({
-      line: location.line,
-      column: base.location.column + invalid.index + (bracketed ? 1 : 0)
-    }, 'Invalid value structure: use [values] for lists and ; between arguments');
-  }
   if (rawValue.startsWith(COMMANDS.$) && !rawValue.includes(CHAR.INIT_MULTIPLE_VALUES)) {
     return { ...base, kind: AST_KIND.reference, name: rawValue };
   }
