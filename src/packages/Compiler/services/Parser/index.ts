@@ -62,7 +62,7 @@ export default class Parser implements IParser {
     return new Instruction({
       name,
       element,
-      key: modifier,
+      key: element ? `${name}${element}` : modifier,
       modifier,
       value,
       type: COMMANDS_MAP[name],

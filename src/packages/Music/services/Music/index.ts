@@ -39,6 +39,18 @@ export default class Music implements IMusic {
     this.app.$logger.log(SAMPLER_MAP);
   }
 
+  validate (instructions: Array<IInstruction>): void {
+    for (const instruction of instructions) {
+      const commands = [instruction, ...instruction.actions];
+
+      for (const command of commands) {
+        if (!COMMANDS_ELEMENT_MAP[command.name]) {
+          throw Error(`Unsupported command "${command.name}".`);
+        }
+      }
+    }
+  }
+
   async add (instructions: Array<IInstruction>) {
     if (instructions.length) {
       this.app.$debugger.add('ADD', instructions);

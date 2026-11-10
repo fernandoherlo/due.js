@@ -198,7 +198,7 @@ describe('Parser', () => {
       ['foo3#mod([bar,ter];[1,3];[1-10])', {
         element: '3',
         name: 'foo',
-        key: 'mod',
+        key: 'foo3',
         modifier: 'mod',
         type: undefined,
         typeValue: 'random',
@@ -217,7 +217,7 @@ describe('Parser', () => {
       ['foo3#mod([bar=ter,tor=bor];1;2)', {
         element: '3',
         name: 'foo',
-        key: 'mod',
+        key: 'foo3',
         modifier: 'mod',
         type: undefined,
         typeValue: 'random',

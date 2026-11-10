@@ -15,15 +15,23 @@ export default class MidiIn extends Instruction implements IMidiIn {
   async start (): Promise<void> {
     WebMidi.inputs.forEach(input => this.app.$logger.log(input.name));
 
-    const [channel, note] = this.value.split('@');
+    const [channelRaw, controllerRaw] = this.value.split('@');
+    const channel = parseInt(channelRaw);
+    const controller = controllerRaw === undefined ? undefined : parseInt(controllerRaw);
 
     const input = WebMidi.inputs[parseInt(this.element)];
-    this.midi = input.channels[parseInt(channel)];
+    this.midi = input.channels[channel];
 
     this.midi.addListener('midimessage', (e: any) => {
       this.app.$debugger.add('MIDI', (e.data || e.note));
 
-      if (note && e.data[0] === 176 && e.data[1] !== parseInt(note)) {
+      const status = e.data[0];
+      const messageChannel = (status & 0x0F) + 1;
+
+      if ((status & 0xF0) !== 0xB0 || messageChannel !== channel) {
+        return;
+      }
+      if (controller !== undefined && e.data[1] !== controller) {
         return;
       }
       if (this.app.$variablesLiveMap[this.key]) {

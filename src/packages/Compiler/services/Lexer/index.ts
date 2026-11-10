@@ -10,34 +10,34 @@ export default class Lexer implements ILexer {
     this.parser = parser;
   }
 
-  exec (code: string): IInstruction[] {
-    if (!code) {
-      throw Error('Code is empty.');
-    }
+  exec (code: string): IInstruction[][] {
     if (typeof code !== 'string') {
       throw Error('Code is not string.');
+    }
+    if (!code.trim()) {
+      return [];
     }
 
     this.app.$logger.log(code);
 
-    const newCode = code.replace(' ', '');
-    return this.generateLexerInstructions(newCode);
+    return this.generateLexerInstructions(code);
   }
 
-  private generateLexerInstructions (code: string): IInstruction[] {
+  private generateLexerInstructions (code: string): IInstruction[][] {
     const lines = code.split('\n');
-    const instructionsGroup: IInstruction[] = [];
+    const instructionsGroup: IInstruction[][] = [];
 
     for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      if (!line || !line.trim() || line.startsWith(CHARACTERS_INSTRUCTIONS.COMMENT)) {
+      const line = lines[i]
+        .split(CHARACTERS_INSTRUCTIONS.COMMENT)[0]
+        .replace(/\s/g, '');
+      if (!line) {
+        instructionsGroup.push([]);
         continue;
       }
 
       const instructions = this.parseLine(line);
-      if (instructions) {
-        instructionsGroup.push(...instructions);
-      }
+      instructionsGroup.push(instructions);
     }
 
     return instructionsGroup;

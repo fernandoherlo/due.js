@@ -7,7 +7,7 @@ export default class Note implements INote {
 
   constructor (data: any, defaults: boolean = false) {
     this.value = data.value;
-    this.duration = data.value2 || (defaults ? 0.25 : undefined);
-    this.interval = data.value3 || (defaults ? 2 : undefined);
+    this.duration = data.value2 ?? (defaults ? 0.25 : undefined);
+    this.interval = data.value3 ?? (defaults ? 2 : undefined);
   }
 }

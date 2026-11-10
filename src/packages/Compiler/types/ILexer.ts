@@ -1,5 +1,5 @@
 import type { IInstruction } from '~/src/types';
 
 export interface ILexer {
-  exec: (code: string) => IInstruction[];
+  exec: (code: string) => IInstruction[][];
 }

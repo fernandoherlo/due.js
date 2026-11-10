@@ -35,6 +35,18 @@ describe('Music', () => {
   });
 
   describe('Instructions', () => {
+    it('Rejects instructions without a registered runtime command', () => {
+      const music = new Music(mockApp);
+
+      expect(() => music.validate([{ name: 'missing', actions: [] }])).toThrow('Unsupported command "missing".');
+    });
+
+    it('Rejects actions without a registered runtime command', () => {
+      const music = new Music(mockApp);
+
+      expect(() => music.validate([{ name: 'foo', actions: [{ name: 'missing' }] }])).toThrow('Unsupported command "missing".');
+    });
+
     it('Add', async () => {
       // Arrange
       const music = new Music(mockApp);

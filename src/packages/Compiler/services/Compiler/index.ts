@@ -1,4 +1,6 @@
 import type { IApp, ILexer, IInterpreter, ICompiler, IInstruction } from '~/src/types';
+import type { ICompilationPlan } from '../../types/ICompiler';
+import Instruction from '~/src/packages/Compiler/services/Instruction';
 import { areDifferentInstructions } from '../Instruction/compare';
 
 export default class Compiler implements ICompiler {
@@ -16,25 +18,47 @@ export default class Compiler implements ICompiler {
     this.previousInstructions = {};
   }
 
-  exec (code: string) {
+  prepare (code: string): ICompilationPlan {
     this.app.$logger.log(code);
 
-    this.resetVariables();
+    const previousVariables = this.app.$variables;
+    const variables: Record<string, string> = {};
+    this.app.$variables = variables;
 
-    const lexical: IInstruction[] = this.lexer.exec(code);
-    const instructions: Record<string, IInstruction> = this.interpreter.exec(lexical);
-    const calculatedInstructions: Record<string, IInstruction[]> = this.calculateInstructions(instructions);
+    let instructions: Record<string, IInstruction>;
+    try {
+      const lexical: IInstruction[][] = this.lexer.exec(code);
+      instructions = this.interpreter.exec(lexical);
+    } finally {
+      this.app.$variables = previousVariables;
+    }
 
-    this.previousInstructions = instructions;
+    const calculatedInstructions = this.calculateInstructions(instructions);
 
-    return calculatedInstructions;
+    return {
+      instructions: this.cloneInstructions(instructions),
+      variables,
+      ...calculatedInstructions
+    };
   }
 
-  private resetVariables (): void {
-    this.app.$variables = {};
+  commit (plan: ICompilationPlan): void {
+    this.previousInstructions = plan.instructions;
+    this.app.$variables = plan.variables;
   }
 
-  private calculateInstructions (instructions: Record<string, IInstruction>): Record<string, IInstruction[]> {
+  private cloneInstructions (instructions: Record<string, IInstruction>): Record<string, IInstruction> {
+    return Object.keys(instructions).reduce((clones: Record<string, IInstruction>, key) => {
+      const instruction = instructions[key];
+      clones[key] = new Instruction({
+        ...instruction,
+        actions: instruction.actions.map(action => new Instruction({ ...action }))
+      });
+      return clones;
+    }, {});
+  }
+
+  private calculateInstructions (instructions: Record<string, IInstruction>): Pick<ICompilationPlan, 'addedInstructions' | 'updatedInstructions' | 'deletedInstructions'> {
     const addedInstructions: IInstruction[] = [];
     const updatedInstructions: IInstruction[] = [];
     const deletedInstructions: IInstruction[] = [];

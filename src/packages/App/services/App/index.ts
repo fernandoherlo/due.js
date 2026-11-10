@@ -27,6 +27,8 @@ export default class App implements IApp {
   $variablesLive: Record<string, IMidiIn> = {};
   $variablesLiveMap: Record<string, any> = {};
 
+  private compileQueue: Promise<void> = Promise.resolve();
+
   constructor (debug: boolean = true) {
     this.__debugEnabled = debug;
     this.__logEnabled = true;
@@ -48,7 +50,13 @@ export default class App implements IApp {
     await this.$ui.start();
   }
 
-  async compile () {
+  compile (): Promise<void> {
+    const compilation = this.compileQueue.then(() => this.compileCurrent());
+    this.compileQueue = compilation.catch(() => {});
+    return compilation;
+  }
+
+  private async compileCurrent (): Promise<void> {
     if (!this.$compiler || !this.$editor || !this.$music) {
       throw Error('No services set.');
     }
@@ -57,12 +65,15 @@ export default class App implements IApp {
       this.$ui.setWaiting();
       const editorCode = this.$editor.getCode();
 
-      if (editorCode) {
-        const { addedInstructions, updatedInstructions, deletedInstructions } = this.$compiler.exec(editorCode);
+      if (editorCode !== undefined) {
+        const plan = this.$compiler.prepare(editorCode);
+        this.$music.validate([...plan.addedInstructions, ...plan.updatedInstructions]);
 
-        await this.$music.add(addedInstructions);
-        await this.$music.update(updatedInstructions);
-        await this.$music.delete(deletedInstructions);
+        await this.$music.add(plan.addedInstructions);
+        await this.$music.update(plan.updatedInstructions);
+        await this.$music.delete(plan.deletedInstructions);
+
+        this.$compiler.commit(plan);
 
         this.$ui.setOk();
 

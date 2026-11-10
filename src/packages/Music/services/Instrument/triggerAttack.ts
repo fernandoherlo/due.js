@@ -32,7 +32,12 @@ export default class TriggerAttack {
       } else {
         value = this._getRandom(values);
       }
-    } else if (typeof values === 'object' && (values.min && values.max)) {
+    } else if (
+      typeof values === 'object' &&
+      values !== null &&
+      values.min !== undefined &&
+      values.max !== undefined
+    ) {
       value = this._getRandomMinMax(values);
     } else {
       value = values;
@@ -49,9 +54,9 @@ export default class TriggerAttack {
   }
 
   static _getRandomMinMax (values: any) {
-    const min = Math.ceil(values.min);
-    const max = Math.floor(values.max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+    const min = parseFloat(values.min);
+    const max = parseFloat(values.max);
+    return min + (Math.random() * (max - min));
   }
 
   static _isChord (value: string | Array<string>, typeValue: string | undefined) {
