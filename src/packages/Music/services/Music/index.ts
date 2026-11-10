@@ -8,9 +8,12 @@ import { SAMPLER_MAP } from '~/src/packages/Music/constants/samplers';
 import validateInstruction from '~/src/packages/Music/helpers/validateInstruction';
 import type { IApp, IInstruction, IInstrument, IMusic } from '~/src/types';
 
+const BEATS_PER_BAR = 4;
+
 export default class Music implements IMusic {
   private app: IApp;
   private instructions: any;
+  private muted: Set<string> = new Set();
 
   constructor (app: IApp) {
     this.app = app;
@@ -40,6 +43,42 @@ export default class Music implements IMusic {
   async toggle () {
     await Tone.start();
     Tone.getTransport().toggle();
+  }
+
+  async waitForNextBar (bpm: number): Promise<void> {
+    const transport = Tone.getTransport();
+    if (transport.state !== 'started') return;
+
+    const bar = (BEATS_PER_BAR * 60) / bpm;
+    const next = (Math.floor(transport.seconds / bar) + 1) * bar;
+    await new Promise<void>((resolve) => {
+      let id = 0;
+      const finish = () => {
+        transport.clear(id);
+        transport.off('stop', finish);
+        transport.off('pause', finish);
+        resolve();
+      };
+      id = transport.scheduleOnce(finish, next);
+      // Sin transporte en marcha el compas no llega; no bloquear la compilacion.
+      transport.once('stop', finish);
+      transport.once('pause', finish);
+    });
+  }
+
+  toggleMute (key: string): boolean {
+    const muted = !this.muted.has(key);
+    if (muted) {
+      this.muted.add(key);
+    } else {
+      this.muted.delete(key);
+    }
+    this.instructions[key]?.setMuted?.(muted);
+    return muted;
+  }
+
+  isMuted (key: string): boolean {
+    return this.muted.has(key);
   }
 
   samples () {
@@ -77,6 +116,9 @@ export default class Music implements IMusic {
       if (!this.instructions[instruction.key]) {
         const element = COMMANDS_ELEMENT_MAP[instruction.name](instruction, this.app) as IInstrument;
         await element.start();
+        if (this.muted.has(instruction.key)) {
+          element.setMuted(true);
+        }
 
         this.instructions[instruction.key] = element;
       }

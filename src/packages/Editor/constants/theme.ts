@@ -33,6 +33,19 @@ export const DueTheme: { [selector: string]: StyleSpec } = {
     backgroundColor: $black,
     color: $purpleFading,
     border: 'none'
+  },
+  '.cm-mute-gutter': {
+    width: '1.5em',
+    textAlign: 'center',
+    cursor: 'pointer'
+  },
+  '.cm-mute-marker': {
+    fontSize: '10pt',
+    color: $gray
+  },
+  '.cm-mute-marker.cm-muted': {
+    color: $red,
+    fontWeight: '600'
   }
 };
 

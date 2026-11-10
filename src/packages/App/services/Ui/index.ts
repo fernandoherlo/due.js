@@ -32,6 +32,14 @@ export default class Ui implements IUi {
     };
     save.onclick = compile;
 
+    const auto: HTMLButtonElement = document.getElementById('auto') as HTMLButtonElement;
+    auto.onclick = () => {
+      const enabled = !auto.classList.contains('active');
+      auto.classList.toggle('active', enabled);
+      auto.setAttribute('aria-pressed', String(enabled));
+      this.app.setAutoCompile(enabled);
+    };
+
     document.addEventListener('keydown', (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.code === 'KeyS') {
         event.preventDefault();

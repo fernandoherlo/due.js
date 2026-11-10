@@ -4,7 +4,7 @@ import Store from '../Store';
 import ErrorHandler from '../Error/handler';
 import Debugger from '../Debugger';
 import Ui from '../Ui';
-import { LOCAL_STORAGE_KEY_CODE } from '../../constants';
+import { AUTO_COMPILE_DELAY_MS, LOCAL_STORAGE_KEY_CODE } from '../../constants';
 
 export default class App implements IApp {
   __debugEnabled: boolean;
@@ -25,6 +25,8 @@ export default class App implements IApp {
   $variablesLiveMap: Record<string, any> = {};
 
   private compileQueue: Promise<void> = Promise.resolve();
+  private autoCompile: boolean = false;
+  private autoCompileTimer: number | undefined;
 
   constructor (debug: boolean = true) {
     this.__debugEnabled = debug;
@@ -48,12 +50,29 @@ export default class App implements IApp {
   }
 
   compile (): Promise<void> {
-    const compilation = this.compileQueue.then(() => this.compileCurrent());
+    const compilation = this.compileQueue.then(() => this.compileCurrent(false));
     this.compileQueue = compilation.catch(() => {});
     return compilation;
   }
 
-  private async compileCurrent (): Promise<void> {
+  setAutoCompile (enabled: boolean): void {
+    this.autoCompile = enabled;
+    clearTimeout(this.autoCompileTimer);
+  }
+
+  onCodeChange (): void {
+    if (!this.autoCompile) return;
+
+    clearTimeout(this.autoCompileTimer);
+    this.autoCompileTimer = window.setTimeout(() => {
+      const compilation = this.compileQueue.then(() => this.autoCompile ? this.compileCurrent(true) : undefined);
+      this.compileQueue = compilation.catch(() => {});
+      // El editor ya marca el error; una compilacion automatica fallida no debe interrumpir la escritura.
+      compilation.catch((error: unknown) => this.$logger.log(error));
+    }, AUTO_COMPILE_DELAY_MS);
+  }
+
+  private async compileCurrent (quantized: boolean): Promise<void> {
     if (!this.$compiler || !this.$editor || !this.$music) {
       throw Error('No services set.');
     }
@@ -65,6 +84,10 @@ export default class App implements IApp {
       if (editorCode !== undefined) {
         const plan = this.$compiler.prepare(editorCode);
         this.$music.validate([...plan.addedInstructions, ...plan.updatedInstructions]);
+
+        if (quantized) {
+          await this.$music.waitForNextBar(plan.bpm);
+        }
 
         await this.$music.add(plan.addedInstructions);
         await this.$music.update(plan.updatedInstructions);

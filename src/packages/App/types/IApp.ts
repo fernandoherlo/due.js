@@ -20,6 +20,8 @@ export interface IApp {
 
   start: () => Promise<void>;
   compile: () => Promise<void>;
+  setAutoCompile: (enabled: boolean) => void;
+  onCodeChange: () => void;
 
   getFromLocalStorage: (key: string) => string | null;
 }

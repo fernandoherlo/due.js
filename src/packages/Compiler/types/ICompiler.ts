@@ -3,6 +3,7 @@ import type { IInstruction } from '~/src/types';
 export interface ICompilationPlan {
   instructions: Record<string, IInstruction>;
   variables: Record<string, string>;
+  bpm: number;
   addedInstructions: IInstruction[];
   updatedInstructions: IInstruction[];
   deletedInstructions: IInstruction[];

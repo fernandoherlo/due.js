@@ -9,7 +9,8 @@ Las entradas F01-F06, F26, F27 y F33 se trasladaron desde features.md y conserva
 Las nuevas usan el prefijo L.
 
 Atajos ya disponibles: `Cmd/Ctrl+S` compila, `Cmd/Ctrl+Enter` alterna play/pausa en el editor,
-`Space` alterna play/pausa fuera del editor y `Cmd/Ctrl+/` comenta o descomenta.
+`Space` alterna play/pausa fuera del editor, `Cmd/Ctrl+/` comenta o descomenta,
+`Cmd/Ctrl+Shift+M` (o clic en el margen) silencia la pista de la linea y `Cmd/Ctrl+Alt+Arriba/Abajo` ajusta el numero bajo el cursor.
 
 Como primer grupo se sugieren L01, L02, L03 y L11, junto con F02 y F04, que comparten el estado por pista.
 
@@ -21,6 +22,11 @@ Alternar el silencio de una pista con un atajo o un clic en el margen, sin edita
 Es la version por linea de F04: el estado se guardaria fuera del texto y se mostraria en el margen.
 Habria que definir la identidad de la linea al editar o reordenar, y si el mute se aplica al instante o en el siguiente compas (F02).
 Con varias lineas seleccionadas, el atajo alternaria todas.
+
+Implementado: `Cmd/Ctrl+Shift+M` alterna las pistas de las lineas seleccionadas y un clic en el margen alterna la de esa linea
+(`●` suena, `M` en rojo silenciada). El estado vive en Music por clave de pista (`sam1`), sobrevive a recompilar
+y se aplica al instante. La pista silenciada sigue avanzando su patron y corta las voces que sonaban.
+Queda el mute cuantizado (F02) y el solo.
 
 ### L02. Grupos de instrumentos
 
@@ -119,11 +125,20 @@ Incrementar o reducir el numero bajo el cursor con teclas (por ejemplo `Alt+Arri
 Con compilacion automatica (L11), permite ajustar volumenes, intervalos y efectos escuchando el resultado.
 Respetaria los rangos de cada comando y las unidades, incluido el sufijo `b`.
 
+Implementado: `Cmd/Ctrl+Alt+Arriba/Abajo` suma o resta 1 (0,1 en decimales, conservando los decimales).
+Ignora los numeros que forman parte de un nombre (`sam1`, `C4`, `A#3`) y no baja de 0 en el limite superior de un rango.
+No valida el rango de cada comando: eso lo hace la compilacion.
+
 ### L11. Compilacion automatica cuantizada
 
 Aplicar el programa al dejar de escribir si es valido, en el siguiente pulso o compas elegido.
 Reduce la necesidad de pulsar `Cmd+S` durante una interpretacion y se apoya en F02.
 Debe poder activarse y desactivarse, y no aplicar nada mientras existan errores de sintaxis.
+
+Implementado: el boton de la barra superior activa la compilacion automatica (desactivada por defecto).
+Tras 800 ms sin escribir se valida el programa y, si el transporte suena, se aplica al comienzo del siguiente
+compas de 4 pulsos segun `bpm`; con el transporte parado se aplica de inmediato. Si hay errores no se aplica nada
+y solo se registra el error. El compas es fijo (4 pulsos) y el estado no se guarda entre sesiones.
 
 ### L12. Volver a la ultima version valida
 

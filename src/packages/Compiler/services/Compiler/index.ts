@@ -17,11 +17,12 @@ export default class Compiler implements ICompiler {
   prepare (code: string): ICompilationPlan {
     this.app.$logger.log(code);
 
-    const { instructions, variables } = this.analyzer.exec(this.parser.parse(code));
+    const { instructions, variables, bpm } = this.analyzer.exec(this.parser.parse(code));
 
     return {
       instructions: this.cloneInstructions(instructions),
       variables,
+      bpm,
       ...this.calculateInstructions(instructions)
     };
   }

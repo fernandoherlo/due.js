@@ -9,6 +9,7 @@ export default class Instrument extends Instruction implements IInstrument {
   protected app: IApp;
   protected instrument: any | null = null;
   protected canUpdate: boolean = false;
+  muted: boolean = false;
 
   private loop: Tone.Loop<Tone.LoopOptions> | null = null;
   private valueStep: number = 0;
@@ -56,8 +57,10 @@ export default class Instrument extends Instruction implements IInstrument {
 
     this.loop = new Tone.Loop((/* time: number */) => {
       if (this.instrument) {
-        const logNote = TriggerAttack.play(this.value, this.typeValue, this.valueStep, this.instrument);
-        LogInstrument.log(this.app.$logger, this, logNote);
+        if (!this.muted) {
+          const logNote = TriggerAttack.play(this.value, this.typeValue, this.valueStep, this.instrument);
+          LogInstrument.log(this.app.$logger, this, logNote);
+        }
 
         if (this.loop) {
           this.loop.interval = parseFloat(TriggerAttack.getValue(note.interval));
@@ -67,6 +70,13 @@ export default class Instrument extends Instruction implements IInstrument {
         }
       }
     }, parseFloat(TriggerAttack.getValue(note.interval))).start(0);
+  }
+
+  setMuted (muted: boolean): void {
+    this.muted = muted;
+    if (muted) {
+      this.instrument?.releaseAll?.();
+    }
   }
 
   async end (): Promise<void> {

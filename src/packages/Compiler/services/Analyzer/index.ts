@@ -12,7 +12,7 @@ export default class Analyzer {
     this.valueFactory = valueFactory;
   }
 
-  exec (program: IAstProgram): Pick<ICompilationPlan, 'instructions' | 'variables'> {
+  exec (program: IAstProgram): Pick<ICompilationPlan, 'instructions' | 'variables' | 'bpm'> {
     const variables: Record<string, string> = {};
     const instructions: Record<string, IInstruction> = {};
     const bpm = readTempo(program);
@@ -35,7 +35,7 @@ export default class Analyzer {
       }
     }
     const ordered = Object.fromEntries(Object.keys(instructions).sort().map(key => [key, instructions[key]]));
-    return { instructions: ordered, variables };
+    return { instructions: ordered, variables, bpm };
   }
 
   private analyzeStatement (statement: IAstStatement, variables: Record<string, string>, bpm: number): IInstruction | undefined {
@@ -133,6 +133,9 @@ function parameter (node: IAstValue | undefined, bpm: number) {
   if (node?.kind === AST_KIND.range) return { min: beatsToSeconds(node.min, bpm), max: beatsToSeconds(node.max, bpm) };
   if (node?.kind === AST_KIND.collection && node.operator === VALUE_OPERATOR.random) {
     return node.values.map(choice => beatsToSeconds(choice.rawValue, bpm));
+  }
+  if (node?.kind === AST_KIND.collection && node.operator === VALUE_OPERATOR.single && node.values.length === 1) {
+    return beatsToSeconds(node.values[0].rawValue, bpm);
   }
   return node?.rawValue ? beatsToSeconds(node.rawValue, bpm) : undefined;
 }

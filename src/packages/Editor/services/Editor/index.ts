@@ -7,6 +7,8 @@ import { LOCAL_STORAGE_KEY_CODE } from '~/src/packages/App/constants';
 import { DueLanguage } from '~/src/packages/Editor/constants/language';
 import { DueTheme, DueThemeHighlightStyle } from '~/src/packages/Editor/constants/theme';
 import { getDiagnostics } from '~/src/packages/Editor/services/Editor/diagnostics';
+import { adjustNumberAtCursor } from '~/src/packages/Editor/services/Editor/adjustNumber';
+import { muteGutter, toggleMuteSelection } from '~/src/packages/Editor/services/Editor/muteGutter';
 import type { IApp, IEditor } from '~/src/types';
 
 export default class Editor implements IEditor {
@@ -30,6 +32,9 @@ export default class Editor implements IEditor {
         history(),
         keymap.of([
           { key: 'Mod-/', run: toggleComment },
+          { key: 'Mod-Shift-m', preventDefault: true, run: toggleMuteSelection(this.app) },
+          { key: 'Mod-Alt-ArrowUp', run: adjustNumberAtCursor(1) },
+          { key: 'Mod-Alt-ArrowDown', run: adjustNumberAtCursor(-1) },
           { key: 'Mod-Enter', run: () => { this.app.$music?.toggle(); return true; } },
           // En teclado español "/" es Shift+7.
           { key: 'Mod-Shift-7', run: toggleComment, preventDefault: true },
@@ -37,6 +42,10 @@ export default class Editor implements IEditor {
           ...historyKeymap
         ]),
         lineNumbers(),
+        muteGutter(this.app),
+        EditorView.updateListener.of((update) => {
+          if (update.docChanged) this.app.onCodeChange();
+        }),
         DueLanguage,
         lintGutter(),
         linter((view) => {

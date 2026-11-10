@@ -13,7 +13,7 @@ export default class MidiSampler extends Sampler implements IMidiSampler {
     this.midi = input.channels[parseInt(channelRaw.value)];
 
     this.midi.addListener('noteon', (e: any) => {
-      if (this.instrument) {
+      if (this.instrument && !this.muted) {
         this.instrument.triggerAttack(e.note.identifier);
       }
     });

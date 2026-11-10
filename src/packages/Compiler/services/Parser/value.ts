@@ -58,5 +58,6 @@ function parseValue (source: string, location: ISourceLocation): IAstValue {
   if (min && max && extra === undefined) {
     return { ...base, kind: AST_KIND.range, min, max };
   }
-  return { ...base, kind: AST_KIND.collection, operator: VALUE_OPERATOR.single, values: [] };
+  const values = content ? [parseValue(content, { line: location.line, column: base.location.column + 1 })] : [];
+  return { ...base, kind: AST_KIND.collection, operator: VALUE_OPERATOR.single, values };
 }

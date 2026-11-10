@@ -97,6 +97,7 @@ body {
 
 #toggle,
 #save,
+#auto,
 #menu,
 #debug {
   position: fixed;
@@ -123,6 +124,13 @@ body {
   left: $toolbar_button_width;
 }
 
+#auto {
+  left: $toolbar_button_width * 2;
+  &.active {
+    background-color: $purple;
+  }
+}
+
 #debug {
   right: $toolbar_button_width;
 }
@@ -134,7 +142,7 @@ body {
 #midi-status {
   position: fixed;
   inset-block-start: 0;
-  inset-inline: $toolbar_button_width * 2;
+  inset-inline: $toolbar_button_width * 3;
   z-index: $toolbar_z_index;
   width: max-content;
   margin-inline: auto;

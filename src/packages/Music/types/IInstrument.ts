@@ -5,5 +5,6 @@ export interface IInstrument extends IInstruction {
   startActions: (effects: EffectsMap) => Promise<void>;
   end: () => Promise<void>;
   play: () => Promise<void>;
+  setMuted: (muted: boolean) => void;
   update: (newIntrument: IInstrument) => Promise<void>;
 }
