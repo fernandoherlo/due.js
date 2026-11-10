@@ -30,6 +30,7 @@ export default class Editor implements IEditor {
         history(),
         keymap.of([
           { key: 'Mod-/', run: toggleComment },
+          { key: 'Mod-Enter', run: () => { this.app.$music?.toggle(); return true; } },
           // En teclado español "/" es Shift+7.
           { key: 'Mod-Shift-7', run: toggleComment, preventDefault: true },
           ...defaultKeymap,

@@ -11,7 +11,8 @@
     "lint": "eslint ./src --ext .vue,.js,.ts,.tsx && tsc",
     "test": "vitest",
     "coverage": "vitest run --coverage",
-    "samples": "node samples.js"
+    "samples": "node samples.js",
+    "midi": "swift scripts/midi-cc.swift"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.35.0",

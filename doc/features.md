@@ -6,46 +6,9 @@ Cada entrada necesita concretar su alcance, sintaxis y pruebas antes de implemen
 Las correcciones, la deuda tecnica y las comprobaciones se mantienen en [tasks.md](tasks.md).
 Las propuestas conservan el DSL propio de due.js; no requieren sustituirlo por JavaScript.
 
-Como primer grupo, se sugieren F02, F04, F07, F24 y F25, una vez resueltas las correcciones necesarias del motor.
+Como primer grupo, se sugieren F07, F24 y F25, una vez resueltas las correcciones necesarias del motor.
+Las propuestas de interpretacion en directo (F01-F06, F26, F27 y F33) estan en [live-coding.md](live-coding.md).
 F01 y F31 deben coordinarse para definir la relacion entre tiempo musical y tempo.
-
-## Interpretacion en directo
-
-### F01. Tiempo musical
-
-Permitir expresar duraciones e intervalos en pulsos, compases y subdivisiones, ademas de segundos.
-Esto facilitaria escribir patrones que mantengan su relacion ritmica al cambiar el tempo.
-Habria que distinguir ambas unidades explicitamente y conservar el significado de los programas actuales.
-
-### F02. Cambios cuantizados
-
-Preparar y validar un programa antes de aplicar sus cambios al siguiente pulso o compas elegido.
-El objetivo es introducir variaciones sin romper la continuidad ritmica durante una interpretacion.
-Deberia indicarse que hay un cambio pendiente y permitir cancelarlo o sustituirlo antes de aplicarlo.
-
-### F03. Ejecutar una seleccion
-
-Compilar una linea o un bloque seleccionado sin modificar las pistas que quedan fuera de ese fragmento.
-Esto permitiria experimentar con una parte del programa mientras el resto sigue sonando.
-La identidad de las pistas y el alcance de las variables deben quedar definidos para evitar borrados inesperados.
-
-### F04. Mute y solo por instrumento
-
-Silenciar temporalmente una pista o escucharla de forma aislada sin borrar ni comentar su codigo.
-El estado deberia ser visible y poder restablecerse sin reconstruir el programa.
-Habria que definir como conservar estos estados al recompilar y como afectan a las notas y efectos que ya suenan.
-
-### F05. Atajos configurables
-
-Ofrecer atajos para compilar, ejecutar la seleccion, reproducir y detener sin abandonar el teclado.
-Las combinaciones deberian poder consultarse y configurarse, evitando conflictos con el editor y el navegador.
-Las mismas acciones seguirian disponibles mediante controles accesibles para quienes no utilicen atajos.
-
-### F06. Parada de emergencia
-
-Incluir una accion inmediata para detener el transporte, cortar las voces activas y evitar notas MIDI colgadas.
-Su comportamiento debe distinguirse de una pausa normal y definir que ocurre con las colas de los efectos.
-El codigo permaneceria intacto y el usuario podria volver a iniciar una interpretacion desde un estado conocido.
 
 ## Patrones y composicion
 
@@ -172,18 +135,6 @@ Mostrar la firma, las unidades, los rangos y un ejemplo del comando o parametro 
 La ayuda distinguiria argumentos opcionales, valores por defecto y funciones todavia no disponibles.
 Deberia poder consultarse sin abrir otra pagina y mantenerse coherente con la documentacion y la validacion del DSL.
 
-### F26. Inspeccion de valores
-
-Consultar el valor actual de variables, controles MIDI y expresiones relevantes sin depender de la consola.
-La vista deberia distinguir los valores del programa aplicado de los cambios que siguen pendientes en el editor.
-Las actualizaciones frecuentes se limitarian para no interferir con el rendimiento del audio ni con la escritura.
-
-### F27. Visualizacion sincronizada
-
-Senalar el paso activo de cada patron y ofrecer una vista de las notas o eventos proximos a ejecutarse.
-Esto ayudaria a relacionar el codigo con lo que se escucha, especialmente con secuencias largas o varias pistas.
-La visualizacion seguiria el reloj del audio, no controlaria su ejecucion y reflejaria pausas y recompilaciones.
-
 ### F28. Versiones de una sesion
 
 Guardar instantaneas del programa y su configuracion para comparar o recuperar versiones durante una interpretacion.
@@ -218,12 +169,6 @@ Los patrones expresados en tiempo musical seguirian el tempo; los expresados en 
 Definir el significado musical de las conexiones que el parser ya reconoce con `=>` y el comando `con`.
 Antes de habilitarlas habria que concretar que elementos pueden conectarse, como se representan las rutas y que ciclos se permiten.
 La creacion, modificacion y eliminacion de conexiones deberia integrarse en el plan de compilacion y liberar sus recursos.
-
-### F33. Conexion y reconexion MIDI en directo
-
-Gestionar la conexion y desconexion de dispositivos mientras el programa esta activo, sin detener los demas instrumentos.
-Habria que decidir como identificar un dispositivo al cambiar el orden de las entradas y si las variables inactivas se reconectan.
-La interfaz deberia reflejar el estado y la recuperacion de cada conexion, evitando listeners duplicados y notas colgadas.
 
 ## Exploracion experimental
 

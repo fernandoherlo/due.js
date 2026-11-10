@@ -19,16 +19,32 @@ export default class Ui implements IUi {
 
   async start () {
     const togglePlay: HTMLDivElement | null = document.getElementById('toggle') as HTMLDivElement;
-    togglePlay.onclick = async () => {
+    const toggle = async () => {
       if (this.app.$music) {
         await this.app.$music.toggle();
       }
     };
+    togglePlay.onclick = toggle;
 
     const save: HTMLDivElement | null = document.getElementById('save') as HTMLDivElement;
-    save.onclick = async () => {
+    const compile = async () => {
       await this.app.compile();
     };
+    save.onclick = compile;
+
+    document.addEventListener('keydown', (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.code === 'KeyS') {
+        event.preventDefault();
+        compile();
+        return;
+      }
+      // Fuera del editor y de botones, donde Space escribe o pulsa.
+      const target = event.target as HTMLElement;
+      if (event.code === 'Space' && !event.repeat && !target.closest('.cm-editor, button, input, textarea')) {
+        event.preventDefault();
+        toggle();
+      }
+    });
 
     const menu: HTMLDivElement | null = document.getElementById('menu') as HTMLDivElement;
     menu.onclick = () => {};
