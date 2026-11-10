@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@codemirror/language": "^6.11.2",
+    "@codemirror/lint": "^6.9.7",
     "@codemirror/state": "^6.5.2",
     "@codemirror/view": "^6.38.0",
     "@magenta/music": "^1.23.1",

@@ -2,8 +2,8 @@
 
 ## Editor
 
-- [ ] Sustituir el lenguaje Sass por resaltado propio de due.js.
-- [ ] Verificar comandos, variables, presets, notas, numeros, operadores y comentarios.
+- [x] Sustituir el lenguaje Sass por resaltado propio de due.js.
+- [x] Verificar comandos, variables, presets, notas, numeros, operadores y comentarios.
 
 ## Validar el DSL antes de modificar el audio
 
@@ -13,8 +13,9 @@
 
 ## Errores en pantalla
 
-- [ ] Mostrar el mensaje de error y su linea y columna cuando esten disponibles.
-- [ ] No depender solo del color de la barra y de la consola.
+- [x] Mostrar errores de sintaxis con subrayado, marcador y mensaje con linea y columna.
+- [x] Poner la barra en rojo ante errores de sintaxis y limpiar el estado al corregirlos.
+- [ ] Mostrar tambien los errores de ejecucion, sin depender solo de la barra y la consola.
 
 ## Recuperar tras fallos
 
@@ -32,7 +33,7 @@
 
 ## Cierre
 
-- [ ] Ejecutar la suite completa y el build con todos los cambios antes del commit.
+- [x] Ejecutar la suite completa y el build con todos los cambios antes del commit.
 
 ## Decisiones posteriores
 

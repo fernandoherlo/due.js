@@ -71,6 +71,16 @@ describe('DSL syntax parser', () => {
     expect(() => parser.parse('\n\nsam1#piano')).toThrow('Line 3, column 1');
   });
 
+  it.each([
+    'sam3#tom(A2>C2>B2D3];[1-3][2-4]):r(64):d(64;0.3):v($bajo)',
+    'sam3#tom([A2>C2];[1-3][2-4])',
+    'sam3#tom([A2>C2;1;2)',
+    'sam3#tom(A2>C2;1;2)',
+    'sam3#tom(C4))'
+  ])('rejects malformed value structure: %s', (source) => {
+    expect(() => parser.parse('\n\n' + source)).toThrow('Line 3, column');
+  });
+
   it('represents => as a connection node rather than a synthetic command', () => {
     const program = parser.parse('sam1#piano(C4)=>out1');
 

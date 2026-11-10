@@ -1,5 +1,6 @@
 import { describe, afterEach, it, expect, vi } from 'vitest';
 import App from '~/src/packages/App/services/App';
+import Ui from '~/src/packages/App/services/Ui';
 
 describe('App', () => {
   global.window = {
@@ -12,6 +13,8 @@ describe('App', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
   });
 
   it('Create new instance', () => {
@@ -210,5 +213,24 @@ describe('App', () => {
     app.getFromLocalStorage('foo');
     // Assert
     expect(global.localStorage.getItem).toHaveBeenCalledWith('foo');
+  });
+
+  it('keeps new errors visible after a previous success timeout', () => {
+    vi.useFakeTimers();
+    const progressBar = {
+      className: '',
+      style: { width: '0%' },
+      classList: { add: className => { progressBar.className = className; } }
+    };
+    vi.stubGlobal('document', { getElementById: () => progressBar });
+    vi.stubGlobal('window', { setTimeout });
+    const ui = new Ui({});
+
+    ui.setOk();
+    ui.setError();
+    vi.advanceTimersByTime(300);
+
+    expect(progressBar.className).toBe('error');
+    expect(progressBar.style.width).toBe('100%');
   });
 });

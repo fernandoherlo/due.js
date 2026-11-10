@@ -1,4 +1,5 @@
 import { AST_KIND, CHARACTERS_INSTRUCTIONS as CHAR, COMMANDS, VALUE_OPERATOR } from '~/src/packages/Compiler/constants';
+import ParseError from '~/src/packages/Compiler/services/Parser/error';
 import type { IAstValue, IAstValueExpression, ISourceLocation } from '~/src/packages/Compiler/types/IAst';
 
 const COLLECTION_SEPARATORS = [
@@ -23,10 +24,19 @@ function parseValue (source: string, location: ISourceLocation): IAstValue {
     rawValue,
     location: { line: location.line, column: location.column + source.length - source.trimStart().length }
   };
+  const bracketed = rawValue.startsWith(CHAR.INIT_MULTIPLE_VALUES) && rawValue.endsWith(CHAR.END_MULTIPLE_VALUES);
+  const valueSource = bracketed ? source.trim().slice(1, -1) : source.trim();
+  const invalid = (bracketed ? /[()[\]]/ : /[()[\],>|]/).exec(valueSource);
+  if (invalid) {
+    throw new ParseError({
+      line: location.line,
+      column: base.location.column + invalid.index + (bracketed ? 1 : 0)
+    }, 'Invalid value structure: use [values] for lists and ; between arguments');
+  }
   if (rawValue.startsWith(COMMANDS.$) && !rawValue.includes(CHAR.INIT_MULTIPLE_VALUES)) {
     return { ...base, kind: AST_KIND.reference, name: rawValue };
   }
-  if (!rawValue.startsWith(CHAR.INIT_MULTIPLE_VALUES) || !rawValue.endsWith(CHAR.END_MULTIPLE_VALUES)) {
+  if (!bracketed) {
     return { ...base, kind: AST_KIND.scalar };
   }
 

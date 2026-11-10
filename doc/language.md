@@ -99,6 +99,8 @@ En una cadena de efectos, el primer efecto escrito queda más cerca de la salida
 ## Comportamiento observado
 
 - El parser ignora comentarios y espacios al interpretar instrucciones y conserva las líneas vacías para ubicar los errores.
+- Las listas deben estar encerradas en corchetes y los argumentos separados por `;`. El parser rechaza estructuras como `A2>C2]` o `[1-3][2-4]` antes de modificar el audio.
+- El editor valida la estructura al escribir: subraya el primer error, marca su línea y muestra un mensaje con línea y columna. La barra se pone roja y el aviso se limpia al corregir el código. Esto no sustituye la validación semántica de presets, variables y valores.
 - Los valores explícitos `0` de duración e intervalo se conservan al crear una nota. La validez de un intervalo cero para Tone.js no está garantizada.
 - El tempo no se configura desde el DSL; el transporte de Tone.js se inicia actualmente a `120` BPM. Esto puede ser una limitación deliberada, no necesariamente un bug.
 - El compilador prepara un plan y solo actualiza su snapshot y variables tras aplicar las operaciones de audio. Esto mantiene coherente el estado lógico, pero no revierte efectos de audio/MIDI si una operación falla a mitad.

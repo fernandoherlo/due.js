@@ -1,4 +1,5 @@
 import { AST_KIND, CHARACTERS_INSTRUCTIONS as CHAR, COMMANDS } from '~/src/packages/Compiler/constants';
+import ParseError from '~/src/packages/Compiler/services/Parser/error';
 import { parseExpression } from '~/src/packages/Compiler/services/Parser/value';
 import type {
   IAstCommand, IAstLine, IAstProgram, IAstStatement, ISourceLocation
@@ -45,7 +46,7 @@ export default class Parser {
     const rawValue = source.slice(assignmentIndex + CHAR.EQUAL.length);
     const valueLocation = { line: location.line, column: location.column + assignmentIndex + CHAR.EQUAL.length };
     if (!rawValue.trim()) {
-      throw syntaxError(location, 'Variable assignment is missing a value');
+      throw new ParseError(location, 'Variable assignment is missing a value');
     }
     return name.startsWith(COMMANDS.$$)
       ? { kind: AST_KIND.liveVariable, name, command: this.parseCommand(rawValue, valueLocation), location }
@@ -55,12 +56,12 @@ export default class Parser {
   private parseCommand (source: string, location: ISourceLocation): IAstCommand {
     const valueStart = source.indexOf(CHAR.INIT_VALUE_COMMAND);
     if (valueStart <= 0 || !source.endsWith(CHAR.END_VALUE_COMMAND)) {
-      throw syntaxError(location, 'Expected command syntax name(value)');
+      throw new ParseError(location, 'Expected command syntax name(value)');
     }
     const [commandId, modifier] = source.slice(0, valueStart).replace(/\s/g, '').split(CHAR.IDENTIFIER);
     const match = /^([a-z]+)(\d+)?$/.exec(commandId);
     if (!match) {
-      throw syntaxError(location, `Invalid command name "${commandId}"`);
+      throw new ParseError(location, `Invalid command name "${commandId}"`);
     }
     return {
       kind: AST_KIND.command,
@@ -73,8 +74,4 @@ export default class Parser {
       location
     };
   }
-}
-
-function syntaxError (location: ISourceLocation, message: string): Error {
-  return Error(`Line ${location.line}, column ${location.column}: ${message}.`);
 }

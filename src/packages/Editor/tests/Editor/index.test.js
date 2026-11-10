@@ -4,6 +4,7 @@ import { highlightTree, tagHighlighter, tags } from '@lezer/highlight';
 import { describe, expect, it, vi } from 'vitest';
 import { DueLanguage } from '~/src/packages/Editor/constants/language';
 import Editor from '~/src/packages/Editor/services/Editor';
+import { getDiagnostics } from '~/src/packages/Editor/services/Editor/diagnostics';
 
 const mockApp = {
   getFromLocalStorage: vi.fn()
@@ -84,5 +85,30 @@ describe('Editor', () => {
       { text: 'C#4', type: 'note' },
       { text: '>', type: 'operator' }
     ]));
+  });
+
+  it('locates the malformed value on its original line', () => {
+    const source = '$bajo=24\n\nsam3#tom(A2>C2>B2D3];[1-3][2-4]):r(64):d(64;0.3):v($bajo)';
+    const state = EditorState.create({ doc: source });
+
+    const diagnostics = getDiagnostics(state);
+
+    expect(diagnostics).toEqual([{
+      from: source.indexOf('>'),
+      to: source.indexOf('>') + 1,
+      severity: 'error',
+      message: expect.stringContaining('Line 3, column 12')
+    }]);
+  });
+
+  it('clears syntax diagnostics after correcting the document', () => {
+    const state = EditorState.create({ doc: 'sam3#tom([A2>C2];[1-3][2-4])' });
+    expect(getDiagnostics(state)).toHaveLength(1);
+
+    const corrected = state.update({
+      changes: { from: 0, to: state.doc.length, insert: 'sam3#tom([A2>C2];[1-3];[2-4])' }
+    }).state;
+
+    expect(getDiagnostics(corrected)).toEqual([]);
   });
 });

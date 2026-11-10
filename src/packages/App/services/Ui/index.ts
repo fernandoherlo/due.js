@@ -45,25 +45,29 @@ export default class Ui implements IUi {
     progressBarEditorElement.className = '';
     progressBarEditorElement.classList.add('ok');
 
-    clearInterval(this.idTimeoutValid);
+    clearTimeout(this.idTimeoutValid);
     this.idTimeoutValid = window.setTimeout(() => {
       progressBarEditorElement.className = '';
     }, 250);
   }
 
   setValid () {
+    clearTimeout(this.idTimeoutValid);
     const progressBarEditorElement: HTMLDivElement | null = document.getElementById(this.htmlIdProgressBar) as HTMLDivElement;
     progressBarEditorElement.className = '';
     progressBarEditorElement.classList.add('valid');
   }
 
   setError () {
+    clearTimeout(this.idTimeoutValid);
     const progressBarEditorElement: HTMLDivElement | null = document.getElementById(this.htmlIdProgressBar) as HTMLDivElement;
     progressBarEditorElement.className = '';
     progressBarEditorElement.classList.add('error');
+    progressBarEditorElement.style.width = '100%';
   }
 
   setWaiting () {
+    clearTimeout(this.idTimeoutValid);
     const progressBarEditorElement: HTMLDivElement | null = document.getElementById(this.htmlIdProgressBar) as HTMLDivElement;
     progressBarEditorElement.className = '';
     progressBarEditorElement.classList.add('wait');

@@ -1,9 +1,11 @@
 import { syntaxHighlighting } from '@codemirror/language';
+import { linter, lintGutter } from '@codemirror/lint';
 import { EditorState } from '@codemirror/state';
 import { EditorView, lineNumbers } from '@codemirror/view';
 import { LOCAL_STORAGE_KEY_CODE } from '~/src/packages/App/constants';
 import { DueLanguage } from '~/src/packages/Editor/constants/language';
 import { DueTheme, DueThemeHighlightStyle } from '~/src/packages/Editor/constants/theme';
+import { getDiagnostics } from '~/src/packages/Editor/services/Editor/diagnostics';
 import type { IApp, IEditor } from '~/src/types';
 
 export default class Editor implements IEditor {
@@ -18,13 +20,25 @@ export default class Editor implements IEditor {
   create () {
     const code = this.app.getFromLocalStorage(LOCAL_STORAGE_KEY_CODE) || undefined;
 
-    const theme = EditorView.theme(DueTheme);
+    const theme = EditorView.theme(DueTheme, { dark: true });
+    let hasSyntaxError = false;
 
     const startState = EditorState.create({
       doc: code,
       extensions: [
         lineNumbers(),
         DueLanguage,
+        lintGutter(),
+        linter((view) => {
+          const diagnostics = getDiagnostics(view.state);
+          if (diagnostics.length) {
+            this.app.$ui.setError();
+          } else if (hasSyntaxError) {
+            this.app.$ui.setValid();
+          }
+          hasSyntaxError = diagnostics.length > 0;
+          return diagnostics;
+        }, { delay: 200 }),
         theme,
         syntaxHighlighting(DueThemeHighlightStyle)
       ]
