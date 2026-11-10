@@ -103,7 +103,7 @@ function validateMode (instruction: IInstruction, instrument: IInstruction | und
   }
   if (!instruction.mode) return;
   if (!MODES.includes(instruction.name) || instruction.element || instruction.modifier) {
-    throw Error(`Unsupported playback mode. Use ::${MODES[0]}(...).`);
+    throw Error(`Unsupported playback mode. Use ${MODES.map(mode => `::${mode}(...)`).join(' or ')}.`);
   }
   if (instrument?.name !== COMMANDS.sam) {
     throw Error(`::${instruction.name}(...) is only available on sam instruments.`);

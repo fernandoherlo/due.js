@@ -3,6 +3,7 @@ import { toMidi } from '~/src/packages/Music/helpers/toMidi';
 import type { IInstruction, IMode, Playback } from '~/src/types';
 
 type Notes = Parameters<Tone.Sampler['triggerAttackRelease']>[0];
+type Time = Parameters<Tone.Sampler['triggerAttackRelease']>[2];
 
 export default abstract class Mode extends Tone.Sampler implements IMode {
   private readonly samples: Map<number, AudioBuffer>;
@@ -22,7 +23,7 @@ export default abstract class Mode extends Tone.Sampler implements IMode {
 
   abstract playback (): Playback;
 
-  override triggerAttackRelease (notes: Notes, duration: number): this {
+  override triggerAttackRelease (notes: Notes, duration: number, time?: Time, velocity?: number): this {
     const play = this.playback();
     for (const note of [notes].flat()) {
       const frequency = Tone.Frequency(note);
@@ -33,7 +34,7 @@ export default abstract class Mode extends Tone.Sampler implements IMode {
         this.add(closest, played);
         this.loaded.set(closest, played);
       }
-      super.triggerAttackRelease(note, duration);
+      super.triggerAttackRelease(note, duration, time, velocity);
     }
     return this;
   }
