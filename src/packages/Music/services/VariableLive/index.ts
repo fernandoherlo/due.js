@@ -1,7 +1,6 @@
-import type { IApp, IMidiIn, IVariableLive } from '~/src/types';
+import type { IApp, IVariableLive } from '~/src/types';
 import Instruction from '~/src/packages/Compiler/services/Instruction';
-import { COMMANDS } from '~/src/packages/Compiler/constants';
-import { COMMANDS_ELEMENT_MAP } from '../../constants';
+import MidiIn from '../MidiIn';
 
 export default class VariableLive extends Instruction implements IVariableLive {
   private app: IApp;
@@ -13,7 +12,7 @@ export default class VariableLive extends Instruction implements IVariableLive {
   }
 
   async start (): Promise<void> {
-    const midiIn = COMMANDS_ELEMENT_MAP[COMMANDS.mi](this, this.app) as IMidiIn;
+    const midiIn = new MidiIn(this, this.app);
     await midiIn.start();
     this.app.$variablesLive[this.key] = midiIn;
   }

@@ -1,6 +1,8 @@
 import * as Tone from 'tone';
 import { areDifferentInstructions } from '~/src/packages/Compiler/services/Instruction/compare';
-import { MODES_MAP, SAMPLER_MAP } from '~/src/packages/Music/constants';
+import { EFFECTS_MAP } from '~/src/packages/Music/constants/effects';
+import { MODES_MAP } from '~/src/packages/Music/constants/modes';
+import { SAMPLER_MAP } from '~/src/packages/Music/constants/samplers';
 import samples from '~/src/packages/Music/constants/samples.json';
 import Instrument from '~/src/packages/Music/services/Instrument';
 import Mode from '~/src/packages/Music/services/Modes';
@@ -19,7 +21,7 @@ export default class Sampler extends Instrument implements ISampler {
   async start (): Promise<void> {
     let connect: any | null = null;
     if (this.actions.length) {
-      connect = await this.startActions();
+      connect = await this.startActions(EFFECTS_MAP);
     }
 
     const samplesMap: any = samples;

@@ -206,6 +206,9 @@ Deberia explicarse que el sonido de dispositivos MIDI externos no se incluye sal
 
 ### F31. Tempo configurable
 
+Implementado de forma parcial: `bpm(N)` y el sufijo `b` (pulsos) en duracion e intervalo; ver `doc/language.md`.
+Quedan control desde la interfaz, compases y subdivisiones (F01).
+
 Permitir cambiar el tempo de la sesion sin modificar el codigo interno ni perder la sincronizacion de las pistas.
 Habria que decidir si se controla desde el DSL, desde la interfaz o desde ambos, con una precedencia explicita.
 Los patrones expresados en tiempo musical seguirian el tempo; los expresados en segundos conservarian su unidad.

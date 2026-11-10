@@ -15,10 +15,14 @@ const $red = '#ff6767';
 
 export const DueTheme: { [selector: string]: StyleSpec } = {
   '&': {
+    height: '100%',
     fontSize: '18pt',
     fontFamily: 'Fira Code',
     color: $white,
     background: $black
+  },
+  '.cm-scroller': {
+    overflow: 'auto'
   },
   '.cm-content': {
     caretColor: $purple

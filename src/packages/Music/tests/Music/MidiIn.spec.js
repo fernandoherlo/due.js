@@ -18,8 +18,7 @@ vi.mock('~/src/packages/Music/constants', () => ({
     [COMMANDS.$$]: (instruction, app) => new VariableLive(instruction, app),
     [COMMANDS.mi]: (instruction, app) => new MidiIn(instruction, app),
     [COMMANDS.sam]: () => ({ start: samplerStart })
-  },
-  SAMPLER_MAP: {}
+  }
 }));
 
 describe('MidiIn', () => {

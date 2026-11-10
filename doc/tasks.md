@@ -17,10 +17,11 @@ Las propuestas de nuevas funcionalidades se recogen en [features.md](features.md
 
 ## Validar el DSL antes de modificar el audio
 
-- [ ] Rechazar presets desconocidos y variables sin definir.
-- [ ] Validar valores de efectos, duraciones e intervalos fuera de rango.
-- [ ] Decidir si el intervalo 0 debe rechazarse o limitarse.
-- [ ] Distinguir valores omitidos de ceros explicitos: el feedback `0` del delay no debe convertirse en `0.5`.
+- [x] Rechazar presets desconocidos y variables sin definir.
+- [x] Validar valores de efectos, duraciones e intervalos fuera de rango.
+- [x] Decidir si el intervalo 0 debe rechazarse o limitarse.
+	Se rechaza: el intervalo debe ser mayor que 0 (un rango puede empezar en 0).
+- [x] Distinguir valores omitidos de ceros explicitos: el feedback `0` del delay no debe convertirse en `0.5`.
 	Revisar los valores por defecto equivalentes y cubrir el caso con pruebas.
 - [ ] Validar indices MIDI, canales de 1 a 16 y controladores de 0 a 127 antes de crear las conexiones,
 	tambien cuando no exista el dispositivo seleccionado.
@@ -52,7 +53,7 @@ Mantener los modulos App, Compiler, Editor y Music y los servicios como clases.
 Conservar la reutilizacion del Parser desde Editor, sin duplicar la validacion del lenguaje.
 No introducir un paquete Core/Shared ni nuevas capas o interfaces sin una necesidad concreta.
 
-- [ ] Romper el ciclo entre el registro `COMMANDS_ELEMENT_MAP` y los instrumentos: la clase base Instrument no debe importar el registro que construye sus subclases.
+- [x] Romper el ciclo entre el registro `COMMANDS_ELEMENT_MAP` y los instrumentos: la clase base Instrument no debe importar el registro que construye sus subclases.
 - [ ] Desacoplar Compiler de IApp: recibir solo el logger necesario y dejar que App publique las variables del plan tras aplicarlo correctamente.
 - [ ] Revisar las dependencias de Music y Editor sobre IApp y reducirlas a las que realmente utilizan, sin crear una interfaz por cada servicio.
 - [ ] Sustituir la herencia `Instrument extends Instruction` por composicion: recibir la instruccion como dato y mantener separado el estado de reproduccion.

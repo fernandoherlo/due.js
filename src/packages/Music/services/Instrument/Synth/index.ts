@@ -1,6 +1,7 @@
 import type { ISynth, IApp } from '~/src/types';
 import * as Tone from 'tone';
 import Instrument from '..';
+import { EFFECTS_MAP } from '../../../constants/effects';
 
 export default class Synth extends Instrument implements ISynth {
   protected instrument: Tone.Synth<Tone.SynthOptions> | null = null;
@@ -14,7 +15,7 @@ export default class Synth extends Instrument implements ISynth {
   async start (): Promise<void> {
     let connect: any | null;
     if (this.actions.length) {
-      connect = await this.startActions();
+      connect = await this.startActions(EFFECTS_MAP);
     }
 
     this.instrument = new Tone.Synth();

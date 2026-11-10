@@ -85,7 +85,24 @@ Los campos de duración e intervalo también admiten listas o rangos:
 sam1#piano([C4>E4>G4];[1-3];[2-4])
 ```
 
-Los rangos se eligen con distribución uniforme continua desde el mínimo (incluido) hasta el máximo (excluido), por lo que admiten decimales y extremos iguales a `0`. Los campos se interpretan como segundos al programar el patrón. Los valores omitidos de duración e intervalo usan `0.25` y `2` cuando el comando lleva índice numérico. Un rango de intervalo que incluya `0` puede producir un intervalo que Tone.js no acepte; falta fijar si debe rechazarse o limitarse.
+Los rangos se eligen con distribución uniforme continua desde el mínimo (incluido) hasta el máximo (excluido), por lo que admiten decimales y extremos iguales a `0`. Los campos se interpretan como segundos al programar el patrón. Los valores omitidos de duración e intervalo usan `0.25` y `2` cuando el comando lleva índice numérico. La duración debe ser un número mayor o igual que `0`; el intervalo debe ser mayor que `0`. En un rango de intervalo, el mínimo puede ser `0` pero el máximo debe ser mayor que `0`. Los valores fuera de estos límites o no numéricos se rechazan antes de modificar el audio.
+
+## Tempo y pulsos
+
+`bpm(N)` fija el tempo de la sesión, entre `20` y `300`; sin esa línea es `120`.
+Debe ir sola en su línea, una sola vez, con un número literal (no admite variables) y puede escribirse antes o después de los instrumentos.
+
+La duración y el intervalo admiten el sufijo `b` para expresar pulsos; sin sufijo son segundos y no dependen del tempo:
+
+```text
+bpm(90)
+sam1#piano(C4;1b;4b)
+sam2#tom(C2;0.5b;[1b-2b])
+sam3#harp(C4;1;2)
+```
+
+El compilador convierte los pulsos a segundos (`b × 60 / bpm`) al compilar, también en listas, rangos y variables (`$beat=1b`).
+Al cambiar `bpm` solo se reprograman los instrumentos que usan pulsos. Aún no hay compases ni subdivisiones.
 
 ## Variables
 
@@ -96,7 +113,7 @@ $volumen=90
 sam1#piano([C4>E4>G4];0.25;1):v($volumen)
 ```
 
-Las asignaciones se procesan en orden, así que define una variable antes de usarla. La sustitución es textual: no hay operaciones aritméticas ni evaluación de expresiones. Las variables normales se reinician al compilar de nuevo.
+Las asignaciones se procesan en orden, así que define una variable antes de usarla; usar una variable sin definir es un error con línea y columna. La sustitución es textual y reemplaza todas las apariciones: no hay operaciones aritméticas ni evaluación de expresiones. Las variables normales se reinician al compilar de nuevo.
 
 Las variables que comienzan con `$$` reciben valores de entrada MIDI. Por ejemplo:
 
@@ -133,10 +150,12 @@ Las siguientes escalas describen lo que hace el runtime actual, no necesariament
 
 | Efecto | Escala aplicada |
 | --- | --- |
-| `v(valor)` | `0-127` se mapea linealmente a `-30..30` dB. |
+| `v(valor)` | Cualquier número; `0-127` se mapea linealmente a `-30..30` dB. |
 | `r(valor)` | `0-127` se mapea a `0..20` segundos de decay. |
-| `d(retardo;feedback)` | El retardo se mapea de `0-127` a `0..3` segundos; feedback se pasa como número y, si falta, usa `0.5`. |
+| `d(retardo;feedback)` | El retardo `0-127` se mapea a `0..3` segundos; el feedback va de `0` a `1` y, si falta, usa `0.5`. Un `0` explícito se conserva. |
 | `cho(valor)` | `0-127` se mapea a `0..30` Hz. |
+
+Los valores de `r`, `d` y `cho` fuera de `0-127`, o de feedback fuera de `0-1`, se rechazan antes de modificar el audio. Un preset de `sam` desconocido también se rechaza.
 
 En una cadena de efectos, el primer efecto escrito queda más cerca de la salida de audio. Para MIDI en vivo, el enlace `$$variable=miN(...)` crea la escucha de entrada.
 
@@ -145,8 +164,8 @@ En una cadena de efectos, el primer efecto escrito queda más cerca de la salida
 - El parser ignora comentarios y espacios al interpretar instrucciones y conserva las líneas vacías para ubicar los errores.
 - Las listas deben estar encerradas en corchetes y los argumentos separados por `;`. El parser rechaza estructuras como `A2>C2]` o `[1-3][2-4]` antes de modificar el audio.
 - El editor valida la estructura al escribir: subraya el primer error, marca su línea y muestra un mensaje con línea y columna. La barra se pone roja y el aviso se limpia al corregir el código. Esto no sustituye la validación semántica de presets, variables y valores.
-- Los valores explícitos `0` de duración e intervalo se conservan al crear una nota. La validez de un intervalo cero para Tone.js no está garantizada.
-- El tempo no se configura desde el DSL; el transporte de Tone.js se inicia actualmente a `120` BPM. Esto puede ser una limitación deliberada, no necesariamente un bug.
+- Los valores explícitos `0` de duración y de feedback se conservan; el intervalo `0` se rechaza.
+- El tempo se configura con `bpm(N)` (ver Tempo y pulsos); no se usa el tempo del transporte de Tone.js.
 - El compilador prepara un plan y solo actualiza su snapshot y variables tras aplicar las operaciones de audio. Esto mantiene coherente el estado lógico, pero no revierte efectos de audio/MIDI si una operación falla a mitad.
 
 ## Posibles bugs e incompletitudes

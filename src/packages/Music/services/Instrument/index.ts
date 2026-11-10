@@ -1,10 +1,9 @@
-import type { IApp, IEffect, IInstruction, IInstrument, INote } from '~/src/types';
+import type { EffectsMap, IApp, IEffect, IInstruction, IInstrument, INote } from '~/src/types';
 import * as Tone from 'tone';
 import Instruction from '~/src/packages/Compiler/services/Instruction';
 import { TYPE_VALUE } from '~/src/packages/Compiler/constants';
 import TriggerAttack from './triggerAttack';
 import LogInstrument from './logInstrument';
-import { COMMANDS_ELEMENT_MAP } from '../../constants';
 
 export default class Instrument extends Instruction implements IInstrument {
   protected app: IApp;
@@ -24,14 +23,14 @@ export default class Instrument extends Instruction implements IInstrument {
     await this.play();
   }
 
-  async startActions (): Promise<void> {
+  async startActions (effects: EffectsMap): Promise<void> {
     let lastAction: any | null = null;
 
     for (let i = 0; i < this.actions.length; i++) {
       const action: IInstruction = this.actions[i];
       if (action.mode) continue;
 
-      const element = COMMANDS_ELEMENT_MAP[action.name](action, this.app) as IEffect;
+      const element = effects[action.name](action, this.app) as IEffect;
       element.create();
       this.actions[i] = element;
 

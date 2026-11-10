@@ -19,7 +19,7 @@ export default class Delay extends Effect implements IDelay {
       const feedback: number = parseFloat(this.value.duration);
 
       this.effect.delayTime.value = delay;
-      this.effect.feedback.value = feedback || 0.5;
+      this.effect.feedback.value = Number.isNaN(feedback) ? 0.5 : feedback;
     }
 
     super.create();

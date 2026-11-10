@@ -7,12 +7,12 @@ type Time = Parameters<Tone.Sampler['triggerAttackRelease']>[2];
 
 export default abstract class Mode extends Tone.Sampler implements IMode {
   private readonly samples: Map<number, AudioBuffer>;
-  private readonly loaded: Map<number, AudioBuffer>;
+  private readonly current: Map<number, AudioBuffer>;
 
   constructor (protected readonly action: IInstruction, buffers: Record<string, AudioBuffer>) {
     super({ urls: buffers });
     this.samples = new Map(Object.entries(buffers).map(([note, buffer]) => [toMidi(note), buffer] as const));
-    this.loaded = new Map(this.samples);
+    this.current = new Map(this.samples);
   }
 
   static async loadBuffers (urls: Record<string, string>): Promise<Record<string, AudioBuffer>> {
@@ -30,9 +30,9 @@ export default abstract class Mode extends Tone.Sampler implements IMode {
       const closest = this.closestSample(frequency.toMidi());
       const rate = frequency.toFrequency() / Tone.Frequency(closest, 'midi').toFrequency();
       const played = play(this.samples.get(closest)!, duration * rate);
-      if (this.loaded.get(closest) !== played) {
-        this.add(closest, played);
-        this.loaded.set(closest, played);
+      if (this.current.get(closest) !== played) {
+        this.add(Tone.Frequency(closest, 'midi').toNote(), played);
+        this.current.set(closest, played);
       }
       super.triggerAttackRelease(note, duration, time, velocity);
     }

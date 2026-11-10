@@ -26,6 +26,7 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
+    "@codemirror/commands": "^6.11.1",
     "@codemirror/language": "^6.11.2",
     "@codemirror/lint": "^6.9.7",
     "@codemirror/state": "^6.5.2",

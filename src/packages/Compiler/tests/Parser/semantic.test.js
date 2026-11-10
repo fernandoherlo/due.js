@@ -60,9 +60,6 @@ describe('DSL semantic analyzer', () => {
     const invalid = parser.parse('$level=42\nv($level)');
 
     expect(() => analyzer.exec(invalid)).toThrow('Line 2, column 1');
-    const result = analyzer.exec(parser.parse('sam1(C4):v($level)'));
-
-    expect(result.variables).toEqual({});
-    expect(result.instructions[`${COMMANDS_MAP[COMMANDS.sam]}1`].actions[0].value.value).toBe('$level');
+    expect(() => analyzer.exec(parser.parse('sam1(C4):v($level)'))).toThrow('Undefined variable "$level"');
   });
 });

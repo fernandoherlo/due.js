@@ -1,4 +1,4 @@
-import type { IInstrument } from '~/src/types';
+import type { IApp, IInstrument, IInstruction } from '~/src/types';
 
 export interface IEffect extends IInstrument {
   create: () => void;
@@ -6,3 +6,5 @@ export interface IEffect extends IInstrument {
   connect: (action: IEffect) => void;
   end: () => Promise<void>
 }
+
+export type EffectsMap = Record<string, (instruction: IInstruction, app: IApp) => IEffect>;

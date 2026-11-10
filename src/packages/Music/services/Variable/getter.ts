@@ -8,8 +8,8 @@ export default function getter (value: any, variables: any): any {
   let newValue = stringValue.replace(' ', '');
 
   if (Object.keys(variables)) {
-    Object.keys(variables).forEach((variable) => {
-      newValue = newValue.replace(variable, variables[variable]);
+    Object.keys(variables).sort((a, b) => b.length - a.length).forEach((variable) => {
+      newValue = newValue.split(variable).join(variables[variable]);
     });
   }
 

@@ -16,11 +16,14 @@ export const COMMANDS: Record<string, string> = {
   d: 'd',
   cho: 'cho',
   con: 'con',
+  bpm: 'bpm',
   $: '$',
   $$: '$$'
 } as const;
 
 export const MODES: readonly string[] = [COMMANDS.reverse];
+
+export const TEMPO = { default: 120, min: 20, max: 300, beatUnit: 'b' } as const;
 
 export const COMMANDS_MAP: Record<typeof COMMANDS[keyof typeof COMMANDS], string> = {
   [COMMANDS.p]: 'piece',

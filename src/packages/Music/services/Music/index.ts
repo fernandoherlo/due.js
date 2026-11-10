@@ -1,7 +1,11 @@
 import * as Tone from 'tone';
 import { WebMidi } from 'webmidi';
 
-import { COMMANDS_ELEMENT_MAP, MODES_MAP, SAMPLER_MAP } from '~/src/packages/Music/constants';
+import { COMMANDS } from '~/src/packages/Compiler/constants';
+import { COMMANDS_ELEMENT_MAP } from '~/src/packages/Music/constants';
+import { MODES_MAP } from '~/src/packages/Music/constants/modes';
+import { SAMPLER_MAP } from '~/src/packages/Music/constants/samplers';
+import validateInstruction from '~/src/packages/Music/helpers/validateInstruction';
 import type { IApp, IInstruction, IInstrument, IMusic } from '~/src/types';
 
 export default class Music implements IMusic {
@@ -30,7 +34,7 @@ export default class Music implements IMusic {
       this.app.$ui.updateSteps();
     }, 1);
 
-    Tone.getTransport().bpm.value = 120; // TODO: make configurable
+    Tone.getTransport().bpm.value = 120; // Tempo is applied by the compiler: beats are converted to seconds.
   }
 
   async toggle () {
@@ -54,6 +58,11 @@ export default class Music implements IMusic {
         if (!COMMANDS_ELEMENT_MAP[command.name]) {
           throw Error(`Unsupported command "${command.name}".`);
         }
+        validateInstruction(command);
+      }
+
+      if (instruction.name === COMMANDS.sam && instruction.modifier && !SAMPLER_MAP[instruction.modifier]) {
+        throw Error(`Unknown sample preset "${instruction.modifier}".`);
       }
     }
   }

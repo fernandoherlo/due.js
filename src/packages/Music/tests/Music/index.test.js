@@ -26,27 +26,31 @@ vi.mock('tone', async (importOriginal) => {
 
 vi.mock('webmidi', () => ({ WebMidi: { enable: vi.fn() } }));
 
-vi.mock('~/src/packages/Music/constants', async () => {
-  const { default: Reverse } = await import('~/src/packages/Music/services/Modes/Reverse');
-  const { default: Sampler } = await import('~/src/packages/Music/services/Instrument/Sampler');
+const fakeVolume = vi.hoisted(() => instruction => ({
+  ...instruction,
+  effect: {},
+  create: vi.fn(),
+  toDestination: vi.fn(),
+  connect: vi.fn(),
+  end: vi.fn()
+}));
+
+vi.mock('~/src/packages/Music/constants', () => {
   const COMMANDS_ELEMENT_MAP = {
     sam: (instruction, app) => new Sampler(instruction, app),
-    v: instruction => ({
-      ...instruction,
-      effect: {},
-      create: vi.fn(),
-      toDestination: vi.fn(),
-      connect: vi.fn(),
-      end: vi.fn()
-    }),
+    v: fakeVolume,
     foo: () => {
       return { start: vi.fn(), update: vi.fn(), end: vi.fn() };
     }
   };
-  const SAMPLER_MAP = { birds: 'birds', test: 'test', tom: 'vcsl-tom' };
-  const MODES_MAP = { reverse: Reverse };
-  return { COMMANDS_ELEMENT_MAP, MODES_MAP, SAMPLER_MAP };
+  return { COMMANDS_ELEMENT_MAP };
 });
+
+vi.mock('~/src/packages/Music/constants/effects', () => ({ EFFECTS_MAP: { v: fakeVolume } }));
+
+vi.mock('~/src/packages/Music/constants/samplers', () => ({
+  SAMPLER_MAP: { birds: 'birds', test: 'test', tom: 'vcsl-tom' }
+}));
 
 vi.mock('~/src/packages/Music/constants/samples.json', () => ({
   default: { birds: ['1.mp3'], test: { C4: 'c4.wav' }, 'vcsl-tom': { C2: 'c2.wav' } }
@@ -230,6 +234,22 @@ describe('Music', () => {
       expect(effect.delayTime.value).toBeCloseTo(amount / 127 * 3);
       expect(effect.feedback.value).toBe(0.3);
     });
+
+    it('keeps an explicit feedback of 0 and defaults only when it is omitted', () => {
+      const effect = { delayTime: { value: 0 }, feedback: { value: 0 } };
+      Tone.FeedbackDelay.mockImplementation(function () {
+        return effect;
+      });
+      const compiler = new Compiler(mockApp, new ValueFactory());
+      const [explicit, omitted] = ['d(64;0)', 'd(64)'].map(action =>
+        compiler.prepare(`sam1#tom(C4;1;1):${action}`).addedInstructions[0].actions[0]);
+
+      new Delay(explicit, mockApp).create();
+      expect(effect.feedback.value).toBe(0);
+
+      new Delay(omitted, mockApp).create();
+      expect(effect.feedback.value).toBe(0.5);
+    });
   });
 
   describe('Reverse playback', () => {
@@ -328,9 +348,9 @@ describe('Music', () => {
       Tone.Loop.mock.results[0].value.callback();
 
       expect(Math.random).not.toHaveBeenCalled();
-      const selected = Tone.Sampler.prototype.add.mock.calls.at(-1)[1];
-      if (probability === 0) expect(selected).toBe(forward);
-      else expect(selected).not.toBe(forward);
+      const added = Tone.Sampler.prototype.add.mock.calls.at(-1);
+      if (probability === 0) expect(added).toBeUndefined();
+      else expect(added[1]).not.toBe(forward);
       expect(Tone.Sampler.prototype.triggerAttack).toHaveBeenCalledWith('C4', 0, 1);
     });
 
@@ -445,6 +465,15 @@ describe('Music', () => {
   });
 
   describe('Sampler', () => {
+    it('rejects unknown sample presets before allocating audio', () => {
+      const compiler = new Compiler(mockApp, new ValueFactory());
+      const music = new Music(mockApp);
+      const plan = compiler.prepare('sam1#nothing(C4;1;1)');
+
+      expect(() => music.validate(plan.addedInstructions)).toThrow('Unknown sample preset "nothing"');
+      expect(Tone.Sampler).not.toHaveBeenCalled();
+    });
+
     it('rejects startup when an audio sample cannot be loaded', async () => {
       const failure = new Error('Sample not found');
       Tone.Sampler.mockImplementation(function (options) {

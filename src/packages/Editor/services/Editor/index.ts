@@ -1,7 +1,8 @@
+import { defaultKeymap, history, historyKeymap, toggleComment } from '@codemirror/commands';
 import { syntaxHighlighting } from '@codemirror/language';
 import { linter, lintGutter } from '@codemirror/lint';
 import { EditorState } from '@codemirror/state';
-import { EditorView, lineNumbers } from '@codemirror/view';
+import { EditorView, keymap, lineNumbers } from '@codemirror/view';
 import { LOCAL_STORAGE_KEY_CODE } from '~/src/packages/App/constants';
 import { DueLanguage } from '~/src/packages/Editor/constants/language';
 import { DueTheme, DueThemeHighlightStyle } from '~/src/packages/Editor/constants/theme';
@@ -26,6 +27,14 @@ export default class Editor implements IEditor {
     const startState = EditorState.create({
       doc: code,
       extensions: [
+        history(),
+        keymap.of([
+          { key: 'Mod-/', run: toggleComment },
+          // En teclado español "/" es Shift+7.
+          { key: 'Mod-Shift-7', run: toggleComment, preventDefault: true },
+          ...defaultKeymap,
+          ...historyKeymap
+        ]),
         lineNumbers(),
         DueLanguage,
         lintGutter(),
