@@ -38,9 +38,7 @@ export default class Instrument extends Instruction implements IInstrument {
       if (!lastAction) {
         this.actions[i].toDestination();
       } else {
-        if (lastAction) {
-          this.actions[i].connect(lastAction);
-        }
+        this.actions[i].connect(lastAction);
       }
 
       lastAction = element;

@@ -1,4 +1,4 @@
-import { AST_KIND, COMMANDS, COMMANDS_MAP, TYPE_VALUE, VALUE_OPERATOR } from '~/src/packages/Compiler/constants';
+import { AST_KIND, COMMANDS, COMMANDS_MAP, MODES, TYPE_VALUE, VALUE_OPERATOR } from '~/src/packages/Compiler/constants';
 import Instruction from '~/src/packages/Compiler/services/Instruction';
 import { parseExpression } from '~/src/packages/Compiler/services/Parser/value';
 import type { IAstProgram, IAstStatement, IAstValue, IAstValueExpression } from '~/src/packages/Compiler/types/IAst';
@@ -98,15 +98,15 @@ export default class Analyzer {
 }
 
 function validateMode (instruction: IInstruction, instrument: IInstruction | undefined): void {
-  if (instruction.name === COMMANDS.reverse && !instruction.mode) {
-    throw Error('Use ::reverse(...) to configure sample playback.');
+  if (MODES.includes(instruction.name) && !instruction.mode) {
+    throw Error(`Use ::${instruction.name}(...) to configure sample playback.`);
   }
   if (!instruction.mode) return;
-  if (instruction.name !== COMMANDS.reverse || instruction.element || instruction.modifier) {
-    throw Error('Unsupported playback mode. Use ::reverse(...).');
+  if (!MODES.includes(instruction.name) || instruction.element || instruction.modifier) {
+    throw Error(`Unsupported playback mode. Use ::${MODES[0]}(...).`);
   }
   if (instrument?.name !== COMMANDS.sam) {
-    throw Error('::reverse(...) is only available on sam instruments.');
+    throw Error(`::${instruction.name}(...) is only available on sam instruments.`);
   }
   if (instrument.actions.some(action => action.mode)) {
     throw Error('Only one playback mode is allowed per sampler.');
@@ -114,7 +114,7 @@ function validateMode (instruction: IInstruction, instrument: IInstruction | und
   const { value, typeValue, modeParameters } = instruction;
   if (typeValue !== TYPE_VALUE.normal || !value || Array.isArray(value) ||
     (modeParameters?.length ?? 0) > 1 || value.duration !== undefined || value.interval !== undefined) {
-    throw Error('Playback modes require one scalar argument. Use ::reverse(value).');
+    throw Error(`Playback modes require one scalar argument. Use ::${instruction.name}(value).`);
   }
 }
 

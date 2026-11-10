@@ -20,6 +20,8 @@ export const COMMANDS: Record<string, string> = {
   $$: '$$'
 } as const;
 
+export const MODES: readonly string[] = [COMMANDS.reverse];
+
 export const COMMANDS_MAP: Record<typeof COMMANDS[keyof typeof COMMANDS], string> = {
   [COMMANDS.p]: 'piece',
   [COMMANDS.n]: 'notes',
