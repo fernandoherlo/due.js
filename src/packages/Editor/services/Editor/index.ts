@@ -1,13 +1,10 @@
-import type { IApp, IEditor } from '~/src/types';
-
+import { syntaxHighlighting } from '@codemirror/language';
 import { EditorState } from '@codemirror/state';
 import { EditorView, lineNumbers } from '@codemirror/view';
-import { syntaxHighlighting } from '@codemirror/language';
-import { sassLanguage } from '@codemirror/lang-sass';
-
-import { DueTheme, DueThemeHighlightStyle } from '../../constants/theme';
-
 import { LOCAL_STORAGE_KEY_CODE } from '~/src/packages/App/constants';
+import { DueLanguage } from '~/src/packages/Editor/constants/language';
+import { DueTheme, DueThemeHighlightStyle } from '~/src/packages/Editor/constants/theme';
+import type { IApp, IEditor } from '~/src/types';
 
 export default class Editor implements IEditor {
   private app: IApp;
@@ -27,7 +24,7 @@ export default class Editor implements IEditor {
       doc: code,
       extensions: [
         lineNumbers(),
-        sassLanguage,
+        DueLanguage,
         theme,
         syntaxHighlighting(DueThemeHighlightStyle)
       ]
