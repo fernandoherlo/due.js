@@ -1,9 +1,11 @@
-import type { IInstrument, ISampler, IApp } from '~/src/types';
 import * as Tone from 'tone';
 import { areDifferentInstructions } from '~/src/packages/Compiler/services/Instruction/compare';
-import samples from '../../../constants/samples.json';
-import Instrument from '..';
-import { SAMPLER_MAP } from '../../../constants';
+import { MODES_MAP, SAMPLER_MAP } from '~/src/packages/Music/constants';
+import samples from '~/src/packages/Music/constants/samples.json';
+import Instrument from '~/src/packages/Music/services/Instrument';
+import Mode from '~/src/packages/Music/services/Modes';
+
+import type { IApp, IInstrument, ISampler } from '~/src/types';
 
 export default class Sampler extends Instrument implements ISampler {
   protected instrument: Tone.Sampler | null = null;
@@ -21,18 +23,20 @@ export default class Sampler extends Instrument implements ISampler {
     }
 
     const samplesMap: any = samples;
-    const samplerPromise: Promise<Tone.Sampler> = new Promise((resolve, reject) => {
-      const sound = this.modifier || 'piano';
-      const sampler: Tone.Sampler = new Tone.Sampler({
-        urls: this.pathUrl(samplesMap[SAMPLER_MAP[sound]], SAMPLER_MAP[sound]),
-        onload: function onload () {
-          return resolve(sampler);
-        },
-        onerror: reject
+    const sound = this.modifier || 'piano';
+    const urls = this.pathUrl(samplesMap[SAMPLER_MAP[sound]], SAMPLER_MAP[sound]);
+    const mode = this.actions.find(action => action.mode);
+    this.instrument = mode
+      ? new MODES_MAP[mode.name](mode, await Mode.loadBuffers(urls))
+      : await new Promise<Tone.Sampler>((resolve, reject) => {
+        const sampler: Tone.Sampler = new Tone.Sampler({
+          urls,
+          onload: function onload () {
+            return resolve(sampler);
+          },
+          onerror: reject
+        });
       });
-    });
-
-    this.instrument = (await samplerPromise);
     this.instrument.debug = this.app.__debugEnabled;
 
     if (connect) {

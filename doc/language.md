@@ -23,6 +23,40 @@ sam1#piano([C4,E4,G4];0.25;1):v(90):r(20)
 
 Define un sampler con el preset `piano`, elige notas al azar de la lista y le añade volumen y reverb.
 
+## Modos de reproduccion
+
+`::` configura como se reproduce la fuente; `:` sigue reservada a los efectos de audio.
+El modo `::reverse` de `sam` decide si cada paso reproduce la muestra hacia delante o hacia atras:
+
+```text
+sam1#piano(C4;4;6)::reverse(127):v(48)
+```
+
+El sampler conserva `nota;duracion;intervalo`, en este ejemplo `C4`, 4 segundos y 6 segundos.
+`reverse` recibe un unico numero obligatorio entre `0` y `127`, incluidos decimales:
+
+- `0`: siempre hacia delante.
+- `127`: siempre hacia atras.
+- Valores intermedios: probabilidad de invertir igual a `valor / 127`; `64` es aproximadamente un 50 %.
+
+La direccion se elige una vez por paso y se mantiene hasta terminar la nota.
+Todas las notas de un acorde comparten la decision. No se altera el volumen ni se compensa la ganancia;
+los efectos `:v(...)`, `:r(...)` y los demas siguen funcionando igual.
+
+Se invierte el fragmento inicial que corresponde a la duracion de la nota, no toda la cola del archivo.
+Asi el ataque invertido llega al final de la nota incluso en muestras de piano con colas largas.
+La longitud del fragmento se ajusta a la transposicion para conservar la duracion y la afinacion.
+Si la muestra es mas corta que la nota, se invierte solo su longitud disponible, sin estirarla ni repetirla.
+Los fragmentos se preparan en cada disparo, sin modificar los datos originales ni normalizar el volumen.
+
+Solo se permite un modo por sampler. La probabilidad debe ser un numero escalar, no una lista ni un rango;
+las notas del sampler siguen admitiendo patrones y acordes. `:reverse(...)` no es un efecto valido.
+No se admite `::reverse()` sin valor, varios argumentos ni su uso en otros instrumentos.
+Los bancos de muestras, la eleccion de la muestra mas cercana y la transposicion son los mismos que sin modo.
+
+Cambiar la probabilidad o retirar el modo reconstruye la fuente, sin transicion continua.
+El prototipo `::grain` se ha retirado y ya no se admite.
+
 ## Valores y patrones
 
 Los tres argumentos principales representan:
@@ -76,6 +110,10 @@ sam1#piano(C4;0.25;1):v($$control)
 Una entrada MIDI ausente no bloquea la compilación: se registra un aviso, la variable queda inactiva
 y los demás instrumentos continúan. Un canal no disponible en una entrada presente sigue siendo un error.
 No hay reconexión automática si el dispositivo se conecta después.
+
+Si el navegador no soporta Web MIDI o deniega el permiso, el editor, la compilacion y el audio
+siguen disponibles. La barra muestra `MIDI off`, con el motivo al pasar el puntero y en su nombre accesible;
+tambien se registra el error original en el logger. Esto no habilita dispositivos MIDI ni oculta errores de audio.
 
 ## Comandos conectados actualmente
 

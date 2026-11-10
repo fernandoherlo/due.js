@@ -40,6 +40,14 @@ export default class Ui implements IUi {
     };
   }
 
+  setMidiUnavailable (reason: string): void {
+    const status = document.querySelector<HTMLElement>('#midi-status')!;
+    status.hidden = false;
+    status.textContent = 'MIDI off';
+    status.title = reason;
+    status.setAttribute('aria-label', `MIDI unavailable: ${reason}`);
+  }
+
   setOk () {
     const progressBarEditorElement: HTMLDivElement | null = document.getElementById(this.htmlIdProgressBar) as HTMLDivElement;
     progressBarEditorElement.className = '';

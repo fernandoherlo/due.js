@@ -20,6 +20,7 @@ export type { IMidiIn } from '~/src/packages/Music/types/IMidiIn';
 export type { IMagenta } from '~/src/packages/Music/types/IMagenta';
 export type { INote } from '~/src/packages/Music/types/INote';
 export type { IEffect } from '~/src/packages/Music/types/IEffect';
+export type { IMode, IModeClass, Playback } from '~/src/packages/Music/types/IMode';
 export type { IVolumen } from '~/src/packages/Music/types/IVolumen';
 export type { IReverb } from '~/src/packages/Music/types/IReverb';
 export type { IChorus } from '~/src/packages/Music/types/IChorus';

@@ -20,6 +20,7 @@ export default class Analyzer {
       for (const statement of line.statements) {
         const instruction = this.analyzeStatement(statement, variables);
         if (!instruction) continue;
+        validateMode(instruction, instrument);
         if (instruction.type && instruction.element) {
           instructions[`${instruction.type}${instruction.element}`] = instruction;
           instrument = instruction;
@@ -60,7 +61,16 @@ export default class Analyzer {
     const expression = connection ? statement.target : statement.arguments;
     const rawValue = valueFactory.adapt(expression.rawValue, variables);
     const resolved = rawValue === expression.rawValue ? expression : parseExpression(rawValue, expression.location);
-    return new Instruction({ name, element, modifier, type: COMMANDS_MAP[name], ...this.createValue(resolved, element) });
+    const mode = !connection && statement.mode;
+    return new Instruction({
+      name,
+      element,
+      modifier,
+      mode,
+      modeParameters: mode ? resolved.values.map(argument => argument.rawValue) : undefined,
+      type: COMMANDS_MAP[name],
+      ...this.createValue(resolved, element)
+    });
   }
 
   private createValue (expression: IAstValueExpression, element: string) {
@@ -84,6 +94,27 @@ export default class Analyzer {
         : valueFactory.create({ value: note?.rawValue || '', ...parameters }, !!element),
       typeValue: TYPE_VALUE.normal
     };
+  }
+}
+
+function validateMode (instruction: IInstruction, instrument: IInstruction | undefined): void {
+  if (instruction.name === COMMANDS.reverse && !instruction.mode) {
+    throw Error('Use ::reverse(...) to configure sample playback.');
+  }
+  if (!instruction.mode) return;
+  if (instruction.name !== COMMANDS.reverse || instruction.element || instruction.modifier) {
+    throw Error('Unsupported playback mode. Use ::reverse(...).');
+  }
+  if (instrument?.name !== COMMANDS.sam) {
+    throw Error('::reverse(...) is only available on sam instruments.');
+  }
+  if (instrument.actions.some(action => action.mode)) {
+    throw Error('Only one playback mode is allowed per sampler.');
+  }
+  const { value, typeValue, modeParameters } = instruction;
+  if (typeValue !== TYPE_VALUE.normal || !value || Array.isArray(value) ||
+    (modeParameters?.length ?? 0) > 1 || value.duration !== undefined || value.interval !== undefined) {
+    throw Error('Playback modes require one scalar argument. Use ::reverse(value).');
   }
 }
 

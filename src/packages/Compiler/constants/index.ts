@@ -3,6 +3,7 @@ export const COMMANDS: Record<string, string> = {
   n: 'n',
   seq: 'seq',
   sam: 'sam',
+  reverse: 'reverse',
   misam: 'misam',
   s: 's',
   ai: 'ai',
@@ -24,6 +25,7 @@ export const COMMANDS_MAP: Record<typeof COMMANDS[keyof typeof COMMANDS], string
   [COMMANDS.n]: 'notes',
   [COMMANDS.seq]: 'sequencer',
   [COMMANDS.sam]: 'sampler',
+  [COMMANDS.reverse]: 'reverse_mode',
   [COMMANDS.misam]: 'midi_sampler',
   [COMMANDS.s]: 'synth',
   [COMMANDS.ai]: 'ai',
@@ -68,6 +70,7 @@ export const VALUE_OPERATOR = {
 export const CHARACTERS_INSTRUCTIONS = {
   CONNECT: '=>',
   CONCATENATE_COMMANDS: ':',
+  MODE_COMMAND: '::',
   COMMENT: '//',
   EQUAL: '=',
   INIT_VALUE_COMMAND: '(',

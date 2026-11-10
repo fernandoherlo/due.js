@@ -5,6 +5,7 @@ export interface IUi {
   setValid: () => void;
   setError: () => void;
   setWaiting: () => void;
+  setMidiUnavailable: (reason: string) => void;
 
   updateLoopTime: () => void;
   updateSteps: () => void;

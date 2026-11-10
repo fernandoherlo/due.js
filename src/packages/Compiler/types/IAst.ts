@@ -25,6 +25,7 @@ export interface IAstValueExpression {
 export interface IAstCommand {
   kind: typeof AST_KIND.command;
   name: string;
+  mode?: boolean;
   element: string;
   modifier?: string;
   arguments: IAstValueExpression;

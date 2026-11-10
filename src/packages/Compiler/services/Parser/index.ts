@@ -18,10 +18,25 @@ export default class Parser {
     const connectionIndex = source.indexOf(CHAR.CONNECT);
     const commandGroup = connectionIndex < 0 ? source : source.slice(0, connectionIndex);
     let column = 1;
-    const statements: IAstStatement[] = commandGroup.split(CHAR.CONCATENATE_COMMANDS).flatMap((rawCommand) => {
+    let mode = false;
+    const statements: IAstStatement[] = commandGroup.split(/(:+)/).flatMap((rawCommand) => {
+      if (rawCommand.startsWith(CHAR.CONCATENATE_COMMANDS)) {
+        if (rawCommand.length > CHAR.MODE_COMMAND.length) {
+          throw new ParseError({ line, column }, 'Expected : for effects or :: for playback modes');
+        }
+        mode = rawCommand === CHAR.MODE_COMMAND;
+        column += rawCommand.length;
+        return [];
+      }
       const location = { line, column: column + rawCommand.length - rawCommand.trimStart().length };
-      column += rawCommand.length + CHAR.CONCATENATE_COMMANDS.length;
-      return rawCommand.trim() ? [this.parseStatement(rawCommand.trim(), location)] : [];
+      column += rawCommand.length;
+      if (!rawCommand.trim()) return [];
+      const statement = this.parseStatement(rawCommand.trim(), location);
+      if (!mode) return [statement];
+      if (statement.kind !== AST_KIND.command) {
+        throw new ParseError(location, 'Expected a playback mode after ::');
+      }
+      return [{ ...statement, mode: true }];
     });
     if (connectionIndex >= 0) {
       const target = source.slice(connectionIndex + CHAR.CONNECT.length);

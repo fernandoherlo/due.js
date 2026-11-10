@@ -7,6 +7,8 @@ export interface IInstruction {
   modifier: string | any;
   value: INote | INote[] | any;
   typeValue: string;
+  mode?: boolean;
+  modeParameters?: readonly string[];
   actions: Array<any>;
   type?: string;
 }

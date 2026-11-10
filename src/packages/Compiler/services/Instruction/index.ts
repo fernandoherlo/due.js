@@ -8,6 +8,8 @@ export default class Instruction implements IInstruction {
   modifier: string;
   value: INote | INote[] | any;
   typeValue: string;
+  mode?: boolean;
+  modeParameters?: readonly string[];
   actions: Array<any>;
 
   constructor (data: Record<string, any> = {}) {
@@ -22,6 +24,8 @@ export default class Instruction implements IInstruction {
     this.modifier = data.modifier;
     this.value = data.value;
     this.typeValue = data.typeValue;
+    this.mode = data.mode;
+    this.modeParameters = data.modeParameters;
     this.actions = data.actions || [];
   }
 }

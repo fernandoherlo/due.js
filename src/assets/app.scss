@@ -10,6 +10,8 @@ $blue: #82e2ff;
 $red: 	#ff6767;
 
 $topbar_height: 40px;
+$toolbar_button_width: 60px;
+$toolbar_z_index: 100;
 
 :root {
   font-family: 'Fira Code', monospace;
@@ -99,7 +101,7 @@ body {
 #debug {
   position: fixed;
   top: 0;
-  z-index: 100;
+  z-index: $toolbar_z_index;
   height: $topbar_height;
   background-color: $purple-fading;
   color: antiquewhite;
@@ -118,13 +120,29 @@ body {
 }
 
 #save {
-  left: 60px;
+  left: $toolbar_button_width;
 }
 
 #debug {
-  right: 60px;
+  right: $toolbar_button_width;
 }
 
 #menu {
   right: 0;
+}
+
+#midi-status {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: $toolbar_button_width * 2;
+  z-index: $toolbar_z_index;
+  width: max-content;
+  margin-inline: auto;
+  padding-inline: 6px;
+  background-color: $black;
+  color: $orange;
+  font-size: 11px;
+  line-height: $topbar_height;
+  text-align: center;
+  white-space: nowrap;
 }

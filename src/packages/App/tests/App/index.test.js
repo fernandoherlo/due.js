@@ -47,6 +47,20 @@ describe('App', () => {
     expect(app.$ui.start).toHaveBeenCalled();
   });
 
+  it('shows the MIDI warning without replacing the compilation status', () => {
+    const status = { hidden: true, textContent: '', title: '', setAttribute: vi.fn() };
+    vi.stubGlobal('document', { querySelector: vi.fn().mockReturnValue(status) });
+    const ui = new Ui({});
+
+    ui.setMidiUnavailable('Permission denied');
+
+    expect(document.querySelector).toHaveBeenCalledWith('#midi-status');
+    expect(status.hidden).toBe(false);
+    expect(status.textContent).toBe('MIDI off');
+    expect(status.title).toBe('Permission denied');
+    expect(status.setAttribute).toHaveBeenCalledWith('aria-label', 'MIDI unavailable: Permission denied');
+  });
+
   it('Should throw error on compile if not has services', async () => {
     // Arrange
     const app = new App();

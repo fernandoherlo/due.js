@@ -1,4 +1,4 @@
-import type { IApp, IEffect, IInstruction, IInstrument, IMidiIn } from '~/src/types';
+import type { IApp, IEffect, IInstruction, IInstrument, IMidiIn, IModeClass } from '~/src/types';
 import { COMMANDS } from '~/src/packages/Compiler/constants';
 
 import Synth from '../services/Instrument/Synth';
@@ -12,6 +12,7 @@ import Chorus from '../services/Effect/Chorus';
 import Delay from '../services/Effect/Delay';
 import VariableLive from '../services/VariableLive';
 import MidiIn from '../services/MidiIn';
+import Reverse from '../services/Modes/Reverse';
 
 export const COMMANDS_ELEMENT_MAP: Record<typeof COMMANDS[keyof typeof COMMANDS], (instruction: IInstruction, app: IApp) => IInstrument | IMidiIn | IEffect> = {
   [COMMANDS.n]: (instruction: IInstruction, app: IApp) => new Synth(instruction, app),
@@ -84,4 +85,8 @@ export const SAMPLER_MAP: Record<string, string> = {
   ride: 'ride-brush-p',
   birds: 'birds',
   explosion: 'explosion'
+};
+
+export const MODES_MAP: Record<string, IModeClass> = {
+  [COMMANDS.reverse]: Reverse
 };

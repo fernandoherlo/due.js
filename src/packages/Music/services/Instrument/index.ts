@@ -29,12 +29,13 @@ export default class Instrument extends Instruction implements IInstrument {
 
     for (let i = 0; i < this.actions.length; i++) {
       const action: IInstruction = this.actions[i];
+      if (action.mode) continue;
 
       const element = COMMANDS_ELEMENT_MAP[action.name](action, this.app) as IEffect;
       element.create();
       this.actions[i] = element;
 
-      if (i === 0) {
+      if (!lastAction) {
         this.actions[i].toDestination();
       } else {
         if (lastAction) {
@@ -79,6 +80,7 @@ export default class Instrument extends Instruction implements IInstrument {
 
     if (this.actions) {
       for (let i = 0; i < this.actions.length; i++) {
+        if (this.actions[i].mode) continue;
         await this.actions[i].end();
       }
     }
