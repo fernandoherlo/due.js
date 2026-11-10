@@ -9,7 +9,7 @@ describe('DSL semantic analyzer', () => {
       create: vi.fn()
     };
     const valueParser = {
-      exec: vi.fn(value => [value, 'normal'])
+      exec: vi.fn(value => [value.rawValue, 'normal'])
     };
     const syntax = new SyntaxParser();
     const analyzer = new SemanticAnalyzer(valueFactory, valueParser);
@@ -48,5 +48,20 @@ describe('DSL semantic analyzer', () => {
       value: '2@5'
     });
     expect(valueParser.exec).not.toHaveBeenCalled();
+  });
+
+  it('lowers a connection node to the existing runtime command', () => {
+    const valueFactory = { adapt: vi.fn(value => value), create: vi.fn() };
+    const valueParser = { exec: vi.fn(value => [value.rawValue, 'normal']) };
+    const analyzer = new SemanticAnalyzer(valueFactory, valueParser);
+    const program = new SyntaxParser().parse([{ code: 'sam1#piano(C4)=>out1', line: 1 }]);
+
+    const result = analyzer.exec(program);
+
+    expect(result.instructions[0][1]).toMatchObject({
+      name: 'con',
+      type: 'connect',
+      value: 'out1'
+    });
   });
 });

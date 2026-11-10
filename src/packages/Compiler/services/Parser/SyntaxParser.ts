@@ -1,7 +1,10 @@
 import type { IAstCommand, IAstLine, IAstProgram, IAstStatement, ISourceLine, ISourceLocation } from '../../types/IAst';
 import { COMMANDS, CHARACTERS_INSTRUCTIONS } from '~/src/packages/Compiler/constants';
+import ValueSyntaxParser from './ValueSyntaxParser';
 
 export default class SyntaxParser {
+  private valueSyntaxParser = new ValueSyntaxParser();
+
   parse (sourceLines: ISourceLine[]): IAstProgram {
     if (!Array.isArray(sourceLines)) {
       throw Error('Source lines must be an array.');
@@ -30,10 +33,15 @@ export default class SyntaxParser {
     });
 
     if (connection) {
-      statements.push(this.parseCommand(`${COMMANDS.con}(${connection})`, {
+      const location = {
         line: sourceLine.line,
         column: connectionIndex + CHARACTERS_INSTRUCTIONS.CONNECT.length + 1
-      }));
+      };
+      statements.push({
+        kind: 'connection',
+        target: this.valueSyntaxParser.parseExpression(connection, location),
+        location
+      });
     }
 
     return {
@@ -58,12 +66,23 @@ export default class SyntaxParser {
         return {
           kind: 'live-variable',
           name,
-          command: this.parseCommand(rawValue, location),
+          command: this.parseCommand(rawValue, {
+            line: location.line,
+            column: location.column + name.length + 1
+          }),
           location
         };
       }
 
-      return { kind: 'variable', name, rawValue, location };
+      return {
+        kind: 'variable',
+        name,
+        value: this.valueSyntaxParser.parseExpression(rawValue, {
+          line: location.line,
+          column: location.column + name.length + 1
+        }),
+        location
+      };
     }
 
     return this.parseCommand(statement, location);
@@ -81,12 +100,17 @@ export default class SyntaxParser {
       throw this.syntaxError(location, `Invalid command name "${commandId}"`);
     }
 
+    const valueLocation = {
+      line: location.line,
+      column: location.column + valueStart + 1
+    };
+
     return {
       kind: 'command',
       name: match[1],
       element: match[2] || '',
       modifier: modifier || undefined,
-      rawValue: command.slice(valueStart + 1, -1),
+      arguments: this.valueSyntaxParser.parseExpression(command.slice(valueStart + 1, -1), valueLocation),
       location
     };
   }

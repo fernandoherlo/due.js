@@ -1,12 +1,15 @@
 import { describe, expect, it, vi } from 'vitest';
 import ValueParser from '~/src/packages/Compiler/services/Parser/value';
+import ValueSyntaxParser from '~/src/packages/Compiler/services/Parser/ValueSyntaxParser';
 
 describe('DSL value parser', () => {
+  const parse = value => new ValueSyntaxParser().parseExpression(value, { line: 1, column: 1 });
+
   it('creates a normal value with its separated parameters', () => {
     const valueFactory = { create: vi.fn(data => data) };
     const parser = new ValueParser(valueFactory);
 
-    const [value, type] = parser.exec('C4;0.25;1', true);
+    const [value, type] = parser.exec(parse('C4;0.25;1'), true);
 
     expect(type).toBe('normal');
     expect(value).toEqual({ value: 'C4', value2: '0.25', value3: '1' });
@@ -17,7 +20,7 @@ describe('DSL value parser', () => {
     const valueFactory = { create: vi.fn(data => data) };
     const parser = new ValueParser(valueFactory);
 
-    const [values, type] = parser.exec('[C4,E4];[0,1];[2-4]', false);
+    const [values, type] = parser.exec(parse('[C4,E4];[0,1];[2-4]'), false);
 
     expect(type).toBe('random');
     expect(values).toEqual([
@@ -30,8 +33,8 @@ describe('DSL value parser', () => {
     const valueFactory = { create: vi.fn(data => data) };
     const parser = new ValueParser(valueFactory);
 
-    const [sequence, sequenceType] = parser.exec('[C4>E4];1;2', false);
-    const [chord, chordType] = parser.exec('[C4|E4];1;2', false);
+    const [sequence, sequenceType] = parser.exec(parse('[C4>E4];1;2'), false);
+    const [chord, chordType] = parser.exec(parse('[C4|E4];1;2'), false);
 
     expect(sequenceType).toBe('sequence');
     expect(sequence.map(value => value.value)).toEqual(['C4', 'E4']);

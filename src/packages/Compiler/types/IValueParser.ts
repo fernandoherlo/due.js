@@ -1,5 +1,6 @@
 import type { INote } from '~/src/types';
+import type { IAstValueExpression } from './IAst';
 
 export interface IValueParser {
-  exec: (valueRaw: string, defaults: boolean) => (string | INote | undefined)[] | (string | (INote | undefined)[])[];
+  exec: (value: IAstValueExpression, defaults: boolean) => (string | INote | undefined)[] | (string | (INote | undefined)[])[];
 }

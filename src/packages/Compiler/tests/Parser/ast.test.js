@@ -10,7 +10,10 @@ describe('DSL syntax parser', () => {
     expect(program.lines[0].statements[0]).toMatchObject({
       kind: 'variable',
       name: '$level',
-      rawValue: '42',
+      value: {
+        rawValue: '42',
+        values: [{ kind: 'scalar', rawValue: '42' }]
+      },
       location: { line: 1, column: 1 }
     });
   });
@@ -23,7 +26,13 @@ describe('DSL syntax parser', () => {
       name: 'sam',
       element: '3',
       modifier: 'tom',
-      rawValue: '[C4>E4];[0.2-1];2'
+      arguments: {
+        values: [
+          { kind: 'collection', operator: 'sequence' },
+          { kind: 'range', min: '0.2', max: '1' },
+          { kind: 'scalar', rawValue: '2' }
+        ]
+      }
     });
   });
 
@@ -33,7 +42,12 @@ describe('DSL syntax parser', () => {
     expect(program.lines[0].statements[0]).toMatchObject({
       kind: 'live-variable',
       name: '$$control',
-      command: { kind: 'command', name: 'mi', element: '1', rawValue: '2@5' }
+      command: {
+        kind: 'command',
+        name: 'mi',
+        element: '1',
+        arguments: { rawValue: '2@5', values: [{ kind: 'scalar', rawValue: '2@5' }] }
+      }
     });
   });
 
@@ -43,7 +57,25 @@ describe('DSL syntax parser', () => {
     expect(program.lines[0].statements.map(statement => statement.name)).toEqual(['sam', 'v']);
   });
 
+  it('represents command variable usage as a reference node', () => {
+    const program = parser.parse([{ code: 'v($volume)', line: 1 }]);
+
+    expect(program.lines[0].statements[0].arguments.values[0]).toMatchObject({
+      kind: 'variable-reference',
+      name: '$volume'
+    });
+  });
+
   it('retains the line of a syntax error', () => {
     expect(() => parser.parse([{ code: 'sam1#piano', line: 3 }])).toThrow('Line 3, column 1');
+  });
+
+  it('represents => as a connection node rather than a synthetic command', () => {
+    const program = parser.parse([{ code: 'sam1#piano(C4)=>out1', line: 1 }]);
+
+    expect(program.lines[0].statements[1]).toMatchObject({
+      kind: 'connection',
+      target: { rawValue: 'out1', values: [{ kind: 'scalar', rawValue: 'out1' }] }
+    });
   });
 });

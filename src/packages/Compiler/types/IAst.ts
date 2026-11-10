@@ -8,19 +8,31 @@ export interface ISourceLocation {
   column: number;
 }
 
+export type IAstValue =
+  | { kind: 'scalar'; rawValue: string; location: ISourceLocation }
+  | { kind: 'variable-reference'; name: string; rawValue: string; location: ISourceLocation }
+  | { kind: 'collection'; operator: 'random' | 'sequence' | 'chord' | 'single'; values: IAstValue[]; rawValue: string; location: ISourceLocation }
+  | { kind: 'range'; min: string; max: string; rawValue: string; location: ISourceLocation };
+
+export interface IAstValueExpression {
+  values: IAstValue[];
+  rawValue: string;
+  location: ISourceLocation;
+}
+
 export interface IAstCommand {
   kind: 'command';
   name: string;
   element: string;
   modifier?: string;
-  rawValue: string;
+  arguments: IAstValueExpression;
   location: ISourceLocation;
 }
 
 export interface IAstVariable {
   kind: 'variable';
   name: string;
-  rawValue: string;
+  value: IAstValueExpression;
   location: ISourceLocation;
 }
 
@@ -31,7 +43,13 @@ export interface IAstLiveVariable {
   location: ISourceLocation;
 }
 
-export type IAstStatement = IAstCommand | IAstVariable | IAstLiveVariable;
+export interface IAstConnection {
+  kind: 'connection';
+  target: IAstValueExpression;
+  location: ISourceLocation;
+}
+
+export type IAstStatement = IAstCommand | IAstVariable | IAstLiveVariable | IAstConnection;
 
 export interface IAstLine {
   statements: IAstStatement[];

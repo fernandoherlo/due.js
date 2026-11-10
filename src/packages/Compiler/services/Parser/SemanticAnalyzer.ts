@@ -1,14 +1,16 @@
 import type { IValueFactory } from '~/src/types';
 import type { IInstruction } from '../../types/IInstruction';
 import type { IValueParser } from '../../types/IValueParser';
-import type { IAstCommand, IAstProgram, IAstStatement } from '../../types/IAst';
+import type { IAstProgram, IAstStatement, IAstValueExpression } from '../../types/IAst';
 import type { ISemanticAnalyzer, ISemanticResult } from '../../types/ISemanticAnalyzer';
 import { COMMANDS, COMMANDS_MAP, TYPE_VALUE } from '~/src/packages/Compiler/constants';
 import Instruction from '~/src/packages/Compiler/services/Instruction';
+import ValueSyntaxParser from './ValueSyntaxParser';
 
 export default class SemanticAnalyzer implements ISemanticAnalyzer {
   private valueFactory: IValueFactory;
   private valueParser: IValueParser;
+  private valueSyntaxParser = new ValueSyntaxParser();
   private variables: Record<string, string> = {};
 
   constructor (valueFactory: IValueFactory, valueParser: IValueParser) {
@@ -34,7 +36,7 @@ export default class SemanticAnalyzer implements ISemanticAnalyzer {
 
   private analyze (statement: IAstStatement) {
     if (statement.kind === 'variable') {
-      this.variables[statement.name] = this.valueFactory.adapt(statement.rawValue, this.variables);
+      this.variables[statement.name] = this.valueFactory.adapt(statement.value.rawValue, this.variables);
       return;
     }
 
@@ -46,26 +48,33 @@ export default class SemanticAnalyzer implements ISemanticAnalyzer {
         element: command.element,
         key: COMMANDS.$$ + modifier,
         modifier,
-        value: command.rawValue,
+        value: command.arguments.rawValue,
         type: COMMANDS_MAP[COMMANDS.$$],
         typeValue: TYPE_VALUE.normal
       });
     }
 
-    return this.createInstruction(statement);
+    if (statement.kind === 'connection') {
+      return this.createInstruction(COMMANDS.con, '', undefined, statement.target);
+    }
+
+    return this.createInstruction(statement.name, statement.element, statement.modifier, statement.arguments);
   }
 
-  private createInstruction (command: IAstCommand) {
-    const valueRaw = this.valueFactory.adapt(command.rawValue, this.variables);
-    const [value, typeValue] = this.valueParser.exec(valueRaw, !!command.element);
+  private createInstruction (name: string, element: string, modifier: string | undefined, expression: IAstValueExpression) {
+    const valueRaw = this.valueFactory.adapt(expression.rawValue, this.variables);
+    const adaptedExpression = valueRaw === expression.rawValue
+      ? expression
+      : this.valueSyntaxParser.parseExpression(valueRaw, expression.location);
+    const [value, typeValue] = this.valueParser.exec(adaptedExpression, !!element);
 
     return new Instruction({
-      name: command.name,
-      element: command.element,
-      key: command.element ? `${command.name}${command.element}` : command.modifier,
-      modifier: command.modifier,
+      name,
+      element,
+      key: element ? `${name}${element}` : modifier,
+      modifier,
       value,
-      type: COMMANDS_MAP[command.name],
+      type: COMMANDS_MAP[name],
       typeValue: String(typeValue)
     });
   }
