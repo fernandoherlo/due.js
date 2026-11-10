@@ -40,6 +40,10 @@ Los efectos del grupo se sumarian a los de cada pista; habria que fijar el orden
 Un grupo podria llevar nombre (`$$drums=[...]`) para silenciarlo, ajustarlo desde la interfaz o mapearlo a MIDI.
 Debe decidirse si los grupos se anidan y si un grupo comparte una sola instancia de efecto o una por pista.
 
+Implementado: una linea que empieza por `[` define un grupo de pistas separadas por `,`. Los efectos tras el `]` (y un `=>`) se
+anaden a cada pista despues de los suyos, con una instancia de efecto por pista. El mute (`Cmd/Ctrl+Shift+M` o clic en el margen)
+alterna todo el grupo. Sin anidado ni nombres de grupo; las pistas siguen en una sola linea.
+
 ### L03. Panel lateral de vista previa
 
 Un panel a la derecha con el programa reducido, al estilo del minimapa de VS Code, util cuando el codigo es muy largo.

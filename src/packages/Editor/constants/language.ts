@@ -3,10 +3,23 @@ import { CHARACTERS_INSTRUCTIONS, COMMANDS } from '~/src/packages/Compiler/const
 
 const commandNames = new Set(Object.values(COMMANDS));
 
-export const DueLanguage = StreamLanguage.define({
+interface IDueState {
+  started: boolean;
+  group: boolean;
+  depth: number;
+}
+
+const GROUP_TOKEN = 'string.special';
+
+export const DueLanguage = StreamLanguage.define<IDueState>({
   name: 'duejs',
-  token (stream) {
+  startState: () => ({ started: false, group: false, depth: 0 }),
+  copyState: state => ({ ...state }),
+  token (stream, state) {
+    if (stream.sol()) Object.assign(state, { started: false, group: false, depth: 0 });
     if (stream.eatSpace()) return null;
+    const first = !state.started;
+    state.started = true;
     if (stream.match(CHARACTERS_INSTRUCTIONS.COMMENT)) {
       stream.skipToEnd();
       return 'comment';
@@ -18,9 +31,25 @@ export const DueLanguage = StreamLanguage.define({
     if (stream.match(/^[a-z]+/)) {
       return commandNames.has(stream.current()) ? 'keyword' : null;
     }
-    if (stream.match(/^(?:=>|[=,>|-])/)) return 'operator';
+    if (stream.match(/^(?:=>|[=>|-])/)) return 'operator';
+    if (stream.match(',')) return state.group && state.depth === 1 ? GROUP_TOKEN : 'operator';
     if (stream.match(/^[;:@]/)) return 'separator';
-    if (stream.match(/^[()[\]]/)) return 'bracket';
+    if (stream.match(/^[([]/)) {
+      state.depth++;
+      if (first && stream.current() === '[') {
+        state.group = true;
+        return GROUP_TOKEN;
+      }
+      return 'bracket';
+    }
+    if (stream.match(/^[)\]]/)) {
+      state.depth = Math.max(0, state.depth - 1);
+      if (state.group && state.depth === 0) {
+        state.group = false;
+        return GROUP_TOKEN;
+      }
+      return 'bracket';
+    }
     stream.next();
     return null;
   },

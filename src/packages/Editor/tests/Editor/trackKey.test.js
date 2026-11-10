@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { getTrackKey } from '~/src/packages/Editor/services/Editor/trackKey';
+import { getTrackKey, getTrackKeys } from '~/src/packages/Editor/services/Editor/trackKey';
+
+describe('getTrackKeys', () => {
+  it('returns every track of a group once', () => {
+    expect(getTrackKeys('[sam1#kick(C2;1;1):v(1), n2(A3;1;1)]:r(2)')).toEqual(['sam1', 'n2']);
+  });
+
+  it('returns nothing for an invalid group', () => {
+    expect(getTrackKeys('[sam1(C2;1;1)')).toEqual([]);
+  });
+});
 
 describe('getTrackKey', () => {
   it.each([

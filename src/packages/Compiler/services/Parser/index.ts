@@ -1,5 +1,6 @@
 import { AST_KIND, CHARACTERS_INSTRUCTIONS as CHAR, COMMANDS } from '~/src/packages/Compiler/constants';
 import ParseError from '~/src/packages/Compiler/services/Parser/error';
+import { splitGroup } from '~/src/packages/Compiler/services/Parser/group';
 import { parseExpression } from '~/src/packages/Compiler/services/Parser/value';
 import type {
   IAstCommand, IAstLine, IAstProgram, IAstStatement, ISourceLocation
@@ -15,9 +16,17 @@ export default class Parser {
   }
 
   private parseLine (source: string, line: number): IAstLine {
+    const group = splitGroup(source, line);
+    if (!group) return this.parseChain(source, line, 1);
+    // Los efectos tras el grupo se anaden a cada miembro, tras los suyos propios.
+    const statements = group.members.flatMap(member => this.parseChain(member.text + group.suffix, line, member.column).statements);
+    return { statements, location: { line, column: 1 } };
+  }
+
+  private parseChain (source: string, line: number, startColumn: number): IAstLine {
     const connectionIndex = source.indexOf(CHAR.CONNECT);
     const commandGroup = connectionIndex < 0 ? source : source.slice(0, connectionIndex);
-    let column = 1;
+    let column = startColumn;
     let mode = false;
     const statements: IAstStatement[] = commandGroup.split(/(:+)/).flatMap((rawCommand) => {
       if (rawCommand.startsWith(CHAR.CONCATENATE_COMMANDS)) {
@@ -41,7 +50,7 @@ export default class Parser {
     if (connectionIndex >= 0) {
       const target = source.slice(connectionIndex + CHAR.CONNECT.length);
       if (target.trim()) {
-        const location = { line, column: connectionIndex + 1 };
+        const location = { line, column: startColumn + connectionIndex };
         statements.push({
           kind: AST_KIND.connection,
           target: parseExpression(target, { line, column: location.column + CHAR.CONNECT.length }),
@@ -49,7 +58,7 @@ export default class Parser {
         });
       }
     }
-    return { statements, location: { line, column: 1 } };
+    return { statements, location: { line, column: startColumn } };
   }
 
   private parseStatement (source: string, location: ISourceLocation): IAstStatement {

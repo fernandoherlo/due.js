@@ -2,7 +2,7 @@ import { StateEffect } from '@codemirror/state';
 import type { Extension } from '@codemirror/state';
 import { EditorView, GutterMarker, gutter } from '@codemirror/view';
 import type { Command } from '@codemirror/view';
-import { getTrackKey } from '~/src/packages/Editor/services/Editor/trackKey';
+import { getTrackKeys } from '~/src/packages/Editor/services/Editor/trackKey';
 import type { IApp } from '~/src/types';
 
 const refreshMute = StateEffect.define<null>();
@@ -30,7 +30,9 @@ class MuteMarker extends GutterMarker {
 
 function toggle (app: IApp, view: EditorView, keys: string[]): void {
   if (!app.$music || !keys.length) return;
-  keys.forEach(key => app.$music!.toggleMute(key));
+  // Con estado mixto (p. ej. un grupo) se silencia todo antes de reactivar.
+  const mute = !keys.every(key => app.$music!.isMuted(key));
+  keys.filter(key => app.$music!.isMuted(key) !== mute).forEach(key => app.$music!.toggleMute(key));
   view.dispatch({ effects: refreshMute.of(null) });
 }
 
@@ -38,15 +40,15 @@ export function muteGutter (app: IApp): Extension {
   return gutter({
     class: 'cm-mute-gutter',
     lineMarker (view, line) {
-      const key = getTrackKey(view.state.doc.lineAt(line.from).text);
-      return key ? new MuteMarker(!!app.$music?.isMuted(key)) : null;
+      const keys = getTrackKeys(view.state.doc.lineAt(line.from).text);
+      return keys.length ? new MuteMarker(keys.every(key => app.$music?.isMuted(key))) : null;
     },
     lineMarkerChange: update => update.transactions.some(transaction => transaction.effects.some(effect => effect.is(refreshMute))),
     domEventHandlers: {
       mousedown (view, line) {
-        const key = getTrackKey(view.state.doc.lineAt(line.from).text);
-        if (!key) return false;
-        toggle(app, view, [key]);
+        const keys = getTrackKeys(view.state.doc.lineAt(line.from).text);
+        if (!keys.length) return false;
+        toggle(app, view, keys);
         return true;
       }
     }
@@ -59,8 +61,8 @@ export function toggleMuteSelection (app: IApp): Command {
     const keys = new Set<string>();
     for (const range of selection.ranges) {
       for (let number = doc.lineAt(range.from).number; number <= doc.lineAt(range.to).number; number++) {
-        const key = getTrackKey(doc.line(number).text);
-        if (key) keys.add(key);
+        const lineKeys = getTrackKeys(doc.line(number).text);
+        lineKeys.forEach(key => keys.add(key));
       }
     }
     toggle(app, view, [...keys]);

@@ -3,16 +3,24 @@ import Parser from '~/src/packages/Compiler/services/Parser';
 
 const parser = new Parser();
 
-// Devuelve la clave de la pista (p. ej. "sam1") si la linea empieza una; la misma que usa Music.
-export function getTrackKey (lineText: string): string | null {
+// Devuelve las claves de las pistas de la linea (una, o todas las de un grupo); las mismas que usa Music.
+export function getTrackKeys (lineText: string): string[] {
   try {
     const [line] = parser.parse(lineText).lines;
-    const statement = line.statements[0];
-    if (statement?.kind === AST_KIND.command && statement.element) {
-      return `${statement.name}${statement.element}`;
-    }
+    const isGroup = lineText.trimStart().startsWith('[');
+    const statements = isGroup ? line.statements : line.statements.slice(0, 1);
+    const keys = statements.flatMap(statement => (
+      statement.kind === AST_KIND.command && statement.element && !statement.mode
+        ? [`${statement.name}${statement.element}`]
+        : []
+    ));
+    return [...new Set(keys)];
   } catch {
     // Una linea con sintaxis invalida no es una pista; el linter ya la senala.
+    return [];
   }
-  return null;
+}
+
+export function getTrackKey (lineText: string): string | null {
+  return getTrackKeys(lineText)[0] ?? null;
 }
