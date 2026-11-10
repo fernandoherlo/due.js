@@ -1,16 +1,9 @@
-import type { IApp, IParser, ILexer, IInstruction } from '~/src/types';
+import type { ILexer } from '~/src/types';
+import type { ISourceLine } from '../../types/IAst';
 import { CHARACTERS_INSTRUCTIONS } from '~/src/packages/Compiler/constants';
 
 export default class Lexer implements ILexer {
-  private app: IApp;
-  private parser: IParser;
-
-  constructor (app: IApp, parser: IParser) {
-    this.app = app;
-    this.parser = parser;
-  }
-
-  exec (code: string): IInstruction[][] {
+  exec (code: string): ISourceLine[] {
     if (typeof code !== 'string') {
       throw Error('Code is not string.');
     }
@@ -18,46 +11,9 @@ export default class Lexer implements ILexer {
       return [];
     }
 
-    this.app.$logger.log(code);
-
-    return this.generateLexerInstructions(code);
-  }
-
-  private generateLexerInstructions (code: string): IInstruction[][] {
-    const lines = code.split('\n');
-    const instructionsGroup: IInstruction[][] = [];
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i]
-        .split(CHARACTERS_INSTRUCTIONS.COMMENT)[0]
-        .replace(/\s/g, '');
-      if (!line) {
-        instructionsGroup.push([]);
-        continue;
-      }
-
-      const instructions = this.parseLine(line);
-      instructionsGroup.push(instructions);
-    }
-
-    return instructionsGroup;
-  }
-
-  private parseLine (line: string): IInstruction[] {
-    const instructions: IInstruction[] = [];
-    const commands: string[] = this.parser.line(line);
-
-    if (!Array.isArray(commands)) {
-      throw Error('"commands" is not array.');
-    }
-
-    commands.forEach((command) => {
-      const instruction = this.parser.command(command);
-      if (instruction) {
-        instructions.push(instruction);
-      }
-    });
-
-    return instructions;
+    return code.split('\n').map((line, index) => ({
+      code: line.split(CHARACTERS_INSTRUCTIONS.COMMENT)[0],
+      line: index + 1
+    }));
   }
 }

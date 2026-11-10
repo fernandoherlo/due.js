@@ -1,4 +1,4 @@
-import type { IApp, ILogger, IStore, IErrorHandler, IDebugger, IMusic, ICompiler, IEditor, IUi, IValueFactory, IMidiIn } from '~/src/types';
+import type { IApp, ILogger, IStore, IErrorHandler, IDebugger, IMusic, ICompiler, IEditor, IUi, IMidiIn } from '~/src/types';
 import { stringify } from 'flatted';
 import Logger from '../Logger';
 import Store from '../Store';
@@ -20,8 +20,6 @@ export default class App implements IApp {
   $compiler: ICompiler | undefined;
   $editor: IEditor | undefined;
   $music: IMusic | undefined;
-
-  $valueFactory: IValueFactory | undefined;
 
   $variables: Record<string, string> = {};
   $variablesLive: Record<string, IMidiIn> = {};

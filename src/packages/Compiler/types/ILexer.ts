@@ -1,5 +1,5 @@
-import type { IInstruction } from '~/src/types';
+import type { ISourceLine } from './IAst';
 
 export interface ILexer {
-  exec: (code: string) => IInstruction[][];
+  exec: (code: string) => ISourceLine[];
 }

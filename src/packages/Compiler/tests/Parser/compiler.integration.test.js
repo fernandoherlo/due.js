@@ -5,11 +5,10 @@ import ValueFactory from '~/src/packages/Music/services/Music/valueFactory';
 function createCompiler () {
   const app = {
     $logger: { log: vi.fn() },
-    $variables: {},
-    $valueFactory: new ValueFactory()
+    $variables: {}
   };
 
-  return CompilerFactory(app);
+  return CompilerFactory(app, new ValueFactory());
 }
 
 describe('Compiler integration', () => {
@@ -67,5 +66,16 @@ describe('Compiler integration', () => {
 
     compiler.commit(plan);
     expect(compiler.prepare('sam1#piano(C4;0.25;1)').variables).toEqual({});
+  });
+
+  it('resolves variables used inside command values', () => {
+    const compiler = createCompiler();
+    const plan = compiler.prepare('$pitch=C4\nsam1#piano($pitch;0.25;1)');
+
+    expect(plan.addedInstructions[0].value).toMatchObject({
+      value: 'C4',
+      duration: '0.25',
+      interval: '1'
+    });
   });
 });

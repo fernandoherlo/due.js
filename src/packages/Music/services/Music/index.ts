@@ -2,7 +2,6 @@ import * as Tone from 'tone';
 import { WebMidi } from 'webmidi';
 
 import type { IApp, IMusic, IInstruction, IInstrument } from '~/src/types';
-import ValueFactory from '~/src/packages/Music/services/Music/valueFactory';
 import { COMMANDS_ELEMENT_MAP, SAMPLER_MAP } from '../../constants';
 
 export default class Music implements IMusic {
@@ -12,8 +11,6 @@ export default class Music implements IMusic {
   constructor (app: IApp) {
     this.app = app;
     this.instructions = {};
-
-    this.app.$valueFactory = new ValueFactory();
   }
 
   async start () {

@@ -1,6 +1,5 @@
-import type { IInstruction } from '~/src/types';
+import type { IAstProgram, ISourceLine } from './IAst';
 
 export interface IParser {
-  line: (line: string) => string[];
-  command: (command: string) => undefined | IInstruction;
+  parse: (lines: ISourceLine[]) => IAstProgram;
 }

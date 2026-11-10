@@ -1,18 +1,23 @@
-import type { IApp, ILexer, IInterpreter, ICompiler, IInstruction } from '~/src/types';
+import type { IApp, ILexer, IInterpreter, ICompiler, IInstruction, IParser } from '~/src/types';
 import type { ICompilationPlan } from '../../types/ICompiler';
+import type { ISemanticAnalyzer } from '../../types/ISemanticAnalyzer';
 import Instruction from '~/src/packages/Compiler/services/Instruction';
 import { areDifferentInstructions } from '../Instruction/compare';
 
 export default class Compiler implements ICompiler {
   private app: IApp;
   private lexer: ILexer;
+  private parser: IParser;
+  private semanticAnalyzer: ISemanticAnalyzer;
   private interpreter: IInterpreter;
 
   private previousInstructions: Record<string, IInstruction>;
 
-  constructor (app: IApp, lexer: ILexer, interpreter: IInterpreter) {
+  constructor (app: IApp, lexer: ILexer, parser: IParser, semanticAnalyzer: ISemanticAnalyzer, interpreter: IInterpreter) {
     this.app = app;
     this.lexer = lexer;
+    this.parser = parser;
+    this.semanticAnalyzer = semanticAnalyzer;
     this.interpreter = interpreter;
 
     this.previousInstructions = {};
@@ -21,23 +26,16 @@ export default class Compiler implements ICompiler {
   prepare (code: string): ICompilationPlan {
     this.app.$logger.log(code);
 
-    const previousVariables = this.app.$variables;
-    const variables: Record<string, string> = {};
-    this.app.$variables = variables;
-
-    let instructions: Record<string, IInstruction>;
-    try {
-      const lexical: IInstruction[][] = this.lexer.exec(code);
-      instructions = this.interpreter.exec(lexical);
-    } finally {
-      this.app.$variables = previousVariables;
-    }
+    const sourceLines = this.lexer.exec(code);
+    const syntax = this.parser.parse(sourceLines);
+    const semantic = this.semanticAnalyzer.exec(syntax);
+    const instructions = this.interpreter.exec(semantic.instructions);
 
     const calculatedInstructions = this.calculateInstructions(instructions);
 
     return {
       instructions: this.cloneInstructions(instructions),
-      variables,
+      variables: semantic.variables,
       ...calculatedInstructions
     };
   }

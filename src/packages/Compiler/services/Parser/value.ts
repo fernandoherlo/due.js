@@ -1,11 +1,11 @@
-import type { IApp, IValueParser } from '~/src/types';
+import type { IValueFactory, IValueParser } from '~/src/types';
 import { TYPE_VALUE, CHARACTERS_INSTRUCTIONS } from '~/src/packages/Compiler/constants';
 
 export default class ValueParser implements IValueParser {
-  private app: IApp;
+  private valueFactory: IValueFactory;
 
-  constructor (app: IApp) {
-    this.app = app;
+  constructor (valueFactory: IValueFactory) {
+    this.valueFactory = valueFactory;
   }
 
   exec (valueRaw: string, defaults: boolean) {
@@ -38,7 +38,7 @@ export default class ValueParser implements IValueParser {
     const value2Parse = this.calculateValue(value2);
     const value3Parse = this.calculateValue(value3);
 
-    return this.app.$valueFactory && this.app.$valueFactory.create({ value, value2: value2Parse, value3: value3Parse }, defaults);
+    return this.valueFactory.create({ value, value2: value2Parse, value3: value3Parse }, defaults);
   }
 
   private calculateValue (valueRaw: string | undefined): number | Array<number> | any | undefined {

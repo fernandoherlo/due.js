@@ -1,4 +1,4 @@
-import type { ICompiler, IDebugger, IMusic, IEditor, IErrorHandler, ILogger, IStore, IUi, IValueFactory, IMidiIn } from '~/src/types';
+import type { ICompiler, IDebugger, IMusic, IEditor, IErrorHandler, ILogger, IStore, IUi, IMidiIn } from '~/src/types';
 
 export interface IApp {
   __debugEnabled: boolean;
@@ -13,8 +13,6 @@ export interface IApp {
   $compiler: ICompiler | undefined;
   $editor: IEditor | undefined;
   $music: IMusic | undefined;
-
-  $valueFactory: IValueFactory | undefined;
 
   $variables: Record<string, string>;
   $variablesLive: Record<string, IMidiIn>;
