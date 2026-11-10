@@ -418,7 +418,7 @@ describe('Music', () => {
 
       Tone.Loop.mock.results[0].value.callback();
 
-      expect(trigger).toHaveBeenCalledExactlyOnceWith(['C4', 'G4'], 2);
+      expect(trigger).toHaveBeenCalledExactlyOnceWith(['C4', 'G4'], 2, undefined);
       expect(Tone.Sampler).toHaveBeenCalledWith(expect.objectContaining({ urls: { 0: 'samples/birds/1.mp3' } }));
       expect(Tone.Sampler.prototype.add).not.toHaveBeenCalled();
       expect(Math.random).not.toHaveBeenCalled();

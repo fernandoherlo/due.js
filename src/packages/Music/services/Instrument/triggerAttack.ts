@@ -2,19 +2,19 @@ import type { INote } from '~/src/types';
 import { TYPE_VALUE } from '~/src/packages/Compiler/constants';
 
 export default class TriggerAttack {
-  static play (value: any, typeValue: string, valueStep: number, instrument: any): any[] | undefined {
+  static play (value: any, typeValue: string, valueStep: number, instrument: any, time?: number): any[] | undefined {
     const note: INote = TriggerAttack.getValue(value, typeValue, valueStep);
     if (note.value) {
       const duration = parseFloat(TriggerAttack.getValue(note.duration));
 
       if (this._isChord(note.value, typeValue)) {
         if (!Array.isArray(note.value)) {
-          instrument.triggerAttackRelease(this._createChord(note.value), duration);
+          instrument.triggerAttackRelease(this._createChord(note.value), duration, time);
         } else {
-          instrument.triggerAttackRelease(note.value, duration);
+          instrument.triggerAttackRelease(note.value, duration, time);
         }
       } else {
-        instrument.triggerAttackRelease(note.value, duration);
+        instrument.triggerAttackRelease(note.value, duration, time);
       }
 
       return [note.value, duration];
