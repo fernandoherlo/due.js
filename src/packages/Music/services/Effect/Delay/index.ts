@@ -13,7 +13,7 @@ export default class Delay extends Effect implements IDelay {
   }
 
   create () {
-    this.effect = new Tone.FeedbackDelay();
+    this.effect = new Tone.FeedbackDelay({ maxDelay: this.max });
     if (!Array.isArray(this.value)) {
       const delay: number = this.getValue(this.value.value);
       const feedback: number = parseFloat(this.value.duration);

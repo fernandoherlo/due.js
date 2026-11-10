@@ -21,13 +21,14 @@ export default class Sampler extends Instrument implements ISampler {
     }
 
     const samplesMap: any = samples;
-    const samplerPromise: Promise<Tone.Sampler> = new Promise((resolve) => {
+    const samplerPromise: Promise<Tone.Sampler> = new Promise((resolve, reject) => {
       const sound = this.modifier || 'piano';
       const sampler: Tone.Sampler = new Tone.Sampler({
         urls: this.pathUrl(samplesMap[SAMPLER_MAP[sound]], SAMPLER_MAP[sound]),
         onload: function onload () {
           return resolve(sampler);
-        }
+        },
+        onerror: reject
       });
     });
 

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import CompilerFactory from '~/src/packages/Compiler/services/Compiler/factory';
+import { COMMANDS, COMMANDS_MAP, TYPE_VALUE } from '~/src/packages/Compiler/constants';
+import Compiler from '~/src/packages/Compiler/services/Compiler';
 import ValueFactory from '~/src/packages/Music/services/Music/valueFactory';
 
 function createCompiler () {
@@ -8,7 +9,7 @@ function createCompiler () {
     $variables: {}
   };
 
-  return CompilerFactory(app, new ValueFactory());
+  return new Compiler(app, new ValueFactory());
 }
 
 describe('Compiler integration', () => {
@@ -77,5 +78,34 @@ describe('Compiler integration', () => {
       duration: '0.25',
       interval: '1'
     });
+  });
+
+  it('updates, retains and deletes instructions relative to the committed snapshot', () => {
+    const compiler = createCompiler();
+    const initial = compiler.prepare('sam1(C4)\nsam2(E4)\nsam3(G4)');
+    compiler.commit(initial);
+
+    const next = compiler.prepare('sam1(D4)\nsam2(E4)');
+
+    expect(next.addedInstructions).toEqual([]);
+    expect(next.updatedInstructions.map(instruction => instruction.key)).toEqual(['sam1']);
+    expect(next.deletedInstructions.map(instruction => instruction.key)).toEqual(['sam3']);
+    compiler.commit(next);
+    expect(compiler.prepare('sam1(D4)\nsam2(E4)').updatedInstructions).toEqual([]);
+  });
+
+  it('expands sequence variables while preserving ranges and action defaults', () => {
+    const compiler = createCompiler();
+
+    const plan = compiler.prepare('$notes=[C4>E4]\nsam1($notes;[0-1];0):v(90)');
+    const instruction = plan.instructions[`${COMMANDS_MAP[COMMANDS.sam]}1`];
+
+    expect(instruction.typeValue).toBe(TYPE_VALUE.sequence);
+    expect(instruction.value).toMatchObject([
+      { value: 'C4', duration: { min: '0', max: '1' }, interval: '0' },
+      { value: 'E4', duration: { min: '0', max: '1' }, interval: '0' }
+    ]);
+    expect(instruction.actions[0].value.duration).toBeUndefined();
+    expect(instruction.actions[0].value.interval).toBeUndefined();
   });
 });

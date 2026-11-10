@@ -1,61 +1,51 @@
-import type { IValueFactory, IValueParser } from '~/src/types';
-import type { IAstValue, IAstValueExpression } from '../../types/IAst';
-import { TYPE_VALUE } from '~/src/packages/Compiler/constants';
+import { AST_KIND, CHARACTERS_INSTRUCTIONS as CHAR, COMMANDS, VALUE_OPERATOR } from '~/src/packages/Compiler/constants';
+import type { IAstValue, IAstValueExpression, ISourceLocation } from '~/src/packages/Compiler/types/IAst';
 
-export default class ValueParser implements IValueParser {
-  private valueFactory: IValueFactory;
+const COLLECTION_SEPARATORS = [
+  [CHAR.SEPARATE_DIFERRENT_VALUES, VALUE_OPERATOR.random],
+  [CHAR.SEPARATE_PROGRESSION_VALUES, VALUE_OPERATOR.sequence],
+  [CHAR.SEPARATE_CHORD_VALUES, VALUE_OPERATOR.chord]
+] as const;
 
-  constructor (valueFactory: IValueFactory) {
-    this.valueFactory = valueFactory;
+export function parseExpression (rawValue: string, location: ISourceLocation): IAstValueExpression {
+  let column = location.column;
+  const values = rawValue.split(CHAR.SEPARATE_TYPE_VALUES).map((argument) => {
+    const node = parseValue(argument, { line: location.line, column });
+    column += argument.length + CHAR.SEPARATE_TYPE_VALUES.length;
+    return node;
+  });
+  return { values, rawValue: rawValue.replace(/\s/g, ''), location };
+}
+
+function parseValue (source: string, location: ISourceLocation): IAstValue {
+  const rawValue = source.replace(/\s/g, '');
+  const base = {
+    rawValue,
+    location: { line: location.line, column: location.column + source.length - source.trimStart().length }
+  };
+  if (rawValue.startsWith(COMMANDS.$) && !rawValue.includes(CHAR.INIT_MULTIPLE_VALUES)) {
+    return { ...base, kind: AST_KIND.reference, name: rawValue };
+  }
+  if (!rawValue.startsWith(CHAR.INIT_MULTIPLE_VALUES) || !rawValue.endsWith(CHAR.END_MULTIPLE_VALUES)) {
+    return { ...base, kind: AST_KIND.scalar };
   }
 
-  exec (expression: IAstValueExpression, defaults: boolean) {
-    const [value, value2, value3] = expression.values;
-    let typeValue = TYPE_VALUE.normal;
-
-    if (value && value.kind === 'collection') {
-      let values: IAstValue[] = [];
-      if (value.operator === 'random') {
-        typeValue = TYPE_VALUE.random;
-        values = value.values;
-      } else if (value.operator === 'sequence') {
-        typeValue = TYPE_VALUE.sequence;
-        values = value.values;
-      } else if (value.operator === 'chord') {
-        typeValue = TYPE_VALUE.multi;
-        return [this.createValue(value.rawValue, value2, value3, defaults), typeValue];
-      }
-
-      return [values.map(item => this.createValue(item.rawValue, value2, value3, defaults)), typeValue];
-    }
-
-    if (value && value.kind === 'range') {
-      return [[], typeValue];
-    }
-
-    return [this.createValue(value ? value.rawValue : '', value2, value3, defaults), typeValue];
+  const content = rawValue.slice(1, -1);
+  const separator = COLLECTION_SEPARATORS.find(([token]) => content.includes(token));
+  if (separator) {
+    const [token, operator] = separator;
+    let column = base.location.column + 1;
+    const values = content.split(token).map((part) => {
+      const node = parseValue(part, { line: location.line, column });
+      column += part.length + token.length;
+      return node;
+    });
+    return { ...base, kind: AST_KIND.collection, operator, values };
   }
 
-  private createValue (value: string | Array<any>, value2: IAstValue | undefined, value3: IAstValue | undefined, defaults: boolean) {
-    const value2Parse = this.calculateValue(value2);
-    const value3Parse = this.calculateValue(value3);
-
-    return this.valueFactory.create({ value, value2: value2Parse, value3: value3Parse }, defaults);
+  const [min, max, extra] = content.split(CHAR.SEPARATE_MIN_MAX_VALUES);
+  if (min && max && extra === undefined) {
+    return { ...base, kind: AST_KIND.range, min, max };
   }
-
-  private calculateValue (value: IAstValue | undefined): number | Array<number> | any | undefined {
-    if (!value) {
-      return;
-    }
-
-    if (value.kind === 'collection' && value.operator === 'random') {
-      return value.values.map(item => item.rawValue);
-    }
-
-    if (value.kind === 'range') {
-      return { min: value.min, max: value.max };
-    }
-
-    return value.rawValue;
-  }
+  return { ...base, kind: AST_KIND.collection, operator: VALUE_OPERATOR.single, values: [] };
 }

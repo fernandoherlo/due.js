@@ -98,7 +98,7 @@ En una cadena de efectos, el primer efecto escrito queda más cerca de la salida
 
 ## Comportamiento observado
 
-- Las líneas vacías y los comentarios, incluidos los comentarios al final de una instrucción, se eliminan antes de analizar cada línea. El lexer también elimina whitespace en cada línea.
+- El parser ignora comentarios y espacios al interpretar instrucciones y conserva las líneas vacías para ubicar los errores.
 - Los valores explícitos `0` de duración e intervalo se conservan al crear una nota. La validez de un intervalo cero para Tone.js no está garantizada.
 - El tempo no se configura desde el DSL; el transporte de Tone.js se inicia actualmente a `120` BPM. Esto puede ser una limitación deliberada, no necesariamente un bug.
 - El compilador prepara un plan y solo actualiza su snapshot y variables tras aplicar las operaciones de audio. Esto mantiene coherente el estado lógico, pero no revierte efectos de audio/MIDI si una operación falla a mitad.
@@ -120,3 +120,7 @@ sam5#harp([G4,E4,C4,A3];0.25;1):v($alto)
 ```
 
 Al compilar, due.js compara las instrucciones nuevas con las anteriores y añade, actualiza o elimina los instrumentos correspondientes.
+
+## Flujo interno
+
+`Parser → Analyzer → Compiler`: el parser convierte el texto en un AST; el analizador resuelve variables, convierte los valores y asocia las acciones al instrumento de su línea; el compilador prepara el diff y confirma el estado con `commit` tras aplicar el plan. Los tres servicios son clases. Parser y Analyzer no conservan estado del programa entre llamadas; no hay etapas separadas de Lexer o Interpreter.

@@ -74,15 +74,21 @@ describe('App', () => {
     expect(app.$ui.setOk).toHaveBeenCalled();
   });
 
-  it('Should not commit the compiled plan when applying it fails', async () => {
+  it('Should preserve apply errors without committing the compiled plan', async () => {
     const app = new App();
+    const failure = new Error('audio failed');
     const plan = { instructions: {}, variables: {}, addedInstructions: [{}], updatedInstructions: [], deletedInstructions: [] };
     app.$compiler = { prepare: vi.fn().mockReturnValue(plan), commit: vi.fn() };
     app.$editor = { getCode: vi.fn().mockReturnValue('foo') };
-    app.$music = { validate: vi.fn(), add: vi.fn().mockRejectedValue(new Error('audio failed')), update: vi.fn(), delete: vi.fn() };
+    app.$music = {
+      validate: vi.fn(),
+      add: vi.fn().mockRejectedValue(failure),
+      update: vi.fn(),
+      delete: vi.fn()
+    };
     app.$ui = { setWaiting: vi.fn(), setError: vi.fn(), setOk: vi.fn() };
 
-    await expect(app.compile()).rejects.toThrowError();
+    await expect(app.compile()).rejects.toBe(failure);
 
     expect(app.$music.add).toHaveBeenCalledWith(plan.addedInstructions);
     expect(app.$compiler.commit).not.toHaveBeenCalled();
@@ -169,12 +175,13 @@ describe('App', () => {
     expect(app.$compiler.prepare).toHaveBeenCalledTimes(2);
   });
 
-  it('Should throw error on compile if services fail', async () => {
+  it('Should preserve the original error when compiler preparation fails', async () => {
     // Arrange
     const app = new App();
+    const failure = new Error('foo');
     app.$compiler = {
       prepare: vi.fn().mockImplementation(() => {
-        throw new Error('foo');
+        throw failure;
       }),
       commit: vi.fn()
     };
@@ -183,7 +190,7 @@ describe('App', () => {
     app.$ui = { setWaiting: vi.fn(), setOk: vi.fn(), setError: vi.fn() };
     // Activate
     // Assert
-    await expect(() => app.compile()).rejects.toThrowError();
+    await expect(app.compile()).rejects.toBe(failure);
     expect(app.$ui.setError).toHaveBeenCalled();
   });
 

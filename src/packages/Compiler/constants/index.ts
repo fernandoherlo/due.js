@@ -40,12 +40,30 @@ export const COMMANDS_MAP: Record<typeof COMMANDS[keyof typeof COMMANDS], string
   [COMMANDS.$$]: '1_live_variable_'
 };
 
-export const TYPE_VALUE: Record<string, string> = {
+export const TYPE_VALUE = {
   normal: 'normal',
   random: 'random',
   sequence: 'sequence',
   multi: 'multi'
-};
+} as const;
+
+export const AST_KIND = {
+  command: 'command',
+  variable: 'variable',
+  liveVariable: 'live-variable',
+  connection: 'connection',
+  scalar: 'scalar',
+  reference: 'variable-reference',
+  collection: 'collection',
+  range: 'range'
+} as const;
+
+export const VALUE_OPERATOR = {
+  random: TYPE_VALUE.random,
+  sequence: TYPE_VALUE.sequence,
+  chord: 'chord',
+  single: 'single'
+} as const;
 
 export const CHARACTERS_INSTRUCTIONS = {
   CONNECT: '=>',

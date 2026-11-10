@@ -1,22 +1,30 @@
-import shell from 'shelljs';
-import fs from 'fs';
-import path from 'path';
+import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const folder = process.cwd();
-let tmpDir;
+const projectDirectory = path.dirname(fileURLToPath(import.meta.url));
+const samplesDirectory = path.join(projectDirectory, 'public', 'samples');
+const temporaryDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'duejs-samples-'));
+const repositoryDirectory = path.join(temporaryDirectory, 'repository');
 
 try {
-  tmpDir = path.join(folder, 'samples-alex-bainter/');
-  shell.exec('git clone --verbose https://github.com/generative-music/samples-alex-bainter.git');
-  shell.cp('-R', tmpDir + '/samples', path.join(folder, 'public/'));
-} catch (e) {
-  console.error(`An error has occurred while cloning the repo at ${tmpDir}. Error: ${e}`);
+  console.log('Downloading audio samples with a shallow clone...');
+  execFileSync('git', [
+    'clone',
+    '--depth', '1',
+    '--progress',
+    'https://github.com/generative-music/samples-alex-bainter.git',
+    repositoryDirectory
+  ], { stdio: 'inherit' });
+
+  console.log('Copying audio samples...');
+  fs.cpSync(path.join(repositoryDirectory, 'samples'), samplesDirectory, { recursive: true });
+  console.log(`Audio samples installed in ${samplesDirectory}.`);
+} catch (error) {
+  process.exitCode = 1;
+  console.error('Could not install audio samples:', error instanceof Error ? error.message : error);
 } finally {
-  try {
-    if (tmpDir) {
-      fs.rmSync(tmpDir, { recursive: true });
-    }
-  } catch (e) {
-    console.error(`An error has occurred while removing the temp folder at ${tmpDir}. Please remove it manually. Error: ${e}`);
-  }
+  fs.rmSync(temporaryDirectory, { recursive: true, force: true });
 }

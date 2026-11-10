@@ -1,5 +1,4 @@
 import type { IApp, ILogger, IStore, IErrorHandler, IDebugger, IMusic, ICompiler, IEditor, IUi, IMidiIn } from '~/src/types';
-import { stringify } from 'flatted';
 import Logger from '../Logger';
 import Store from '../Store';
 import ErrorHandler from '../Error/handler';
@@ -77,9 +76,9 @@ export default class App implements IApp {
 
         this.saveInLocalStorage(LOCAL_STORAGE_KEY_CODE, editorCode);
       }
-    } catch (e: unknown) {
+    } catch (error: unknown) {
       this.$ui.setError();
-      throw Error(`Error in proxy composer. ${stringify(e)}`);
+      throw error;
     }
   }
 

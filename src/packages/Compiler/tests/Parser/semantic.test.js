@@ -1,67 +1,68 @@
 import { describe, expect, it, vi } from 'vitest';
-import SemanticAnalyzer from '~/src/packages/Compiler/services/Parser/SemanticAnalyzer';
-import SyntaxParser from '~/src/packages/Compiler/services/Parser/SyntaxParser';
+import { COMMANDS, COMMANDS_MAP } from '~/src/packages/Compiler/constants';
+import Analyzer from '~/src/packages/Compiler/services/Analyzer';
+import Parser from '~/src/packages/Compiler/services/Parser';
+import ValueFactory from '~/src/packages/Music/services/Music/valueFactory';
 
 describe('DSL semantic analyzer', () => {
+  const parser = new Parser();
+
   it('resolves variables in source order and emits runtime instructions', () => {
-    const valueFactory = {
-      adapt: vi.fn((value, variables) => value.replace(/\$[a-z]+/g, name => variables[name] || name)),
-      create: vi.fn()
-    };
-    const valueParser = {
-      exec: vi.fn(value => [value.rawValue, 'normal'])
-    };
-    const syntax = new SyntaxParser();
-    const analyzer = new SemanticAnalyzer(valueFactory, valueParser);
-    const program = syntax.parse([
-      { code: '$level=42', line: 1 },
-      { code: 'sam1#piano($level;0.25;1)', line: 2 }
-    ]);
+    const analyzer = new Analyzer(new ValueFactory());
+    const program = parser.parse('$level=42\nsam1#piano($level;0.25;1)');
 
     const result = analyzer.exec(program);
 
     expect(result.variables).toEqual({ $level: '42' });
-    expect(result.instructions[0]).toEqual([]);
-    expect(result.instructions[1][0]).toMatchObject({
-      name: 'sam',
+    expect(Object.keys(result.instructions)).toEqual([`${COMMANDS_MAP[COMMANDS.sam]}1`]);
+    expect(result.instructions[`${COMMANDS_MAP[COMMANDS.sam]}1`]).toMatchObject({
+      name: COMMANDS.sam,
       element: '1',
       modifier: 'piano',
-      type: 'sampler',
-      value: '42;0.25;1'
+      type: COMMANDS_MAP[COMMANDS.sam],
+      value: { value: '42', duration: '0.25', interval: '1' }
     });
-    expect(valueFactory.adapt).toHaveBeenLastCalledWith('$level;0.25;1', result.variables);
   });
 
   it('emits live-variable instructions without value parsing', () => {
     const valueFactory = { adapt: vi.fn(), create: vi.fn() };
-    const valueParser = { exec: vi.fn() };
-    const analyzer = new SemanticAnalyzer(valueFactory, valueParser);
-    const program = new SyntaxParser().parse([{ code: '$$control=mi1(2@5)', line: 1 }]);
+    const analyzer = new Analyzer(valueFactory);
+    const program = parser.parse('$$control=mi1(2@5)');
 
     const result = analyzer.exec(program);
 
-    expect(result.instructions[0][0]).toMatchObject({
-      name: '$$',
+    expect(result.instructions[`${COMMANDS_MAP[COMMANDS.$$]}1`]).toMatchObject({
+      name: COMMANDS.$$,
       element: '1',
       modifier: 'control',
       key: '$$control',
       value: '2@5'
     });
-    expect(valueParser.exec).not.toHaveBeenCalled();
+    expect(valueFactory.create).not.toHaveBeenCalled();
+    expect(valueFactory.adapt).not.toHaveBeenCalled();
   });
 
   it('lowers a connection node to the existing runtime command', () => {
-    const valueFactory = { adapt: vi.fn(value => value), create: vi.fn() };
-    const valueParser = { exec: vi.fn(value => [value.rawValue, 'normal']) };
-    const analyzer = new SemanticAnalyzer(valueFactory, valueParser);
-    const program = new SyntaxParser().parse([{ code: 'sam1#piano(C4)=>out1', line: 1 }]);
+    const analyzer = new Analyzer(new ValueFactory());
+    const program = parser.parse('sam1#piano(C4)=>out1');
 
     const result = analyzer.exec(program);
 
-    expect(result.instructions[0][1]).toMatchObject({
-      name: 'con',
-      type: 'connect',
-      value: 'out1'
+    expect(result.instructions[`${COMMANDS_MAP[COMMANDS.sam]}1`].actions[0]).toMatchObject({
+      name: COMMANDS.con,
+      type: COMMANDS_MAP[COMMANDS.con],
+      value: { value: 'out1' }
     });
+  });
+
+  it('does not retain variables when the same analyzer is reused after an error', () => {
+    const analyzer = new Analyzer(new ValueFactory());
+    const invalid = parser.parse('$level=42\nv($level)');
+
+    expect(() => analyzer.exec(invalid)).toThrow('Line 2, column 1');
+    const result = analyzer.exec(parser.parse('sam1(C4):v($level)'));
+
+    expect(result.variables).toEqual({});
+    expect(result.instructions[`${COMMANDS_MAP[COMMANDS.sam]}1`].actions[0].value.value).toBe('$level');
   });
 });

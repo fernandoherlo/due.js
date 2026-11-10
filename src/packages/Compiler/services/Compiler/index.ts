@@ -1,42 +1,28 @@
-import type { IApp, ILexer, IInterpreter, ICompiler, IInstruction, IParser } from '~/src/types';
-import type { ICompilationPlan } from '../../types/ICompiler';
-import type { ISemanticAnalyzer } from '../../types/ISemanticAnalyzer';
+import Analyzer from '~/src/packages/Compiler/services/Analyzer';
 import Instruction from '~/src/packages/Compiler/services/Instruction';
-import { areDifferentInstructions } from '../Instruction/compare';
+import { areDifferentInstructions } from '~/src/packages/Compiler/services/Instruction/compare';
+import Parser from '~/src/packages/Compiler/services/Parser';
+import type { ICompilationPlan } from '~/src/packages/Compiler/types/ICompiler';
+import type { IApp, ICompiler, IInstruction, IValueFactory } from '~/src/types';
 
 export default class Compiler implements ICompiler {
-  private app: IApp;
-  private lexer: ILexer;
-  private parser: IParser;
-  private semanticAnalyzer: ISemanticAnalyzer;
-  private interpreter: IInterpreter;
+  private readonly parser = new Parser();
+  private readonly analyzer: Analyzer;
+  private previousInstructions: Record<string, IInstruction> = {};
 
-  private previousInstructions: Record<string, IInstruction>;
-
-  constructor (app: IApp, lexer: ILexer, parser: IParser, semanticAnalyzer: ISemanticAnalyzer, interpreter: IInterpreter) {
-    this.app = app;
-    this.lexer = lexer;
-    this.parser = parser;
-    this.semanticAnalyzer = semanticAnalyzer;
-    this.interpreter = interpreter;
-
-    this.previousInstructions = {};
+  constructor (private readonly app: IApp, valueFactory: IValueFactory) {
+    this.analyzer = new Analyzer(valueFactory);
   }
 
   prepare (code: string): ICompilationPlan {
     this.app.$logger.log(code);
 
-    const sourceLines = this.lexer.exec(code);
-    const syntax = this.parser.parse(sourceLines);
-    const semantic = this.semanticAnalyzer.exec(syntax);
-    const instructions = this.interpreter.exec(semantic.instructions);
-
-    const calculatedInstructions = this.calculateInstructions(instructions);
+    const { instructions, variables } = this.analyzer.exec(this.parser.parse(code));
 
     return {
       instructions: this.cloneInstructions(instructions),
-      variables: semantic.variables,
-      ...calculatedInstructions
+      variables,
+      ...this.calculateInstructions(instructions)
     };
   }
 
@@ -46,43 +32,28 @@ export default class Compiler implements ICompiler {
   }
 
   private cloneInstructions (instructions: Record<string, IInstruction>): Record<string, IInstruction> {
-    return Object.keys(instructions).reduce((clones: Record<string, IInstruction>, key) => {
-      const instruction = instructions[key];
-      clones[key] = new Instruction({
+    return Object.fromEntries(Object.entries(instructions).map(([key, instruction]) => [
+      key,
+      new Instruction({
         ...instruction,
         actions: instruction.actions.map(action => new Instruction({ ...action }))
-      });
-      return clones;
-    }, {});
+      })
+    ]));
   }
 
-  private calculateInstructions (instructions: Record<string, IInstruction>): Pick<ICompilationPlan, 'addedInstructions' | 'updatedInstructions' | 'deletedInstructions'> {
-    const addedInstructions: IInstruction[] = [];
-    const updatedInstructions: IInstruction[] = [];
-    const deletedInstructions: IInstruction[] = [];
-
-    for (const key in instructions) {
-      if (instructions[key] && this.previousInstructions) {
-        if (!Object.keys(this.previousInstructions).includes(key)) {
-          addedInstructions.push(instructions[key]);
-        } else {
-          if (areDifferentInstructions(instructions[key], this.previousInstructions[key])) {
-            updatedInstructions.push(instructions[key]);
-          }
-        }
-      }
-    }
-
-    for (const key in this.previousInstructions) {
-      if (this.previousInstructions[key] && instructions && !Object.keys(instructions).includes(key)) {
-        deletedInstructions.push(this.previousInstructions[key]);
-      }
-    }
-
+  private calculateInstructions (
+    instructions: Record<string, IInstruction>
+  ): Pick<ICompilationPlan, 'addedInstructions' | 'updatedInstructions' | 'deletedInstructions'> {
+    const entries = Object.entries(instructions);
     return {
-      addedInstructions,
-      updatedInstructions,
-      deletedInstructions
+      addedInstructions: entries.filter(([key]) => !this.previousInstructions[key]).map(([, instruction]) => instruction),
+      updatedInstructions: entries
+        .filter(([key, instruction]) => this.previousInstructions[key] &&
+          areDifferentInstructions(instruction, this.previousInstructions[key]))
+        .map(([, instruction]) => instruction),
+      deletedInstructions: Object.entries(this.previousInstructions)
+        .filter(([key]) => !instructions[key])
+        .map(([, instruction]) => instruction)
     };
   }
 }
