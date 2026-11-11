@@ -1,0 +1,20 @@
+// .#####..##..##.######........######..####..
+// .##..##.##..##.##................##.##.....
+// .##..##.##..##.####..............##..####..
+// .##..##.##..##.##.......##...##..##.....##.
+// .#####...####..######...##....####...####..
+// Todos los operadores de nota: ::oct ::late ::chord ::human ::unique ::walk ::trans
+// Se aplican en el orden escrito; walk va antes de trans. late en n debe ser menor que el intervalo.
+bpm(90)
+
+// Bajo: pasos cortos, una octava abajo a veces y un poco humanizado
+n1([C2,D2,E2,G2,A2];2;2b)::walk(3)::oct(0.3;-1)::human(0.04)
+
+// Melodia: sin repetir nota en 6 s, saltos cortos y una tercera menor arriba
+sam1#piano([C4,D4,E4,G4,A4,C5];1;1b):r(70)::walk(4)::unique(6)::trans(3)
+
+// Acordes ocasionales, retrasados y humanizados
+sam2#piano([C4,E4,G4,B4];1b;3b):r(50)::chord(0.4)::late(0.5;1)::human(0.05)
+
+// Adornos agudos: octava arriba y tonalidad desplazada
+n2([G4,A4,C5,D5];0.5;3b)::trans(-2)::oct(0.4;1)::late(0.3;0.5)
