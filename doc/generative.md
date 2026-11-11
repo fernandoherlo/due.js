@@ -248,7 +248,7 @@ Con esas tres y G01, G02 y G11 del primer grupo ya se podria escribir algo parec
 
 ### G31. Operadores de nota encadenables
 
-**Implementado:** `::oct(p;octavas)`, `::late(p;max)`, `::chord(p)` y `::human(s)`; ver `doc/language.md`. Queda pendiente limitar repeticiones de una misma nota.
+**Implementado:** `::oct(p;octavas)`, `::late(p;max)`, `::chord(p)`, `::human(s)` y `::unique(s)` (evita repetir la misma nota en `s` segundos); ver `doc/language.md`.
 
 En "Observable Streams" el flujo de notas pasa por una cadena de operadores: cambiar de octava con cierta probabilidad,
 retrasar la nota, convertirla en acorde, limitar cuantas veces suena la misma nota en pocos segundos y humanizarla.

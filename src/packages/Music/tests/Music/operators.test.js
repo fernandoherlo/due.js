@@ -54,7 +54,8 @@ describe('Note operators', () => {
     ['oct'], ['oct', 2], ['oct', 'a'], ['oct', 0.5, 1.5], ['oct', 0.5, 1, 2],
     ['late', -0.1], ['late', 0.5, -1],
     ['chord'], ['chord', 0.5, 1],
-    ['human', -1], ['human', 1, 2]
+    ['human', -1], ['human', 1, 2],
+    ['unique'], ['unique', -1], ['unique', 'a'], ['unique', 1, 2]
   ])('rejects invalid arguments: %s', (name, ...args) => {
     expect(() => operator(name, ...args)).toThrow();
   });
@@ -86,6 +87,19 @@ describe('Note operators', () => {
     expect(result.duration).toBeCloseTo(1.1);
   });
 
+  it('drops notes repeated within the window and keeps the rest', () => {
+    const unique = operator('unique', 4);
+
+    expect(unique.apply(event(['C4', 'E4'], 0)).notes).toEqual(['C4', 'E4']);
+    expect(unique.apply(event(['C4', 'G4'], 2)).notes).toEqual(['G4']);
+    expect(unique.apply(event(['C4'], 3)).notes).toEqual([]);
+    expect(unique.apply(event(['C4'], 4)).notes).toEqual(['C4']);
+  });
+
+  it('keeps every note when there is no scheduled time', () => {
+    expect(operator('unique', 4).apply(event(['C4'])).notes).toEqual(['C4']);
+  });
+
   it('creates operators only from operator modes', () => {
     const actions = [{ name: 'v' }, { name: 'reverse', mode: true }, { name: 'oct', mode: true, modeParameters: ['1'] }];
 
@@ -109,6 +123,17 @@ describe('Note operators', () => {
       TriggerAttack.play({ value: 'C4', duration: 0.5 }, 'normal', 0, instrument, 3, operators);
 
       expect(instrument.triggerAttackRelease).toHaveBeenCalledWith(['C5', 'G5', 'C6'], 0.5, 3);
+    });
+
+    it('does not play when every note was removed', () => {
+      const instrument = { triggerAttackRelease: vi.fn() };
+      const unique = operator('unique', 10);
+
+      TriggerAttack.play({ value: 'C4', duration: 0.5 }, 'normal', 0, instrument, 1, [unique]);
+      const logged = TriggerAttack.play({ value: 'C4', duration: 0.5 }, 'normal', 0, instrument, 2, [unique]);
+
+      expect(instrument.triggerAttackRelease).toHaveBeenCalledOnce();
+      expect(logged).toBeUndefined();
     });
 
     it('keeps a single note as a string', () => {

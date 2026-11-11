@@ -15,3 +15,6 @@ sam1#piano([C4,D4,E4,G4,A4];1b;2b):r(60)::chord(0.25)::human(0.04)
 
 // Grave y disperso
 n2([C2,G2,A2];2;3b)::oct(0.5;-1)::late(0.6;1)::human(0.05)
+
+// Sin repetir la misma nota en 6 segundos: algunos pasos quedan en silencio
+sam2#piano([C4,D4,E4,G4,A4];1;1):r(80)::unique(6)

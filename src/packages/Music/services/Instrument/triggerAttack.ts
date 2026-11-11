@@ -18,6 +18,7 @@ export default class TriggerAttack {
         const event = operators.reduce<INoteEvent>((current, operator) => operator.apply(current), {
           notes: [played].flat(), duration, time
         });
+        if (!event.notes.length) return;
         played = Array.isArray(played) || event.notes.length > 1 ? event.notes : event.notes[0];
         playedDuration = event.duration;
         playedTime = event.time;

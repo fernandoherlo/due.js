@@ -72,6 +72,7 @@ sam1#piano([C4,E4,G4];1b;2b)::chord(0.25)::human(0.04)
 | `::late(p;max)` | Con probabilidad `p` retrasa la nota hasta `max` segundos (por defecto 0,5) |
 | `::chord(p)` | Con probabilidad `p` anade una quinta y una octava sobre cada nota |
 | `::human(s)` | Siempre retrasa la nota hasta `s` segundos (por defecto 0,03) y varia su duracion un 10 % |
+| `::unique(s)` | Quita las notas que ya sonaron en los ultimos `s` segundos; si no queda ninguna, el paso queda en silencio |
 
 Los operadores se validan al compilar y se actualizan en vivo. Limites conocidos: en `n` (sintetizador monofonico) `chord` no es util
 y `late` debe ser menor que el intervalo. Las notas se transponen solo si son nombres (`C4`, `F#3`); un numero MIDI se deja igual.
