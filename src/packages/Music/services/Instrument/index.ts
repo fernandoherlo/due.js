@@ -1,9 +1,10 @@
-import type { EffectsMap, IApp, IEffect, IInstruction, IInstrument, INote } from '~/src/types';
+import type { EffectsMap, IApp, IEffect, IInstruction, IInstrument, INote, IOperator } from '~/src/types';
 import * as Tone from 'tone';
 import Instruction from '~/src/packages/Compiler/services/Instruction';
 import { TYPE_VALUE } from '~/src/packages/Compiler/constants';
 import TriggerAttack from './triggerAttack';
 import LogInstrument from './logInstrument';
+import { createOperators } from '~/src/packages/Music/helpers/createOperators';
 
 export default class Instrument extends Instruction implements IInstrument {
   protected app: IApp;
@@ -13,11 +14,17 @@ export default class Instrument extends Instruction implements IInstrument {
 
   private loop: Tone.Loop<Tone.LoopOptions> | null = null;
   private valueStep: number = 0;
+  private operators: IOperator[] = [];
 
   constructor (data: any, app: IApp) {
     super(data);
 
     this.app = app;
+    this.setOperators(this.actions);
+  }
+
+  protected setOperators (actions: IInstruction[]): void {
+    this.operators = createOperators(actions ?? []);
   }
 
   async start (): Promise<void> {
@@ -58,7 +65,9 @@ export default class Instrument extends Instruction implements IInstrument {
     this.loop = new Tone.Loop((time: number) => {
       if (this.instrument) {
         if (!this.muted) {
-          const logNote = TriggerAttack.play(this.value, this.typeValue, this.valueStep, this.instrument, time);
+          const logNote = TriggerAttack.play(
+            this.value, this.typeValue, this.valueStep, this.instrument, time, this.operators
+          );
           LogInstrument.log(this.app.$logger, this, logNote);
         }
 
@@ -103,6 +112,7 @@ export default class Instrument extends Instruction implements IInstrument {
       this.value = newInstrument.value;
       this.typeValue = newInstrument.typeValue;
       this.modifier = newInstrument.modifier;
+      this.setOperators(newInstrument.actions);
       await this.play();
     }
   }

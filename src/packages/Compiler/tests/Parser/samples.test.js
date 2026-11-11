@@ -6,11 +6,12 @@ import validateInstruction from '~/src/packages/Music/helpers/validateInstructio
 import ValueFactory from '~/src/packages/Music/services/Music/valueFactory';
 
 const app = { $logger: { log: vi.fn() } };
-const samples = readdirSync('doc').filter(file => file.endsWith('.duejs'));
+const directory = 'doc/examples';
+const samples = readdirSync(directory).filter(file => file.endsWith('.duejs'));
 
 describe('Documented samples', () => {
   it.each(samples)('%s compiles and passes validation', (file) => {
-    const plan = new Compiler(app, new ValueFactory()).prepare(readFileSync(`doc/${file}`, 'utf8'));
+    const plan = new Compiler(app, new ValueFactory()).prepare(readFileSync(`${directory}/${file}`, 'utf8'));
 
     expect(plan.addedInstructions.length).toBeGreaterThan(0);
     for (const instruction of plan.addedInstructions) {

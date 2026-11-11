@@ -1,0 +1,17 @@
+// .#####..##..##.######........######..####..
+// .##..##.##..##.##................##.##.....
+// .##..##.##..##.####..............##..####..
+// .##..##.##..##.##.......##...##..##.....##.
+// .#####...####..######...##....####...####..
+// Operadores de nota (G31): ::oct(prob;octavas) ::late(prob;max s) ::chord(prob) ::human(s)
+// Probabilidades de 0 a 1. chord solo en sam; en n, late debe ser menor que el intervalo.
+bpm(100)
+
+// Octava aleatoria y retardo suave
+n1([C3,E3,G3,B3];0.8;1b)::oct(0.3;1)::late(0.4;0.3)
+
+// Acordes ocasionales sobre un sampler
+sam1#piano([C4,D4,E4,G4,A4];1b;2b):r(60)::chord(0.25)::human(0.04)
+
+// Grave y disperso
+n2([C2,G2,A2];2;3b)::oct(0.5;-1)::late(0.6;1)::human(0.05)

@@ -1,4 +1,4 @@
-import { AST_KIND, COMMANDS, COMMANDS_MAP, MODES, TEMPO, TYPE_VALUE, VALUE_OPERATOR } from '~/src/packages/Compiler/constants';
+import { AST_KIND, COMMANDS, COMMANDS_MAP, MODES, OPERATORS, TEMPO, TYPE_VALUE, VALUE_OPERATOR } from '~/src/packages/Compiler/constants';
 import Instruction from '~/src/packages/Compiler/services/Instruction';
 import { parseExpression } from '~/src/packages/Compiler/services/Parser/value';
 import type { IAstProgram, IAstStatement, IAstValue, IAstValueExpression } from '~/src/packages/Compiler/types/IAst';
@@ -109,17 +109,25 @@ function assertDefined (rawValue: string, location: { line: number, column: numb
 }
 
 function validateMode (instruction: IInstruction, instrument: IInstruction | undefined): void {
-  if (MODES.includes(instruction.name) && !instruction.mode) {
-    throw Error(`Use ::${instruction.name}(...) to configure sample playback.`);
+  const operator = OPERATORS.includes(instruction.name);
+  const known = operator || MODES.includes(instruction.name);
+  if (known && !instruction.mode) {
+    throw Error(`Use ::${instruction.name}(...) to configure ${operator ? 'note operators' : 'sample playback'}.`);
   }
   if (!instruction.mode) return;
-  if (!MODES.includes(instruction.name) || instruction.element || instruction.modifier) {
-    throw Error(`Unsupported playback mode. Use ${MODES.map(mode => `::${mode}(...)`).join(' or ')}.`);
+  if (!known || instruction.element || instruction.modifier) {
+    throw Error(`Unsupported playback mode. Use ${[...MODES, ...OPERATORS].map(mode => `::${mode}(...)`).join(' or ')}.`);
+  }
+  if (operator) {
+    if (instrument?.name !== COMMANDS.n && instrument?.name !== COMMANDS.sam) {
+      throw Error(`::${instruction.name}(...) is only available on n or sam instruments.`);
+    }
+    return;
   }
   if (instrument?.name !== COMMANDS.sam) {
     throw Error(`::${instruction.name}(...) is only available on sam instruments.`);
   }
-  if (instrument.actions.some(action => action.mode)) {
+  if (instrument.actions.some(action => action.mode && MODES.includes(action.name))) {
     throw Error('Only one playback mode is allowed per sampler.');
   }
   const { value, typeValue, modeParameters } = instruction;

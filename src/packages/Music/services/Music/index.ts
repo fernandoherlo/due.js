@@ -1,11 +1,12 @@
 import * as Tone from 'tone';
 import { WebMidi } from 'webmidi';
 
-import { COMMANDS } from '~/src/packages/Compiler/constants';
+import { COMMANDS, OPERATORS } from '~/src/packages/Compiler/constants';
 import { COMMANDS_ELEMENT_MAP } from '~/src/packages/Music/constants';
 import { MODES_MAP } from '~/src/packages/Music/constants/modes';
 import { SAMPLER_MAP } from '~/src/packages/Music/constants/samplers';
 import validateInstruction from '~/src/packages/Music/helpers/validateInstruction';
+import { createOperator } from '~/src/packages/Music/helpers/createOperators';
 import type { IApp, IInstruction, IInstrument, IMusic } from '~/src/types';
 
 const BEATS_PER_BAR = 4;
@@ -91,7 +92,8 @@ export default class Music implements IMusic {
 
       for (const command of commands) {
         if (command.mode) {
-          MODES_MAP[command.name].parse(command);
+          if (OPERATORS.includes(command.name)) createOperator(command);
+          else MODES_MAP[command.name].parse(command);
           continue;
         }
         if (!COMMANDS_ELEMENT_MAP[command.name]) {

@@ -57,6 +57,26 @@ Los bancos de muestras, la eleccion de la muestra mas cercana y la transposicion
 Cambiar la probabilidad o retirar el modo reconstruye la fuente, sin transicion continua.
 El prototipo `::grain` se ha retirado y ya no se admite.
 
+## Operadores de nota
+
+Tambien con `::`, pero en `n` y `sam`, transforman cada nota antes de tocarla. Se pueden encadenar y el orden importa:
+
+```text
+n1([C3,E3,G3,B3];0.8;1b)::oct(0.3;1)::late(0.4;0.3)
+sam1#piano([C4,E4,G4];1b;2b)::chord(0.25)::human(0.04)
+```
+
+| Operador | Efecto |
+| --- | --- |
+| `::oct(p;octavas)` | Con probabilidad `p` (0 a 1) desplaza las notas `octavas` octavas (entero, por defecto 1, puede ser negativo) |
+| `::late(p;max)` | Con probabilidad `p` retrasa la nota hasta `max` segundos (por defecto 0,5) |
+| `::chord(p)` | Con probabilidad `p` anade una quinta y una octava sobre cada nota |
+| `::human(s)` | Siempre retrasa la nota hasta `s` segundos (por defecto 0,03) y varia su duracion un 10 % |
+
+Los operadores se validan al compilar y se actualizan en vivo. Limites conocidos: en `n` (sintetizador monofonico) `chord` no es util
+y `late` debe ser menor que el intervalo. Las notas se transponen solo si son nombres (`C4`, `F#3`); un numero MIDI se deja igual.
+Ejemplos en `doc/examples/operators.duejs`.
+
 ## Valores y patrones
 
 Los tres argumentos principales representan:

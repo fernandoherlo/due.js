@@ -248,6 +248,8 @@ Con esas tres y G01, G02 y G11 del primer grupo ya se podria escribir algo parec
 
 ### G31. Operadores de nota encadenables
 
+**Implementado:** `::oct(p;octavas)`, `::late(p;max)`, `::chord(p)` y `::human(s)`; ver `doc/language.md`. Queda pendiente limitar repeticiones de una misma nota.
+
 En "Observable Streams" el flujo de notas pasa por una cadena de operadores: cambiar de octava con cierta probabilidad,
 retrasar la nota, convertirla en acorde, limitar cuantas veces suena la misma nota en pocos segundos y humanizarla.
 En due.js podria ser una familia de modos tras la pista, al estilo de `::reverse(...)`: por ejemplo `::oct(0.2,1)`, `::late(0.2)`, `::chord(0.2)`.

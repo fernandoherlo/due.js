@@ -27,7 +27,7 @@ export default class Sampler extends Instrument implements ISampler {
     const samplesMap: any = samples;
     const sound = this.modifier || 'piano';
     const urls = this.pathUrl(samplesMap[SAMPLER_MAP[sound]], SAMPLER_MAP[sound]);
-    const mode = this.actions.find(action => action.mode);
+    const mode = this.actions.find(action => action.mode && MODES_MAP[action.name]);
     this.instrument = mode
       ? new MODES_MAP[mode.name](mode, await Mode.loadBuffers(urls))
       : await new Promise<Tone.Sampler>((resolve, reject) => {
@@ -74,6 +74,7 @@ export default class Sampler extends Instrument implements ISampler {
   async setNewValue (newInstrument: IInstrument) {
     this.value = newInstrument.value;
     this.typeValue = newInstrument.typeValue;
+    this.setOperators(newInstrument.actions);
   }
 
   private pathUrl (notes: any, sound: string): any {

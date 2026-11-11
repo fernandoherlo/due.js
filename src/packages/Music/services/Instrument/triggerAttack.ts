@@ -1,23 +1,31 @@
-import type { INote } from '~/src/types';
+import type { INote, INoteEvent, IOperator } from '~/src/types';
 import { TYPE_VALUE } from '~/src/packages/Compiler/constants';
 
 export default class TriggerAttack {
-  static play (value: any, typeValue: string, valueStep: number, instrument: any, time?: number): any[] | undefined {
+  static play (
+    value: any, typeValue: string, valueStep: number, instrument: any, time?: number, operators: readonly IOperator[] = []
+  ): any[] | undefined {
     const note: INote = TriggerAttack.getValue(value, typeValue, valueStep);
     if (note.value) {
       const duration = parseFloat(TriggerAttack.getValue(note.duration));
+      let played = this._isChord(note.value, typeValue) && !Array.isArray(note.value)
+        ? this._createChord(note.value)
+        : note.value;
+      let playedDuration = duration;
+      let playedTime = time;
 
-      if (this._isChord(note.value, typeValue)) {
-        if (!Array.isArray(note.value)) {
-          instrument.triggerAttackRelease(this._createChord(note.value), duration, time);
-        } else {
-          instrument.triggerAttackRelease(note.value, duration, time);
-        }
-      } else {
-        instrument.triggerAttackRelease(note.value, duration, time);
+      if (operators.length) {
+        const event = operators.reduce<INoteEvent>((current, operator) => operator.apply(current), {
+          notes: [played].flat(), duration, time
+        });
+        played = Array.isArray(played) || event.notes.length > 1 ? event.notes : event.notes[0];
+        playedDuration = event.duration;
+        playedTime = event.time;
       }
 
-      return [note.value, duration];
+      instrument.triggerAttackRelease(played, playedDuration, playedTime);
+
+      return [operators.length ? played : note.value, playedDuration];
     }
   }
 

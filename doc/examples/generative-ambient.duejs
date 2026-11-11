@@ -1,0 +1,20 @@
+// .#####..##..##.######........######..####..
+// .##..##.##..##.##................##.##.....
+// .##..##.##..##.####..............##..####..
+// .##..##.##..##.##.......##...##..##.....##.
+// .#####...####..######...##....####...####..
+// Estilo generative.fm (Eno Machine, Apoapsis): pocas notas, intervalos largos y distintos, mucha reverb.
+// Para dejarla sonando mucho tiempo, sube los intervalos (por ejemplo [40-90]) y baja las probabilidades.
+
+// Pedales graves: una nota cada 20-45 s
+sam1#piano(C3;8;[20-40]):r(110):d(64;0.5)
+sam2#piano(G3;8;[25-45]):r(110):d(64;0.5)
+
+// Capa media: nota suelta cada 15-35 s
+sam3#piano(E4;6;[15-35]):r(110):d(64;0.5)
+
+// Melodia dispersa en pentatonica: salta de octava, entra tarde y varia el tiempo
+sam4#piano([C5,D5,E5,G5,A5];4;[8-20]):r(110):d(80;0.6)::oct(0.15;1)::late(0.5;3)::human(0.2)
+
+// Acorde ocasional, muy espaciado
+sam5#piano([C4,E4,G4,A4];5;[30-60]):r(120)::chord(0.4)::late(1;4)
