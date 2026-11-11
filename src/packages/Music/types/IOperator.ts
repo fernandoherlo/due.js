@@ -4,6 +4,8 @@ export interface INoteEvent {
   notes: string[];
   duration: number;
   time?: number;
+  // Single notes the instruction can pick from.
+  pool?: string[];
 }
 
 export interface IOperator {

@@ -18,3 +18,6 @@ n2([C2,G2,A2];2;3b)::oct(0.5;-1)::late(0.6;1)::human(0.05)
 
 // Sin repetir la misma nota en 6 segundos: algunos pasos quedan en silencio
 sam2#piano([C4,D4,E4,G4,A4];1;1):r(80)::unique(6)
+
+// Melodia por pasos cortos: como mucho 4 semitonos entre notas
+n3([C4,D4,E4,G4,A4,C5];1;1b)::walk(4)

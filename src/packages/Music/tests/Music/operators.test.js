@@ -55,7 +55,8 @@ describe('Note operators', () => {
     ['late', -0.1], ['late', 0.5, -1],
     ['chord'], ['chord', 0.5, 1],
     ['human', -1], ['human', 1, 2],
-    ['unique'], ['unique', -1], ['unique', 'a'], ['unique', 1, 2]
+    ['unique'], ['unique', -1], ['unique', 'a'], ['unique', 1, 2],
+    ['walk'], ['walk', -1], ['walk', 'a'], ['walk', 1, 2]
   ])('rejects invalid arguments: %s', (name, ...args) => {
     expect(() => operator(name, ...args)).toThrow();
   });
@@ -94,6 +95,32 @@ describe('Note operators', () => {
     expect(unique.apply(event(['C4', 'G4'], 2)).notes).toEqual(['G4']);
     expect(unique.apply(event(['C4'], 3)).notes).toEqual([]);
     expect(unique.apply(event(['C4'], 4)).notes).toEqual(['C4']);
+  });
+
+  it('limits leaps to notes of the pool within the step', () => {
+    const walk = operator('walk', 4);
+    const pool = ['C4', 'E4', 'C5'];
+    const withPool = note => ({ ...event([note]), pool });
+
+    expect(walk.apply(withPool('C4')).notes).toEqual(['C4']);
+    expect(['C4', 'E4']).toContain(walk.apply(withPool('C5')).notes[0]);
+    expect(walk.apply(withPool('C4')).notes).toHaveLength(1);
+  });
+
+  it('falls back to the closest note when none is within the step', () => {
+    const walk = operator('walk', 1);
+    const pool = ['G4', 'A4', 'C5'];
+
+    walk.apply({ ...event(['C4']), pool });
+    expect(walk.apply({ ...event(['C5']), pool }).notes).toEqual(['G4']);
+  });
+
+  it('leaves chords and events without pool unchanged', () => {
+    const walk = operator('walk', 1);
+
+    walk.apply(event(['C4']));
+    expect(walk.apply(event(['C5'])).notes).toEqual(['C5']);
+    expect(walk.apply(event(['C4', 'G4'])).notes).toEqual(['C4', 'G4']);
   });
 
   it('keeps every note when there is no scheduled time', () => {

@@ -16,7 +16,7 @@ export default class TriggerAttack {
 
       if (operators.length) {
         const event = operators.reduce<INoteEvent>((current, operator) => operator.apply(current), {
-          notes: [played].flat(), duration, time
+          notes: [played].flat(), duration, time, pool: TriggerAttack.getPool(value)
         });
         if (!event.notes.length) return;
         played = Array.isArray(played) || event.notes.length > 1 ? event.notes : event.notes[0];
@@ -28,6 +28,11 @@ export default class TriggerAttack {
 
       return [operators.length ? played : note.value, playedDuration];
     }
+  }
+
+  static getPool (value: any): string[] {
+    const candidates = Array.isArray(value) ? value : [value];
+    return candidates.map(candidate => candidate?.value).filter(item => typeof item === 'string' && !item.includes('|'));
   }
 
   static getValue (values: any | Array<any>, typeValue?: string | undefined, valueStep: number | undefined = 0) {
