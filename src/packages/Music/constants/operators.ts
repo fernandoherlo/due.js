@@ -4,6 +4,7 @@ import Chord from '../services/Operators/Chord';
 import Human from '../services/Operators/Human';
 import Late from '../services/Operators/Late';
 import Octave from '../services/Operators/Octave';
+import Trans from '../services/Operators/Trans';
 import Unique from '../services/Operators/Unique';
 import Walk from '../services/Operators/Walk';
 
@@ -13,5 +14,6 @@ export const OPERATORS_MAP: Record<string, IOperatorClass> = {
   [COMMANDS.chord]: Chord,
   [COMMANDS.human]: Human,
   [COMMANDS.unique]: Unique,
-  [COMMANDS.walk]: Walk
+  [COMMANDS.walk]: Walk,
+  [COMMANDS.trans]: Trans
 };

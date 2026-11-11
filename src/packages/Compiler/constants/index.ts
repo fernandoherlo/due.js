@@ -10,6 +10,7 @@ export const COMMANDS: Record<string, string> = {
   human: 'human',
   unique: 'unique',
   walk: 'walk',
+  trans: 'trans',
   misam: 'misam',
   s: 's',
   ai: 'ai',
@@ -30,7 +31,7 @@ export const COMMANDS: Record<string, string> = {
 export const MODES: readonly string[] = [COMMANDS.reverse];
 
 // Transform each generated note; chained with :: after n/sam tracks.
-export const OPERATORS: readonly string[] = [COMMANDS.oct, COMMANDS.late, COMMANDS.chord, COMMANDS.human, COMMANDS.unique, COMMANDS.walk];
+export const OPERATORS: readonly string[] = [COMMANDS.oct, COMMANDS.late, COMMANDS.chord, COMMANDS.human, COMMANDS.unique, COMMANDS.walk, COMMANDS.trans];
 
 export const TEMPO = { default: 120, min: 20, max: 300, beatUnit: 'b' } as const;
 
@@ -46,6 +47,7 @@ export const COMMANDS_MAP: Record<typeof COMMANDS[keyof typeof COMMANDS], string
   [COMMANDS.human]: 'human_operator',
   [COMMANDS.unique]: 'unique_operator',
   [COMMANDS.walk]: 'walk_operator',
+  [COMMANDS.trans]: 'trans_operator',
   [COMMANDS.misam]: 'midi_sampler',
   [COMMANDS.s]: 'synth',
   [COMMANDS.ai]: 'ai',

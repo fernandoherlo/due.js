@@ -56,7 +56,8 @@ describe('Note operators', () => {
     ['chord'], ['chord', 0.5, 1],
     ['human', -1], ['human', 1, 2],
     ['unique'], ['unique', -1], ['unique', 'a'], ['unique', 1, 2],
-    ['walk'], ['walk', -1], ['walk', 'a'], ['walk', 1, 2]
+    ['walk'], ['walk', -1], ['walk', 'a'], ['walk', 1, 2],
+    ['trans'], ['trans', 1.5], ['trans', 'a'], ['trans', 1, 2]
   ])('rejects invalid arguments: %s', (name, ...args) => {
     expect(() => operator(name, ...args)).toThrow();
   });
@@ -95,6 +96,12 @@ describe('Note operators', () => {
     expect(unique.apply(event(['C4', 'G4'], 2)).notes).toEqual(['G4']);
     expect(unique.apply(event(['C4'], 3)).notes).toEqual([]);
     expect(unique.apply(event(['C4'], 4)).notes).toEqual(['C4']);
+  });
+
+  it('transposes every note by a fixed number of semitones', () => {
+    expect(operator('trans', 3).apply(event(['C4', 'G4'])).notes).toEqual(['D#4', 'A#4']);
+    expect(operator('trans', -12).apply(event(['C4'])).notes).toEqual(['C3']);
+    expect(operator('trans', 0).apply(event(['C4'])).notes).toEqual(['C4']);
   });
 
   it('limits leaps to notes of the pool within the step', () => {

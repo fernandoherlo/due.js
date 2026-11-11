@@ -3,7 +3,7 @@
 // .##..##.##..##.####..............##..####..
 // .##..##.##..##.##.......##...##..##.....##.
 // .#####...####..######...##....####...####..
-// Operadores de nota (G31): ::oct(prob;octavas) ::late(prob;max s) ::chord(prob) ::human(s)
+// Operadores de nota (G31): ::oct(prob;octavas) ::late(prob;max s) ::chord(prob) ::human(s) ::unique(s) ::walk(semitonos) ::trans(semitonos)
 // Probabilidades de 0 a 1. chord solo en sam; en n, late debe ser menor que el intervalo.
 bpm(100)
 
@@ -21,3 +21,13 @@ sam2#piano([C4,D4,E4,G4,A4];1;1):r(80)::unique(6)
 
 // Melodia por pasos cortos: como mucho 4 semitonos entre notas
 n3([C4,D4,E4,G4,A4,C5];1;1b)::walk(4)
+
+// Transposicion: la misma frase una cuarta arriba y una octava abajo
+n4([C4,E4,G4];1;1b)::trans(5)
+n5([C4,E4,G4];1;1b)::trans(-12)
+
+// Combinadas: pasos cortos, sin repetir en 4 s, una tercera menor arriba y humanizada
+n6([C3,D3,E3,G3,A3,C4];1;1b)::walk(3)::unique(4)::trans(3)::human(0.03)
+
+// Sampler: la tonalidad se cambia con un solo numero
+sam3#piano([C4,E4,G4,B4];1b;2b):r(70)::walk(5)::trans(-2)::oct(0.2;1)
