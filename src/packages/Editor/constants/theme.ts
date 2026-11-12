@@ -12,6 +12,11 @@ const $orange = '#ffca85';
 const $pink = '#f694ff';
 const $blue = '#82e2ff';
 const $red = '#ff6767';
+const $minimapLine = '#4b4851';
+const $minimapComment = '#302e38';
+const $minimapTrack = '#53616b';
+const $minimapViewport = '#615947';
+const $minimapCursor = '#557064';
 
 export const DueTheme: { [selector: string]: StyleSpec } = {
   '&': {
@@ -60,7 +65,7 @@ export const DueTheme: { [selector: string]: StyleSpec } = {
   },
   '.cm-minimap': {
     position: 'absolute',
-    insetBlock: '4px',
+    insetBlockStart: '8px',
     insetInlineEnd: '3px',
     zIndex: '2',
     display: 'flex',
@@ -69,6 +74,9 @@ export const DueTheme: { [selector: string]: StyleSpec } = {
     gap: '1px',
     overflow: 'hidden',
     width: '32px',
+    height: '42%',
+    minHeight: '160px',
+    maxHeight: '360px',
     padding: '1px',
     backgroundColor: $black,
     cursor: 'pointer'
@@ -80,22 +88,19 @@ export const DueTheme: { [selector: string]: StyleSpec } = {
     display: 'block',
     flex: '1 1 0',
     minHeight: '0',
-    backgroundColor: $gray,
-    opacity: '0.5'
+    backgroundColor: $minimapLine
   },
   '.cm-minimap-line.cm-minimap-comment': {
-    backgroundColor: $purpleFading
+    backgroundColor: $minimapComment
   },
   '.cm-minimap-line.cm-minimap-track': {
-    backgroundColor: $blue
+    backgroundColor: $minimapTrack
   },
   '.cm-minimap-line.cm-minimap-visible': {
-    backgroundColor: $orange,
-    opacity: '0.8'
+    backgroundColor: $minimapViewport
   },
   '.cm-minimap-line.cm-minimap-cursor': {
-    backgroundColor: $green,
-    opacity: '1'
+    backgroundColor: $minimapCursor
   },
   '.cm-mute-gutter': {
     width: '1.5em',
