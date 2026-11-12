@@ -71,18 +71,14 @@ export const DueTheme: { [selector: string]: StyleSpec } = {
   },
   '.cm-minimap': {
     position: 'absolute',
-    insetBlockStart: '8px',
+    insetBlock: '8px',
     insetInlineEnd: '3px',
     zIndex: '2',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'flex-start',
-    gap: '1px',
+    justifyContent: 'space-between',
     overflow: 'hidden',
     width: '48px',
-    height: '34%',
-    minHeight: '140px',
-    maxHeight: '300px',
     padding: '1px',
     backgroundColor: $black,
     cursor: 'pointer'
@@ -92,8 +88,9 @@ export const DueTheme: { [selector: string]: StyleSpec } = {
   },
   '.cm-minimap-line': {
     display: 'block',
-    flex: '1 1 0',
-    minHeight: '0',
+    flex: '0 0 2px',
+    height: '2px',
+    minHeight: '2px',
     backgroundColor: $minimapLine
   },
   '.cm-minimap-line.cm-minimap-comment': {
