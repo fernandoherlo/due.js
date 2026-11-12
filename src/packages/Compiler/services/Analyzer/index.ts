@@ -83,6 +83,9 @@ export default class Analyzer {
     if (containsRest(duration) || containsRest(interval)) {
       throw Error(`The rest value "${REST_VALUE}" is only allowed as a note.`);
     }
+    if (containsWeight(duration) || containsWeight(interval)) {
+      throw Error('Weights are only allowed on random note choices.');
+    }
     if (note && containsRest(note)) {
       if (command !== COMMANDS.n && command !== COMMANDS.sam) {
         throw Error(`The rest value "${REST_VALUE}" is only supported in n or sam note patterns.`);
@@ -91,6 +94,13 @@ export default class Analyzer {
         throw Error(`The rest value "${REST_VALUE}" cannot be part of a chord.`);
       }
     }
+    const hasWeights = note ? containsWeight(note) : false;
+    if (hasWeights && (note?.kind !== AST_KIND.collection || note.operator !== VALUE_OPERATOR.random)) {
+      throw Error('Weights are only allowed in random choices separated by commas.');
+    }
+    if (hasWeights && command !== COMMANDS.n && command !== COMMANDS.sam && command !== COMMANDS.mo) {
+      throw Error('Weighted note choices are only supported in n, sam or mo patterns.');
+    }
     const parameters = { value2: parameter(duration, bpm), value3: parameter(interval, bpm) };
     if (note?.kind === AST_KIND.collection) {
       if (note.operator === VALUE_OPERATOR.chord) {
@@ -98,8 +108,15 @@ export default class Analyzer {
           value: valueFactory.create({ value: note.rawValue, ...parameters }, !!element), typeValue: TYPE_VALUE.multi
         };
       }
+      const choices: Array<{ value: string, weight?: number }> = note.operator === VALUE_OPERATOR.random
+        ? note.values.map(parseWeightedChoice)
+        : note.values.map(choice => ({ value: choice.rawValue }));
+      const totalWeight = choices.reduce((sum, choice) => sum + (choice.weight ?? 1), 0);
+      if (note.operator === VALUE_OPERATOR.random && (!Number.isFinite(totalWeight) || totalWeight <= 0)) {
+        throw Error('At least one weight must be greater than 0.');
+      }
       return {
-        value: note.values.map(choice => valueFactory.create({ value: choice.rawValue, ...parameters }, !!element)),
+        value: choices.map(choice => valueFactory.create({ ...choice, ...parameters }, !!element)),
         typeValue: note.operator === VALUE_OPERATOR.single ? TYPE_VALUE.normal : note.operator
       };
     }
@@ -117,6 +134,28 @@ function containsRest (value: IAstValue | undefined): boolean {
   if (value.kind === AST_KIND.scalar) return value.rawValue === REST_VALUE;
   if (value.kind === AST_KIND.range) return value.min === REST_VALUE || value.max === REST_VALUE;
   return value.kind === AST_KIND.collection && value.values.some(containsRest);
+}
+
+function containsWeight (value: IAstValue | undefined): boolean {
+  if (!value) return false;
+  if (value.kind === AST_KIND.collection) return value.values.some(containsWeight);
+  if (value.kind === AST_KIND.range) return value.min.includes('^') || value.max.includes('^');
+  return value.rawValue.includes('^');
+}
+
+function parseWeightedChoice (choice: IAstValue): { value: string, weight?: number } {
+  if (!choice.rawValue.includes('^')) return { value: choice.rawValue };
+
+  const separator = choice.rawValue.lastIndexOf('^');
+  const value = choice.rawValue.slice(0, separator);
+  const rawWeight = choice.rawValue.slice(separator + 1);
+  if (!value || value.includes('^') || !/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(rawWeight)) {
+    throw Error('Weight must be a non-negative number after "^".');
+  }
+
+  const weight = Number(rawWeight);
+  if (!Number.isFinite(weight)) throw Error('Weight must be a non-negative number after "^".');
+  return { value, weight };
 }
 
 function assertDefined (rawValue: string, location: { line: number, column: number }): void {

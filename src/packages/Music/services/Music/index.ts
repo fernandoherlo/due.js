@@ -44,6 +44,7 @@ export default class Music implements IMusic {
   async toggle () {
     await Tone.start();
     Tone.getTransport().toggle();
+    this.app.$ui.clearActiveSteps();
   }
 
   async waitForNextBar (bpm: number): Promise<void> {
@@ -75,6 +76,7 @@ export default class Music implements IMusic {
       this.muted.delete(key);
     }
     this.instructions[key]?.setMuted?.(muted);
+    if (muted) this.app.$ui.clearPatternStep(key);
     return muted;
   }
 

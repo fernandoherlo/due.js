@@ -61,6 +61,23 @@ describe('App', () => {
     expect(status.setAttribute).toHaveBeenCalledWith('aria-label', 'MIDI unavailable: Permission denied');
   });
 
+  it('forwards active pattern steps to the editor', () => {
+    const editor = {
+      setActivePatternStep: vi.fn(),
+      clearActivePatternStep: vi.fn(),
+      clearActivePatternSteps: vi.fn()
+    };
+    const ui = new Ui({ $editor: editor });
+
+    ui.updatePatternStep('sam1', 1);
+    ui.clearPatternStep('sam1');
+    ui.clearActiveSteps();
+
+    expect(editor.setActivePatternStep).toHaveBeenCalledWith('sam1', 1);
+    expect(editor.clearActivePatternStep).toHaveBeenCalledWith('sam1');
+    expect(editor.clearActivePatternSteps).toHaveBeenCalledOnce();
+  });
+
   it('Should throw error on compile if not has services', async () => {
     // Arrange
     const app = new App();
@@ -74,7 +91,7 @@ describe('App', () => {
     const app = new App();
     const plan = { instructions: {}, variables: {}, addedInstructions: [], updatedInstructions: [], deletedInstructions: [] };
     app.$compiler = { prepare: vi.fn().mockReturnValue(plan), commit: vi.fn() };
-    app.$editor = { getCode: vi.fn().mockReturnValue('foo') };
+    app.$editor = { getCode: vi.fn().mockReturnValue('foo'), setPatternSource: vi.fn() };
     app.$music = { validate: vi.fn(), add: vi.fn(), update: vi.fn(), delete: vi.fn() };
     app.$ui = { setWaiting: vi.fn(), setOk: vi.fn(), setError: vi.fn() };
     // Activate
@@ -88,6 +105,7 @@ describe('App', () => {
     expect(app.$music.update).toHaveBeenCalled();
     expect(app.$music.delete).toHaveBeenCalled();
     expect(app.$compiler.commit).toHaveBeenCalledWith(plan);
+    expect(app.$editor.setPatternSource).toHaveBeenCalledWith('foo');
     expect(app.$ui.setOk).toHaveBeenCalled();
   });
 
@@ -96,7 +114,7 @@ describe('App', () => {
     const failure = new Error('audio failed');
     const plan = { instructions: {}, variables: {}, addedInstructions: [{}], updatedInstructions: [], deletedInstructions: [] };
     app.$compiler = { prepare: vi.fn().mockReturnValue(plan), commit: vi.fn() };
-    app.$editor = { getCode: vi.fn().mockReturnValue('foo') };
+    app.$editor = { getCode: vi.fn().mockReturnValue('foo'), setPatternSource: vi.fn() };
     app.$music = {
       validate: vi.fn(),
       add: vi.fn().mockRejectedValue(failure),
@@ -116,7 +134,7 @@ describe('App', () => {
     const app = new App();
     const plan = { instructions: {}, variables: {}, addedInstructions: [{ name: 'unknown', actions: [] }], updatedInstructions: [], deletedInstructions: [] };
     app.$compiler = { prepare: vi.fn().mockReturnValue(plan), commit: vi.fn() };
-    app.$editor = { getCode: vi.fn().mockReturnValue('unknown1(value)') };
+    app.$editor = { getCode: vi.fn().mockReturnValue('unknown1(value)'), setPatternSource: vi.fn() };
     app.$music = {
       validate: vi.fn(() => { throw new Error('Unsupported command "unknown".'); }),
       add: vi.fn(),
@@ -136,7 +154,7 @@ describe('App', () => {
     const app = new App();
     const plan = { instructions: {}, variables: {}, addedInstructions: [], updatedInstructions: [], deletedInstructions: [{}] };
     app.$compiler = { prepare: vi.fn().mockReturnValue(plan), commit: vi.fn() };
-    app.$editor = { getCode: vi.fn().mockReturnValue('') };
+    app.$editor = { getCode: vi.fn().mockReturnValue(''), setPatternSource: vi.fn() };
     app.$music = { validate: vi.fn(), add: vi.fn(), update: vi.fn(), delete: vi.fn() };
     app.$ui = { setWaiting: vi.fn(), setOk: vi.fn() };
 
@@ -163,7 +181,7 @@ describe('App', () => {
       }),
       commit: vi.fn()
     };
-    app.$editor = { getCode: vi.fn().mockReturnValue('foo') };
+    app.$editor = { getCode: vi.fn().mockReturnValue('foo'), setPatternSource: vi.fn() };
     app.$music = {
       validate: vi.fn(),
       add: vi.fn(() => {
@@ -202,7 +220,7 @@ describe('App', () => {
       }),
       commit: vi.fn()
     };
-    app.$editor = { getCode: vi.fn().mockReturnValue('foo') };
+    app.$editor = { getCode: vi.fn().mockReturnValue('foo'), setPatternSource: vi.fn() };
     app.$music = { validate: vi.fn(), add: vi.fn(), update: vi.fn(), delete: vi.fn() };
     app.$ui = { setWaiting: vi.fn(), setOk: vi.fn(), setError: vi.fn() };
     // Activate

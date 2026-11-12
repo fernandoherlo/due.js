@@ -65,8 +65,20 @@ export default class Instrument extends Instruction implements IInstrument {
     this.loop = new Tone.Loop((time: number) => {
       if (this.instrument) {
         if (!this.muted) {
+          this.app.$ui.clearPatternStep(this.key);
           const logNote = TriggerAttack.play(
-            this.value, this.typeValue, this.valueStep, this.instrument, time, this.operators
+            this.value,
+            this.typeValue,
+            this.valueStep,
+            this.instrument,
+            time,
+            this.operators,
+            (step, eventTime) => {
+              Tone.getDraw().schedule(
+                () => this.app.$ui.updatePatternStep(this.key, step),
+                eventTime ?? time
+              );
+            }
           );
           LogInstrument.log(this.app.$logger, this, logNote);
         }

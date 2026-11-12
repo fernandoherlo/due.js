@@ -17,6 +17,7 @@ vi.mock('tone', async (importOriginal) => {
   return {
     ...original,
     FeedbackDelay: vi.fn(),
+    getDraw: vi.fn(() => ({ schedule: callback => callback() })),
     Loop: vi.fn(),
     Sampler: sampler,
     ToneAudioBuffer: { load: vi.fn() },
@@ -68,7 +69,10 @@ const mockApp = {
   $ui: {
     setMidiUnavailable: vi.fn(),
     updateLoopTime: vi.fn(),
-    updateSteps: vi.fn()
+    updateSteps: vi.fn(),
+    updatePatternStep: vi.fn(),
+    clearPatternStep: vi.fn(),
+    clearActiveSteps: vi.fn()
   }
 };
 
@@ -104,6 +108,8 @@ describe('Music', () => {
     loop.callback(2);
 
     expect(triggerAttackRelease.mock.calls.map(([note]) => note)).toEqual(['C4', 'E4']);
+    expect(mockApp.$ui.updatePatternStep.mock.calls).toEqual([['sam1', 0], ['sam1', 1], ['sam1', 2]]);
+    expect(mockApp.$ui.clearPatternStep.mock.calls).toEqual([['sam1'], ['sam1'], ['sam1']]);
   });
 
   describe('Startup', () => {

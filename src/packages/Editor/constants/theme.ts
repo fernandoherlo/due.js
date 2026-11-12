@@ -46,6 +46,10 @@ export const DueTheme: { [selector: string]: StyleSpec } = {
   '.cm-mute-marker.cm-muted': {
     color: $red,
     fontWeight: '600'
+  },
+  '.cm-active-pattern-note': {
+    backgroundColor: '#25473e',
+    borderRadius: '2px'
   }
 };
 

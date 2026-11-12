@@ -9,4 +9,7 @@ export interface IUi {
 
   updateLoopTime: () => void;
   updateSteps: () => void;
+  updatePatternStep: (key: string, step: number) => void;
+  clearPatternStep: (key: string) => void;
+  clearActiveSteps: () => void;
 }

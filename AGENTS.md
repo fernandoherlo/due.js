@@ -28,6 +28,7 @@ Lenguaje propio de live coding musical que corre en el navegador: Vite + TypeScr
 
 - `:` efectos (`v`, `r`, `d`, `cho`); `::` modos y operadores de nota; `=>` conexiones (sin ejecutor aun); `$var` variables; `$$var=mi0(1@5)` entrada MIDI.
 - Listas: `[a,b]` azar, `[a>b]` secuencia, `[a|b]` acorde; rangos `[a-b]` (duracion e intervalo); sufijo `b` para pulsos; `bpm(N)` solo en su linea.
+- En listas aleatorias, `^peso` asigna probabilidad relativa a una opcion (peso por defecto `1`; solo listas con coma, no secuencias `>`).
 - `~` es un silencio de un paso en el primer argumento de `n` y `sam`; no se admite en acordes, duraciones ni intervalos.
 - Instrumentos: `samN#preset` (Tone.Sampler, polifonico), `nN` (Tone.Synth, monofonico: acordes o `late` mayor que el intervalo dan problemas), `moN`, `misamN`, `aiN`.
 - Presets de `sam` en `Music/constants/samplers.ts` (`piano`, `kick`, `hats`, `snare`, `harp`, `chorus`...) y datos en `Music/constants/samples.json`.
@@ -75,7 +76,7 @@ Todos empiezan con el banner ASCII `DUE.JS` (5 lineas de comentario, copiar de `
 - `language.md`: referencia del lenguaje y comportamiento real.
 - `generative.md` (G01-G43): musica generativa; G31 implementado (operadores) y G32 parcialmente implementado con `::walk(n)`. G01/G02 (escala global y grados) descartados por cambiar demasiado la sintaxis; la transposicion de notas en `n` y `sam` se cubre parcialmente con `::trans(n)`.
 - `norns.md` (N01-N20): prioridad N07 (secuenciadores de longitudes distintas; probablemente ya funciona, queda comprobar que todas las pistas arrancan a la vez y un posible `::len(N)`).
-- `live-coding.md`: escenas L05 (decisiones tomadas: `scene#intro{ ... }`, una activa, entra en el siguiente compas, `Cmd+Shift+Enter` o `@n`), F06 parada de emergencia, F26 inspeccion, F27 visualizacion.
+- `live-coding.md`: escenas L05 (decisiones tomadas: `scene#intro{ ... }`, una activa, entra en el siguiente compas, `Cmd+Shift+Enter` o `@n`), F06 parada de emergencia, F26 inspeccion, F27 visualizacion (parcial: token activo resaltado inline en patrones explicitos).
 - `shorts.md` (S01-S30): ideas de siete shorts de live coding en Strudel (supersaw, filtro acid, ducking, `beat` por posiciones, deslizadores, `slice`, voicing...). Orden sugerido: S01-S02, S13+S14+S22, S11+S12, S06, S08+S10+S21, S28+S29+S25.
 - `features.md` y `tasks.md`: catalogo de propuestas y deuda tecnica.
 

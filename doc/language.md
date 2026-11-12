@@ -80,46 +80,87 @@ Los operadores se validan al compilar y se actualizan en vivo. Limites conocidos
 y `late` debe ser menor que el intervalo. Las notas se transponen solo si son nombres (`C4`, `F#3`); un numero MIDI se deja igual.
 Ejemplos en `doc/examples/operators.duejs`.
 
-## Valores y patrones
+## Patron, duracion e intervalo
 
-Los tres argumentos principales representan:
+En los instrumentos que reciben notas escritas, los argumentos principales son:
 
 ```text
-valor;duracion;intervalo
+instrumento(patron;duracion;intervalo)
 ```
 
-La duración se pasa al disparo de la nota y el intervalo establece cada cuánto se repite el patrón. Los valores numéricos se interpretan como segundos en el ciclo de reproducción.
+El **patron** es el primer argumento: indica que nota, acorde o silencio corresponde a cada paso. `n`, `sam` y `mo` reproducen notas explicitas; `ai` genera su propia secuencia y `misam` responde a notas MIDI recibidas, por lo que estos dos ultimos no usan el primer argumento como un patron escrito de notas.
 
-Para el primer argumento, las listas usan estos separadores:
+La **duracion** (segundo argumento) controla cuanto dura cada nota y el **intervalo** (tercer argumento) cuanto tiempo pasa hasta el siguiente paso. No son lo mismo: si la duracion supera el intervalo, los sonidos pueden solaparse; el resultado depende del instrumento. `n` es monofonico, por lo que ese solapamiento puede dar problemas; `sam` es polifonico. Si la duracion es menor que el intervalo, queda un espacio entre notas. Un patron avanza por intervalos incluso cuando el paso es un silencio.
+
+### Contenido del patron
+
+Un valor simple se repite en cada paso:
 
 ```text
-[C4,E4,G4]
-[C4>E4>G4]
-[C4|E4|G4]
+sam1#piano(C4;0.25;1)
 ```
 
-La coma elige un valor al azar en cada repetición; `>` recorre los valores en orden y vuelve al inicio; `|` toca las notas como acorde.
+Una lista entre corchetes define varias opciones. Los corchetes rodean el patron completo:
 
-`~` representa un silencio de un paso en el primer argumento de `n` y `sam`:
+| Forma | Significado | Ejemplo |
+| --- | --- | --- |
+| `[a,b,c]` | Elige una opcion al azar en cada paso. | `[C4,E4,G4]` |
+| `[a>b>c]` | Recorre las opciones en orden y vuelve al inicio. | `[C4>E4>G4]` |
+| `[a|b|c]` | Toca las notas simultaneamente como un acorde. | `[C4|E4|G4]` |
+
+En una lista aleatoria con comas, `^peso` asigna un peso relativo a una opcion:
 
 ```text
-sam1#piano([C4>~>E4];1b;1b)
+sam1#piano([C4^4,E4^2,G4];1;1)
+sam2#piano([C4|E4^3,G4^1];1;1)
+```
+
+En el primer ejemplo, los pesos `4:2:1` dan probabilidades aproximadas de 57 %, 29 % y 14 %. La segunda opcion del segundo ejemplo es un acorde completo con peso `3`. Si se omite el peso, vale `1`, por lo que las listas sin pesos conservan la eleccion uniforme de siempre. Se admiten decimales no negativos; `^0` excluye una opcion y la suma de pesos debe ser mayor que cero. El peso solo cambia la eleccion entre opciones: no altera el volumen ni la probabilidad de que el paso se ejecute. Los operadores `::` se aplican despues y pueden transformar la opcion elegida. No se admite en secuencias `>` ni en duraciones o intervalos.
+
+Las opciones de una eleccion o secuencia tambien pueden ser acordes:
+
+```text
+sam1#piano([A2|C2|B2,D2|A2|G2];1;2)
+sam2#piano([A2|C2|B2>D2|A2|G2];1;2)
+```
+
+La primera linea elige al azar entre dos acordes; la segunda los recorre en orden. En una lista se usa un separador de eleccion o de secuencia por nivel; `|` puede agrupar las notas de cada opcion.
+
+`~` es un silencio de un paso en patrones de `n` y `sam`:
+
+```text
+sam3#piano([C4>~>E4];1b;1b)
 n1([C3,~,G3];0.5b;1b)
 ```
 
-En una secuencia, el silencio ocupa el paso y el patrón avanza tras el intervalo normal; en una lista aleatoria puede elegirse y omitir esa repetición.
-No dispara una nota ni corta las voces o colas de efectos que ya esten sonando. No se permite dentro de un acorde ni como duracion o intervalo.
-La prolongacion de notas es una propuesta distinta (F52).
+En la secuencia, `~` ocupa un paso antes de avanzar; en la eleccion aleatoria, si sale `~`, se omite ese disparo. No toca una nota ni corta voces o colas de efectos que ya suenan. No se admite en `mo`, dentro de un acorde, ni como duracion o intervalo. Una prolongacion de la nota anterior es otra funcion (F52).
 
-Las opciones pueden ser acordes: `[A2|C2|B2,D2|A2|G2]` elige al azar entre dos acordes y `[A2|C2|B2>D2|A2|G2]` los recorre en orden. Los corchetes rodean el patrón completo.
-
-Los campos de duración e intervalo también admiten listas o rangos:
+Un patron puede guardarse en una variable normal y usarse en el primer argumento:
 
 ```text
-sam1#piano([C4>E4>G4];[1-3];[2-4])
+$melodia=[C4>~>E4]
+n2($melodia;1b;1b)
 ```
 
-Los rangos se eligen con distribución uniforme continua desde el mínimo (incluido) hasta el máximo (excluido), por lo que admiten decimales y extremos iguales a `0`. Los campos se interpretan como segundos al programar el patrón. Los valores omitidos de duración e intervalo usan `0.25` y `2` cuando el comando lleva índice numérico. La duración debe ser un número mayor o igual que `0`; el intervalo debe ser mayor que `0`. En un rango de intervalo, el mínimo puede ser `0` pero el máximo debe ser mayor que `0`. Los valores fuera de estos límites o no numéricos se rechazan antes de modificar el audio.
+Las variables se sustituyen textualmente y deben definirse antes de usarse; ver [Variables](#variables). El patron no admite listas anidadas ni mezclar `,` y `>` en el mismo nivel.
+
+### Duracion e intervalo
+
+Ambos campos aceptan un numero, una lista de opciones aleatorias o un rango. Sin sufijo, los numeros son segundos; el sufijo `b` expresa pulsos (ver [Tempo y pulsos](#tempo-y-pulsos)). Los rangos se eligen con distribucion uniforme continua desde el minimo (incluido) hasta el maximo (excluido):
+
+```text
+sam1#piano([C4>E4>G4];[1,2];[2-4])
+```
+
+Aqui cada nota dura al azar 1 o 2 segundos y los pasos se separan por un intervalo aleatorio entre 2 segundos (incluido) y 4 (excluido). Las listas de estos campos son elecciones aleatorias, no patrones ordenados. Se admiten decimales y extremos iguales a `0`.
+
+Si se omiten, los valores por defecto son `0.25` segundos de duracion y `2` segundos de intervalo para comandos con indice. La duracion debe ser mayor o igual que `0`; el intervalo debe ser mayor que `0`. En un rango de intervalo, el minimo puede ser `0` pero el maximo debe ser mayor que `0`. Los valores invalidos se rechazan antes de modificar el audio.
+
+### Transformaciones
+
+Los operadores de nota se escriben despues del patron con `::`, solo en `n` y `sam`. Transforman las notas generadas sin cambiar la estructura de pasos; se pueden encadenar y el orden importa. Por ejemplo, `::walk(4)` limita saltos y `::trans(5)` transpone las notas. Si el paso es `~`, no se dispara ninguna nota y no se aplica el operador a ese paso. Consulta [Operadores de nota](#operadores-de-nota) para ver todos los operadores.
+
+El modo de sampler `::reverse(...)` tambien se escribe despues del patron, pero cambia la reproduccion de la muestra; no es una transformacion de las notas del patron. Se describe en [Modos de reproduccion](#modos-de-reproduccion).
 
 ## Tempo y pulsos
 

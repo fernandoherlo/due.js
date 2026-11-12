@@ -1,5 +1,4 @@
 import type { IApp, IUi } from '~/src/types';
-
 export default class Ui implements IUi {
   private app: IApp;
   private htmlIdProgressBar: string;
@@ -116,6 +115,18 @@ export default class Ui implements IUi {
     } else {
       this.steps++;
     }
+  }
+
+  updatePatternStep (key: string, step: number): void {
+    this.app.$editor?.setActivePatternStep(key, step);
+  }
+
+  clearPatternStep (key: string): void {
+    this.app.$editor?.clearActivePatternStep(key);
+  }
+
+  clearActiveSteps (): void {
+    this.app.$editor?.clearActivePatternSteps();
   }
 
   private updateProgressBar (width: number) {

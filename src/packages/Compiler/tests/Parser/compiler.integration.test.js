@@ -119,6 +119,17 @@ describe('Compiler integration', () => {
     expect(instruction.value.map(note => note.value)).toEqual(['C4', '~', 'E4']);
   });
 
+  it('parses weights on random choices without changing their note values', () => {
+    const instruction = createCompiler()
+      .prepare('sam1#piano([C4^4,E4|G4^2,~^0];1;1)').addedInstructions[0];
+
+    expect(instruction.value.map(({ value, weight }) => ({ value, weight }))).toEqual([
+      { value: 'C4', weight: 4 },
+      { value: 'E4|G4', weight: 2 },
+      { value: '~', weight: 0 }
+    ]);
+  });
+
   it.each([
     [',', TYPE_VALUE.random],
     ['>', TYPE_VALUE.sequence]

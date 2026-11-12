@@ -67,6 +67,18 @@ describe('DSL semantic analyzer', () => {
     expect(() => analyzer.exec(parser.parse(source))).toThrow(message);
   });
 
+  it.each([
+    ['sam1#piano([C4^1>E4^2];1;1)', 'only allowed in random choices'],
+    ['sam1#piano([C4^x,E4];1;1)', 'Weight must be a non-negative number'],
+    ['sam1#piano([C4^-1,E4];1;1)', 'Weight must be a non-negative number'],
+    ['sam1#piano([C4^0,E4^0];1;1)', 'At least one weight must be greater than 0'],
+    ['sam1#piano(C4;1^2;1)', 'Weights are only allowed on random note choices']
+  ])('rejects invalid weighted choice syntax: %s', (source, message) => {
+    const analyzer = new Analyzer(new ValueFactory());
+
+    expect(() => analyzer.exec(parser.parse(source))).toThrow(message);
+  });
+
   it('does not retain variables when the same analyzer is reused after an error', () => {
     const analyzer = new Analyzer(new ValueFactory());
     const invalid = parser.parse('$level=42\nv($level)');

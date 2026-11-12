@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { TYPE_VALUE } from '~/src/packages/Compiler/constants';
 import Compiler from '~/src/packages/Compiler/services/Compiler';
 import { createOperator, createOperators } from '~/src/packages/Music/helpers/createOperators';
 import { transpose } from '~/src/packages/Music/helpers/transpose';
@@ -19,6 +20,46 @@ const event = (notes, time) => ({ notes, duration: 1, time });
 
 describe('Note operators', () => {
   afterEach(() => vi.restoreAllMocks());
+
+  it('chooses weighted random pattern options in proportion to their weights', () => {
+    const choices = [
+      { value: 'C4', weight: 4 },
+      { value: 'E4', weight: 2 },
+      { value: 'G4' }
+    ];
+    vi.spyOn(Math, 'random')
+      .mockReturnValueOnce(0.2)
+      .mockReturnValueOnce(0.7)
+      .mockReturnValueOnce(0.95);
+
+    expect(TriggerAttack.getValue(choices, TYPE_VALUE.random).value).toBe('C4');
+    expect(TriggerAttack.getValue(choices, TYPE_VALUE.random).value).toBe('E4');
+    expect(TriggerAttack.getValue(choices, TYPE_VALUE.random).value).toBe('G4');
+  });
+
+  it('reports the selected random pattern index after applying operators', () => {
+    const choices = [
+      { value: 'C4', duration: 1, interval: 1 },
+      { value: 'E4', duration: 1, interval: 1, weight: 3 },
+      { value: 'G4', duration: 1, interval: 1 }
+    ];
+    const instrument = { triggerAttackRelease: vi.fn() };
+    const onPatternStep = vi.fn();
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+
+    TriggerAttack.play(
+      choices,
+      TYPE_VALUE.random,
+      0,
+      instrument,
+      3,
+      [operator('trans', 2)],
+      onPatternStep
+    );
+
+    expect(instrument.triggerAttackRelease).toHaveBeenCalledWith('F#4', 1, 3);
+    expect(onPatternStep).toHaveBeenCalledWith(1, 3);
+  });
 
   it.each([
     ['C4', 12, 'C5'],

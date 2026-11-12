@@ -1,0 +1,15 @@
+// .#####..##..##.######........######..####..
+// .##..##.##..##.##................##.##.....
+// .##..##.##..##.####..............##..####..
+// .##..##.##..##.##.......##...##..##.....##.
+// .#####...####..######...##....####...####..
+bpm(100)
+
+// Relative weights 4:2:1; an omitted weight defaults to 1.
+sam1#piano([C4^4,E4^2,G4];1b;1b)
+
+// A weight after the final chord note applies to the whole chord option.
+sam2#harp([C4|E4^3,G4|B4^1];2b;3b)
+
+// A zero-weight option is never selected.
+sam3#piano([C5^0,D5,E5^3];0.5b;1b)

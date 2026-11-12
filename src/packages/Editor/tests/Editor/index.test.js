@@ -5,6 +5,11 @@ import { describe, expect, it, vi } from 'vitest';
 import { DueLanguage } from '~/src/packages/Editor/constants/language';
 import Editor from '~/src/packages/Editor/services/Editor';
 import { getDiagnostics } from '~/src/packages/Editor/services/Editor/diagnostics';
+import {
+  activePatternHighlight,
+  setActivePatternStep,
+  setPatternSource
+} from '~/src/packages/Editor/services/Editor/activeTrack';
 
 const mockApp = {
   getFromLocalStorage: vi.fn()
@@ -120,5 +125,73 @@ describe('Editor', () => {
     const diagnostics = getDiagnostics(state);
 
     expect(diagnostics).toEqual([]);
+  });
+
+  it('highlights the exact ordered note token and clears stale marks while editing', () => {
+    const source = 'sam1#piano([C4>E4>C4];1;1)';
+    const state = EditorState.create({ doc: source, extensions: [activePatternHighlight] });
+    const compiled = state.update({ effects: setPatternSource.of(source) }).state;
+    const active = compiled.update({ effects: setActivePatternStep.of({ key: 'sam1', step: 1 }) }).state;
+    const ranges = [];
+
+    active.field(activePatternHighlight).decorations.between(0, active.doc.length, (from, to, decoration) => {
+      ranges.push({ text: active.doc.sliceString(from, to), className: decoration.spec.attributes.class });
+    });
+
+    expect(ranges).toEqual([{ text: 'E4', className: 'cm-active-pattern-note' }]);
+
+    const edited = active.update({ changes: { from: 0, insert: '// lead\n' } }).state;
+    const remaining = [];
+    edited.field(activePatternHighlight).decorations.between(0, edited.doc.length, (from, to) => {
+      remaining.push(edited.doc.sliceString(from, to));
+    });
+
+    expect(remaining).toEqual([]);
+  });
+
+  it('highlights the active occurrence when a note repeats in a sequence', () => {
+    const source = 'sam1#piano([C4>E4>C4];1;1)';
+    const state = EditorState.create({ doc: source, extensions: [activePatternHighlight] });
+    const compiled = state.update({ effects: setPatternSource.of(source) }).state;
+    const active = compiled.update({ effects: setActivePatternStep.of({ key: 'sam1', step: 2 }) }).state;
+    const ranges = [];
+
+    active.field(activePatternHighlight).decorations.between(0, active.doc.length, (from, to, decoration) => {
+      ranges.push({ from, text: active.doc.sliceString(from, to), className: decoration.spec.attributes.class });
+    });
+
+    expect(ranges).toEqual([{
+      from: source.lastIndexOf('C4'),
+      text: 'C4',
+      className: 'cm-active-pattern-note'
+    }]);
+  });
+
+  it('highlights the selected weighted random chord without its weight suffix', () => {
+    const source = 'sam1#piano([C4^4,E4|G4^2,G4];1;1)';
+    const state = EditorState.create({ doc: source, extensions: [activePatternHighlight] });
+    const compiled = state.update({ effects: setPatternSource.of(source) }).state;
+    const active = compiled.update({ effects: setActivePatternStep.of({ key: 'sam1', step: 1 }) }).state;
+    const ranges = [];
+
+    active.field(activePatternHighlight).decorations.between(0, active.doc.length, (from, to) => {
+      ranges.push(active.doc.sliceString(from, to));
+    });
+
+    expect(ranges).toEqual(['E4|G4']);
+  });
+
+  it('keeps the source range when note operators follow the pattern', () => {
+    const source = 'sam1#piano([C4>E4];1;1)::trans(5)::oct(1)';
+    const state = EditorState.create({ doc: source, extensions: [activePatternHighlight] });
+    const compiled = state.update({ effects: setPatternSource.of(source) }).state;
+    const active = compiled.update({ effects: setActivePatternStep.of({ key: 'sam1', step: 1 }) }).state;
+    const ranges = [];
+
+    active.field(activePatternHighlight).decorations.between(0, active.doc.length, (from, to) => {
+      ranges.push(active.doc.sliceString(from, to));
+    });
+
+    expect(ranges).toEqual(['E4']);
   });
 });

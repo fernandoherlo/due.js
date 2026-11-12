@@ -5,6 +5,7 @@ Salvo las entradas marcadas como prototipo disponible, no son funcionalidades im
 Cada entrada necesita concretar su alcance, sintaxis y pruebas antes de implementarse.
 Las correcciones, la deuda tecnica y las comprobaciones se mantienen en [tasks.md](tasks.md).
 Las propuestas conservan el DSL propio de due.js; no requieren sustituirlo por JavaScript.
+La sintesis de capacidades y propuestas relacionadas con patrones esta en [patrones.md](patrones.md).
 
 Como primer grupo, se sugieren F07, F24 y F25, una vez resueltas las correcciones necesarias del motor.
 Las propuestas de interpretacion en directo (F01-F06, F26, F27 y F33) estan en [live-coding.md](live-coding.md).
@@ -41,6 +42,7 @@ Habria que definir el reinicio de cada patron y su comportamiento al cambiar el 
 Asignar a una nota, acorde o grupo de pasos una probabilidad de ejecutarse en cada aparicion.
 Cuando un evento no se dispara, su espacio temporal se conservaria para no desplazar el resto del patron.
 La probabilidad deberia poder combinarse con variaciones periodicas y con una semilla de aleatoriedad reproducible.
+Los pesos `^peso` de las listas aleatorias, ya disponibles en patrones, solo cambian la probabilidad relativa de elegir una opcion; no implementan esta propuesta de omitir eventos.
 
 ### F12. Aleatoriedad reproducible
 

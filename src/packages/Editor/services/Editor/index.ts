@@ -6,6 +6,13 @@ import { EditorView, keymap, lineNumbers } from '@codemirror/view';
 import { LOCAL_STORAGE_KEY_CODE } from '~/src/packages/App/constants';
 import { DueLanguage } from '~/src/packages/Editor/constants/language';
 import { DueTheme, DueThemeHighlightStyle } from '~/src/packages/Editor/constants/theme';
+import {
+  activePatternHighlight,
+  clearActivePatternStep,
+  clearActivePatternSteps,
+  setActivePatternStep,
+  setPatternSource
+} from '~/src/packages/Editor/services/Editor/activeTrack';
 import { getDiagnostics } from '~/src/packages/Editor/services/Editor/diagnostics';
 import { adjustNumberAtCursor } from '~/src/packages/Editor/services/Editor/adjustNumber';
 import { muteGutter, toggleMuteSelection } from '~/src/packages/Editor/services/Editor/muteGutter';
@@ -42,6 +49,7 @@ export default class Editor implements IEditor {
           ...historyKeymap
         ]),
         lineNumbers(),
+        activePatternHighlight,
         muteGutter(this.app),
         EditorView.updateListener.of((update) => {
           if (update.docChanged) this.app.onCodeChange();
@@ -73,5 +81,21 @@ export default class Editor implements IEditor {
 
   getCode (): string | undefined {
     return this.editor?.state.doc.toString();
+  }
+
+  setPatternSource (source: string): void {
+    this.editor?.dispatch({ effects: setPatternSource.of(source) });
+  }
+
+  setActivePatternStep (key: string, step: number): void {
+    this.editor?.dispatch({ effects: setActivePatternStep.of({ key, step }) });
+  }
+
+  clearActivePatternStep (key: string): void {
+    this.editor?.dispatch({ effects: clearActivePatternStep.of(key) });
+  }
+
+  clearActivePatternSteps (): void {
+    this.editor?.dispatch({ effects: clearActivePatternSteps.of(null) });
   }
 }

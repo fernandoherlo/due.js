@@ -4,6 +4,7 @@ Propuestas para interpretar con due.js sobre un escenario: control rapido, estru
 Es un catalogo de propuestas, no de compromisos; ninguna esta implementada salvo lo indicado.
 Las propuestas de lenguaje, sonido y proyecto siguen en [features.md](features.md);
 las correcciones y la deuda tecnica, en [tasks.md](tasks.md).
+Una sintesis de opciones de interfaz y referentes externos esta en [ui-ideas.md](ui-ideas.md).
 
 Las entradas F01-F06, F26, F27 y F33 se trasladaron desde features.md y conservan su identificador.
 Las nuevas usan el prefijo L.
@@ -158,6 +159,8 @@ Marcar en el margen las pistas que estan sonando y parpadear con cada evento.
 Es una version ligera de F27, util para saber que linea produce que sonido sin analizar el codigo.
 La marca debe seguir el reloj del audio y no ralentizar la escritura.
 
+Implementado parcialmente: el token de nota, acorde o silencio activo se resalta directamente en el editor para patrones explicitos de `n`, `sam` y `mo`. Tambien marca la opcion elegida al azar, incluidos sus pesos, y las notas fuente de operadores como `::trans` o `::chord`. `ai` genera notas y `misam` recibe MIDI, asi que no tienen un token de patron que resaltar. Pausar o recompilar limpia la marca.
+
 ### L14. Deslizadores de variables
 
 Mostrar un control junto a una variable (`$low`, `$$test`) para cambiar su valor con el raton o el teclado.
@@ -270,6 +273,8 @@ Las actualizaciones frecuentes se limitarian para no interferir con el rendimien
 Senalar el paso activo de cada patron y ofrecer una vista de las notas o eventos proximos a ejecutarse.
 Esto ayudaria a relacionar el codigo con lo que se escucha, especialmente con secuencias largas o varias pistas.
 La visualizacion seguiria el reloj del audio, no controlaria su ejecucion y reflejaria pausas y recompilaciones.
+
+Implementado parcialmente: el token activo se resalta inline en el codigo y sigue el indice real elegido por el runtime, tanto en secuencias `>` como en listas aleatorias. No muestra todavia una prevision de los proximos eventos ni un piano roll o punchcard separado.
 
 ### F33. Conexion y reconexion MIDI en directo
 
