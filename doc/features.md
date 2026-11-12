@@ -56,9 +56,9 @@ Las variaciones deberian compartir una referencia de ciclo clara y no acumular c
 
 ### F14. Transposicion
 
-Desplazar notas, acordes y secuencias por semitonos u octavas sin reescribir sus valores originales.
-La operacion permitiria reutilizar motivos musicales y construir variaciones a partir de una misma frase.
-Deberia distinguirse de cambiar la velocidad de una muestra y respetar los limites del instrumento o de la salida MIDI.
+Disponible parcialmente: `::trans(n)` transpone las notas de eventos en `n` y `sam`, sin reescribir los valores originales; ver `doc/language.md`.
+Sigue pendiente una transposicion global de pistas o secuencias, incluida su interaccion con la salida MIDI.
+La transposicion debe distinguirse de cambiar la velocidad de una muestra y respetar los limites de cada instrumento.
 
 ### F15. Transformaciones de secuencia
 

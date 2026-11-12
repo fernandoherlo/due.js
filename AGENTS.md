@@ -51,7 +51,7 @@ Poner `::walk` antes de `::trans` (walk mira la lista sin transponer). Argumento
 ## Arquitectura (`src/packages`)
 
 - `App`: servicios de aplicacion (`App`, `Debugger`, `Error/handler`, `Logger`, `Store`, `Ui`).
-- `Compiler`: `Lexer` -> `Parser` -> `Analyzer` (validacion, p. ej. `validateMode`) -> `Interpreter`; `constants/index.ts` tiene `COMMANDS`, `OPERATORS` y `COMMANDS_MAP`.
+- `Compiler`: el servicio coordina `Parser` y `Analyzer`, prepara el plan de cambios de instrucciones y confirma el estado tras aplicarlo. No hay etapas separadas de Lexer o Interpreter.
 - `Editor`: CodeMirror 6 con lenguaje y tema propios.
 - `Music`: instrumentos (`Instrument/{Sampler,Synth,Magenta,MidiOut,MidiSampler}`), efectos, `MidiIn`, variables y operadores.
 - Operadores: tipos `Music/types/IOperator.ts` (`INoteEvent` con `notes`, `duration`, `time?`, `pool?`), registro `Music/constants/operators.ts` (`OPERATORS_MAP`), clase base `Music/services/Operators/index.ts` (helpers protegidos `label`, `numbers`, `probability`, `chance`; las subclases llaman `super()` y parsean en el constructor), una carpeta por operador, `Music/helpers/{transpose,createOperators}.ts`. `Instrument/triggerAttack.ts` aplica la cadena y no toca el instrumento si no queda ninguna nota.
@@ -72,7 +72,7 @@ Todos empiezan con el banner ASCII `DUE.JS` (5 lineas de comentario, copiar de `
 ## Documentacion de ideas (`doc/`)
 
 - `language.md`: referencia del lenguaje y comportamiento real.
-- `generative.md` (G01-G40): musica generativa; G31 implementado (operadores). G01/G02 (escala global y grados) descartados por cambiar demasiado la sintaxis; la transposicion se cubre con `::trans`.
+- `generative.md` (G01-G43): musica generativa; G31 implementado (operadores) y G32 parcialmente implementado con `::walk(n)`. G01/G02 (escala global y grados) descartados por cambiar demasiado la sintaxis; la transposicion de notas en `n` y `sam` se cubre parcialmente con `::trans(n)`.
 - `norns.md` (N01-N20): prioridad N07 (secuenciadores de longitudes distintas; probablemente ya funciona, queda comprobar que todas las pistas arrancan a la vez y un posible `::len(N)`).
 - `live-coding.md`: escenas L05 (decisiones tomadas: `scene#intro{ ... }`, una activa, entra en el siguiente compas, `Cmd+Shift+Enter` o `@n`), F06 parada de emergencia, F26 inspeccion, F27 visualizacion.
 - `shorts.md` (S01-S30): ideas de siete shorts de live coding en Strudel (supersaw, filtro acid, ducking, `beat` por posiciones, deslizadores, `slice`, voicing...). Orden sugerido: S01-S02, S13+S14+S22, S11+S12, S06, S08+S10+S21, S28+S29+S25.

@@ -2,16 +2,17 @@
 
 Ideas para que due.js produzca musica ambiental generativa como la de [generative.fm](https://generative.fm/)
 (proyecto de Alex Bainter; codigo en [github.com/generativefm](https://github.com/generativefm), sobre todo `generators`).
-Es un catalogo de propuestas, no de compromisos; ninguna esta implementada.
+Es un catalogo de propuestas, no de compromisos. G31 esta implementada y G32 parcialmente; el resto son ideas pendientes.
 
 Las piezas de ese proyecto comparten recursos que due.js ya tiene en parte: instrumentos de muestras (Tone.js), reverbs largas,
 delays, notas elegidas al azar de una escala y bucles que no coinciden entre si, de modo que la combinacion tarda mucho en repetirse.
-Lo que falta en due.js son las reglas que dan coherencia a ese azar: escalas, probabilidades, evolucion lenta y semillas.
+Lo que falta para acercarse a ese enfoque es escala global, probabilidad por evento, evolucion lenta y semillas reproducibles.
 
 Identificadores con prefijo G. Los ejemplos de sintaxis son orientativos; las propuestas de lenguaje general siguen en [features.md](features.md)
 y las de directo en [live-coding.md](live-coding.md).
 
-Como primer grupo se sugieren G01, G02, G05, G11 y G19: con ellos ya se puede escribir una pieza al estilo Eno.
+Como primer grupo de exploracion se sugieren G05, G11 y G19. G01 y G02 se consideran descartadas porque cambiarian demasiado la sintaxis;
+mientras tanto, las piezas pueden declarar listas de notas explicitas y usar `::trans(n)` para transponerlas.
 
 ## Lo observado en el codigo (pieza "Zed")
 
@@ -243,23 +244,22 @@ Acompana la escucha sin competir con ella, en la linea de las visuales de genera
 
 ## Ideas derivadas de otras piezas
 
-Las mas rentables para el editor: G31 (operadores), G32 (pasos cortos) y G37 (probabilidad con LFO).
-Con esas tres y G01, G02 y G11 del primer grupo ya se podria escribir algo parecido a "A Viable System" o "Lemniscate".
+Las propuestas mas cercanas a capacidades existentes son G31 (implementada), G32 (parcialmente implementada mediante `::walk(n)`) y G37 (probabilidad modulada, pendiente). G01 y G02 estan descartadas; se pueden usar listas explicitas de notas en combinacion con los operadores actuales.
 
 ### G31. Operadores de nota encadenables
 
-**Implementado:** `::oct(p;octavas)`, `::late(p;max)`, `::chord(p)`, `::human(s)` y `::unique(s)` (evita repetir la misma nota en `s` segundos); ver `doc/language.md`.
+**Implementado:** `::oct(p;octavas)`, `::late(p;max)`, `::chord(p)`, `::human(s)`, `::unique(s)`, `::walk(n)` y `::trans(n)`; ver `doc/language.md`.
 
 En "Observable Streams" el flujo de notas pasa por una cadena de operadores: cambiar de octava con cierta probabilidad,
-retrasar la nota, convertirla en acorde, limitar cuantas veces suena la misma nota en pocos segundos y humanizarla.
-En due.js podria ser una familia de modos tras la pista, al estilo de `::reverse(...)`: por ejemplo `::oct(0.2,1)`, `::late(0.2)`, `::chord(0.2)`.
-Cada operador tendria una probabilidad y se aplicaria a cada nota generada, y el orden de la cadena importaria.
+retrasar la nota, convertirla en acorde, limitar repeticiones, humanizar, limitar saltos y transponer.
+En due.js estos operadores se encadenan con `::` y se aplican en el orden escrito; solo los que lo especifican usan probabilidad.
 
 ### G32. Melodias por pasos cortos
 
-En "A Viable System" y "Timbral Oscillations" cada frase empieza en una nota al azar y cada nota siguiente esta como mucho a dos o tres grados de la anterior;
+En "A Viable System" y "Timbral Oscillations" cada frase empieza en una nota al azar y cada nota siguiente esta como mucho a dos o tres grados de la escala;
 la frase termina con probabilidad creciente (cada nota adicional tiene la mitad de posibilidades que la anterior, hasta tres notas).
-Un modo `::walk(3,3)` (salto maximo, longitud maxima) daria melodias coherentes a partir de una lista de notas, sin escribirlas en orden.
+En due.js, `::walk(n)` ya limita el salto en semitonos entre las notas candidatas de la lista, solo para notas sueltas. No limita la longitud de una frase
+ni implementa su terminacion probabilistica; esas partes siguen pendientes.
 Cada instrumento puede tener su propio ritmo: el piano cada 2 s, el violin cada 8 s y el contrabajo solo una nota.
 
 ### G33. Acorde repartido en el tiempo

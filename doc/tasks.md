@@ -61,8 +61,8 @@ No introducir un paquete Core/Shared ni nuevas capas o interfaces sin una necesi
 
 ## Documentar el arranque
 
-- [ ] Completar el README con instalacion, `npm run samples`, compilacion y reproduccion.
-	Incluir versiones compatibles de Node y navegador, permisos MIDI, build y problemas habituales de muestras ausentes.
+- [x] Completar el README con instalacion, `npm run samples`, compilacion y reproduccion.
+	Incluye requisitos de Node y navegador, permisos MIDI, build y descarga opcional de muestras.
 
 ## Cierre
 
