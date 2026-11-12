@@ -24,7 +24,7 @@ export const DueTheme: { [selector: string]: StyleSpec } = {
   },
   '.cm-scroller': {
     overflow: 'auto',
-    marginInlineEnd: '64px'
+    marginInlineEnd: '40px'
   },
   '.cm-no-minimap .cm-scroller': {
     marginInlineEnd: '0'
@@ -49,6 +49,15 @@ export const DueTheme: { [selector: string]: StyleSpec } = {
     padding: '0 1px',
     cursor: 'pointer'
   },
+  '.cm-foldPlaceholder': {
+    backgroundColor: '#24222c',
+    border: '1px solid #484550',
+    color: $gray,
+    borderRadius: '2px',
+    margin: '0 1px',
+    padding: '0 2px',
+    cursor: 'pointer'
+  },
   '.cm-minimap': {
     position: 'absolute',
     insetBlock: '4px',
@@ -59,8 +68,8 @@ export const DueTheme: { [selector: string]: StyleSpec } = {
     justifyContent: 'flex-start',
     gap: '1px',
     overflow: 'hidden',
-    width: '56px',
-    padding: '2px',
+    width: '32px',
+    padding: '1px',
     backgroundColor: $black,
     cursor: 'pointer'
   },
