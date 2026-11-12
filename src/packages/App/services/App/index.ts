@@ -94,6 +94,7 @@ export default class App implements IApp {
         await this.$music.delete(plan.deletedInstructions);
 
         this.$compiler.commit(plan);
+        this.$music.setTempo(plan.bpm);
         this.$editor.setPatternSource(editorCode);
 
         this.$ui.setOk();

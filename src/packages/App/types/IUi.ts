@@ -7,8 +7,7 @@ export interface IUi {
   setWaiting: () => void;
   setMidiUnavailable: (reason: string) => void;
 
-  updateLoopTime: () => void;
-  updateSteps: () => void;
+  updateLoopTime: (progress: number) => void;
   updatePatternStep: (key: string, step: number) => void;
   clearPatternStep: (key: string) => void;
   clearActiveSteps: () => void;

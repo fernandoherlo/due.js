@@ -51,6 +51,8 @@ Un panel a la derecha con el programa reducido, al estilo del minimapa de VS Cod
 Mostraria la posicion visible, las pistas silenciadas, los errores y las lineas que suenan; un clic llevaria a esa zona.
 Debe poder ocultarse y no consumir tiempo del hilo de audio al refrescarse.
 
+Implementado parcialmente como minimapa integrado en CodeMirror: representa lineas de codigo y pistas, marca el viewport y la linea del cursor, y permite saltar por clic o teclado. Se oculta en pantallas estrechas y en documentos cortos; no muestra mute ni errores.
+
 ### L04. Lista de pistas
 
 Un panel con las pistas del programa: nombre, mute, solo, volumen y salto a su linea.
@@ -178,6 +180,8 @@ El aviso no debe interrumpir el audio ni cubrir el editor.
 Plegar y desplegar secciones delimitadas por comentarios para manejar programas largos.
 Facilita centrarse en una parte, y con L03 da una imagen de la estructura del programa.
 El plegado no cambiaria lo que se compila.
+
+Implementado: cualquier comentario independiente que empieza por `//` puede plegar el bloque hasta el siguiente comentario independiente. Los comentarios al final de codigo no delimitan bloques. El gutter permite plegar y desplegar sin modificar el programa.
 
 ## Interfaz y proyeccion
 

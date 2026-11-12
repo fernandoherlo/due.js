@@ -4,16 +4,10 @@ export default class Ui implements IUi {
   private htmlIdProgressBar: string;
   private idTimeoutValid: number | undefined;
 
-  private steps: number;
-  private totalSteps: number;
-
   constructor (app: IApp) {
     this.app = app;
     this.htmlIdProgressBar = 'progress-bar';
     this.idTimeoutValid = undefined;
-
-    this.steps = 1;
-    this.totalSteps = 4;
   }
 
   async start () {
@@ -104,17 +98,8 @@ export default class Ui implements IUi {
     progressBarEditorElement.classList.add('wait');
   }
 
-  updateLoopTime () {
-    const percentage: number = (this.steps * 100) / this.totalSteps;
-    this.updateProgressBar(Math.ceil(percentage));
-  }
-
-  updateSteps () {
-    if (this.steps === this.totalSteps) {
-      this.steps = 1;
-    } else {
-      this.steps++;
-    }
+  updateLoopTime (progress: number): void {
+    this.updateProgressBar(Math.ceil(progress));
   }
 
   updatePatternStep (key: string, step: number): void {

@@ -1,10 +1,11 @@
-import { syntaxTree } from '@codemirror/language';
+import { foldable, syntaxTree } from '@codemirror/language';
 import { EditorState } from '@codemirror/state';
 import { highlightTree, tagHighlighter, tags } from '@lezer/highlight';
 import { describe, expect, it, vi } from 'vitest';
 import { DueLanguage } from '~/src/packages/Editor/constants/language';
 import Editor from '~/src/packages/Editor/services/Editor';
 import { getDiagnostics } from '~/src/packages/Editor/services/Editor/diagnostics';
+import { dueRegionFolding } from '~/src/packages/Editor/services/Editor/regions';
 import {
   activePatternHighlight,
   setActivePatternStep,
@@ -90,6 +91,37 @@ describe('Editor', () => {
       { text: 'C#4', type: 'note' },
       { text: '>', type: 'operator' }
     ]));
+  });
+
+  it('folds from a standalone comment to the next standalone comment', () => {
+    const source = [
+      '// title',
+      'bpm(120)',
+      '// drums',
+      'sam1#kick(C2;0.25;1)',
+      'sam2#snare(D2;0.25;1)',
+      '// melody',
+      'sam3#harp(C4;1;2)',
+      'sam3#hats(F#3;0.1;0.5) // inline comment',
+      '// outro',
+      'sam4#piano(C4;1;1)'
+    ].join('\n');
+    const state = EditorState.create({ doc: source, extensions: [dueRegionFolding] });
+    const title = state.doc.line(1);
+    const drums = state.doc.line(3);
+    const inlineComment = state.doc.line(8);
+    const lastComment = state.doc.line(9);
+
+    expect(foldable(state, title.from, title.to)).toEqual({
+      from: title.to,
+      to: drums.from - 1
+    });
+    expect(foldable(state, drums.from, drums.to)).toEqual({
+      from: drums.to,
+      to: state.doc.line(6).from - 1
+    });
+    expect(foldable(state, inlineComment.from, inlineComment.to)).toBeNull();
+    expect(foldable(state, lastComment.from, lastComment.to)).toBeNull();
   });
 
   it('locates the malformed value on its original line', () => {

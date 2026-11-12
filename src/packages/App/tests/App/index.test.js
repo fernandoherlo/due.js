@@ -89,10 +89,10 @@ describe('App', () => {
   it('Should compile the code', async () => {
     // Arrange
     const app = new App();
-    const plan = { instructions: {}, variables: {}, addedInstructions: [], updatedInstructions: [], deletedInstructions: [] };
+    const plan = { instructions: {}, variables: {}, bpm: 90, addedInstructions: [], updatedInstructions: [], deletedInstructions: [] };
     app.$compiler = { prepare: vi.fn().mockReturnValue(plan), commit: vi.fn() };
     app.$editor = { getCode: vi.fn().mockReturnValue('foo'), setPatternSource: vi.fn() };
-    app.$music = { validate: vi.fn(), add: vi.fn(), update: vi.fn(), delete: vi.fn() };
+    app.$music = { validate: vi.fn(), add: vi.fn(), update: vi.fn(), delete: vi.fn(), setTempo: vi.fn() };
     app.$ui = { setWaiting: vi.fn(), setOk: vi.fn(), setError: vi.fn() };
     // Activate
     await app.compile();
@@ -106,6 +106,7 @@ describe('App', () => {
     expect(app.$music.delete).toHaveBeenCalled();
     expect(app.$compiler.commit).toHaveBeenCalledWith(plan);
     expect(app.$editor.setPatternSource).toHaveBeenCalledWith('foo');
+    expect(app.$music.setTempo).toHaveBeenCalledWith(90);
     expect(app.$ui.setOk).toHaveBeenCalled();
   });
 
@@ -152,10 +153,10 @@ describe('App', () => {
 
   it('Should compile empty code to clear the active program', async () => {
     const app = new App();
-    const plan = { instructions: {}, variables: {}, addedInstructions: [], updatedInstructions: [], deletedInstructions: [{}] };
+    const plan = { instructions: {}, variables: {}, bpm: 120, addedInstructions: [], updatedInstructions: [], deletedInstructions: [{}] };
     app.$compiler = { prepare: vi.fn().mockReturnValue(plan), commit: vi.fn() };
     app.$editor = { getCode: vi.fn().mockReturnValue(''), setPatternSource: vi.fn() };
-    app.$music = { validate: vi.fn(), add: vi.fn(), update: vi.fn(), delete: vi.fn() };
+    app.$music = { validate: vi.fn(), add: vi.fn(), update: vi.fn(), delete: vi.fn(), setTempo: vi.fn() };
     app.$ui = { setWaiting: vi.fn(), setOk: vi.fn() };
 
     await app.compile();
@@ -167,7 +168,7 @@ describe('App', () => {
 
   it('Should serialize concurrent compile requests', async () => {
     const app = new App();
-    const plan = { instructions: {}, variables: {}, addedInstructions: [], updatedInstructions: [], deletedInstructions: [] };
+    const plan = { instructions: {}, variables: {}, bpm: 120, addedInstructions: [], updatedInstructions: [], deletedInstructions: [] };
     let resolveAdd;
     let markPrepared;
     let markSecondAdd;
@@ -193,7 +194,8 @@ describe('App', () => {
         return Promise.resolve();
       }),
       update: vi.fn(),
-      delete: vi.fn()
+      delete: vi.fn(),
+      setTempo: vi.fn()
     };
     app.$ui = { setWaiting: vi.fn(), setOk: vi.fn() };
 

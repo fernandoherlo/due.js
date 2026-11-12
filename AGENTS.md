@@ -76,7 +76,7 @@ Todos empiezan con el banner ASCII `DUE.JS` (5 lineas de comentario, copiar de `
 - `language.md`: referencia del lenguaje y comportamiento real.
 - `generative.md` (G01-G43): musica generativa; G31 implementado (operadores) y G32 parcialmente implementado con `::walk(n)`. G01/G02 (escala global y grados) descartados por cambiar demasiado la sintaxis; la transposicion de notas en `n` y `sam` se cubre parcialmente con `::trans(n)`.
 - `norns.md` (N01-N20): prioridad N07 (secuenciadores de longitudes distintas; probablemente ya funciona, queda comprobar que todas las pistas arrancan a la vez y un posible `::len(N)`).
-- `live-coding.md`: escenas L05 (decisiones tomadas: `scene#intro{ ... }`, una activa, entra en el siguiente compas, `Cmd+Shift+Enter` o `@n`), F06 parada de emergencia, F26 inspeccion, F27 visualizacion (parcial: token activo resaltado inline en patrones explicitos).
+- `live-coding.md`: escenas L05 (decisiones tomadas: `scene#intro{ ... }`, una activa, entra en el siguiente compas, `Cmd+Shift+Enter` o `@n`), L03 minimapa y L16 plegado por regiones parcialmente implementados, F06 parada de emergencia, F26 inspeccion y F27 token activo inline en patrones explicitos.
 - `shorts.md` (S01-S30): ideas de siete shorts de live coding en Strudel (supersaw, filtro acid, ducking, `beat` por posiciones, deslizadores, `slice`, voicing...). Orden sugerido: S01-S02, S13+S14+S22, S11+S12, S06, S08+S10+S21, S28+S29+S25.
 - `features.md` y `tasks.md`: catalogo de propuestas y deuda tecnica.
 

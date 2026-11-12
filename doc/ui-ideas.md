@@ -8,7 +8,7 @@ Este documento reune 30 ideas de interfaz a partir de las propuestas ya escritas
 2. **Ayuda junto al codigo** [F25, propuesta]: mostrar firma, unidades, rangos, valores por defecto y ejemplos del comando actual.
 3. **Galeria de ejemplos** [L18, propuesta]: buscar, preescuchar y abrir ejemplos sin perder el programa actual; pedir confirmacion antes de sustituirlo.
 4. **Buscador rapido de comandos y sonidos** [Nueva]: una paleta filtrable para insertar un comando, preset o efecto sin recorrer menus.
-5. **Plegado y minimapa del programa** [L03, L16, propuestas]: plegar secciones y saltar entre pistas desde una vista compacta.
+5. **Plegado y minimapa del programa** [L03, L16; parcialmente implementado]: cualquier comentario independiente `//` pliega hasta el siguiente, y el mapa de lineas permite saltar por clic o teclado; quedan los marcadores de mute/error y pulir la navegacion de bloques.
 6. **Diagnosticos junto a la linea** [tasks.md, parcialmente pendiente]: distinguir errores de sintaxis, compilacion, carga de muestras y reproduccion con una accion para ir al origen.
 7. **Atajos configurables** [F05, parcialmente implementada]: consultar y reasignar acciones como compilar, play, mute y parada.
 

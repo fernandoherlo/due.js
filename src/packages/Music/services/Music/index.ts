@@ -15,6 +15,9 @@ export default class Music implements IMusic {
   private app: IApp;
   private instructions: any;
   private muted: Set<string> = new Set();
+  private progressEventId: number | undefined;
+  private progressStep = 0;
+  private progressTempo: number | undefined;
 
   constructor (app: IApp) {
     this.app = app;
@@ -30,21 +33,27 @@ export default class Music implements IMusic {
       this.app.$ui.setMidiUnavailable(reason);
     }
 
-    Tone.getTransport().scheduleRepeat(async (time) => {
-      Tone.getDraw().schedule(() => {
-        this.app.$ui.updateLoopTime();
-      }, time);
-
-      this.app.$ui.updateSteps();
-    }, 1);
-
-    Tone.getTransport().bpm.value = 120; // Tempo is applied by the compiler: beats are converted to seconds.
+    Tone.getTransport().bpm.value = 120; // Note intervals are compiled to seconds.
+    this.setTempo(120);
   }
 
   async toggle () {
     await Tone.start();
     Tone.getTransport().toggle();
     this.app.$ui.clearActiveSteps();
+  }
+
+  setTempo (bpm: number): void {
+    if (this.progressTempo === bpm && this.progressEventId !== undefined) return;
+    const transport = Tone.getTransport();
+    if (this.progressEventId !== undefined) transport.clear(this.progressEventId);
+    this.progressTempo = bpm;
+    this.progressStep = 0;
+    this.progressEventId = transport.scheduleRepeat((time) => {
+      this.progressStep = this.progressStep === BEATS_PER_BAR ? 1 : this.progressStep + 1;
+      const progress = (this.progressStep * 100) / BEATS_PER_BAR;
+      Tone.getDraw().schedule(() => this.app.$ui.updateLoopTime(progress), time);
+    }, 60 / bpm, transport.seconds ?? 0);
   }
 
   async waitForNextBar (bpm: number): Promise<void> {

@@ -1,5 +1,5 @@
 import { defaultKeymap, history, historyKeymap, toggleComment } from '@codemirror/commands';
-import { syntaxHighlighting } from '@codemirror/language';
+import { foldGutter, foldKeymap, syntaxHighlighting } from '@codemirror/language';
 import { linter, lintGutter } from '@codemirror/lint';
 import { EditorState } from '@codemirror/state';
 import { EditorView, keymap, lineNumbers } from '@codemirror/view';
@@ -15,6 +15,8 @@ import {
 } from '~/src/packages/Editor/services/Editor/activeTrack';
 import { getDiagnostics } from '~/src/packages/Editor/services/Editor/diagnostics';
 import { adjustNumberAtCursor } from '~/src/packages/Editor/services/Editor/adjustNumber';
+import { dueRegionFolding } from '~/src/packages/Editor/services/Editor/regions';
+import { codeMinimap } from '~/src/packages/Editor/services/Editor/minimap';
 import { muteGutter, toggleMuteSelection } from '~/src/packages/Editor/services/Editor/muteGutter';
 import type { IApp, IEditor } from '~/src/types';
 
@@ -46,9 +48,13 @@ export default class Editor implements IEditor {
           // En teclado español "/" es Shift+7.
           { key: 'Mod-Shift-7', run: toggleComment, preventDefault: true },
           ...defaultKeymap,
-          ...historyKeymap
+          ...historyKeymap,
+          ...foldKeymap
         ]),
         lineNumbers(),
+        foldGutter(),
+        dueRegionFolding,
+        codeMinimap,
         activePatternHighlight,
         muteGutter(this.app),
         EditorView.updateListener.of((update) => {

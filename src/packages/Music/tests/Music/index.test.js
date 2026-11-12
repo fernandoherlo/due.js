@@ -69,7 +69,6 @@ const mockApp = {
   $ui: {
     setMidiUnavailable: vi.fn(),
     updateLoopTime: vi.fn(),
-    updateSteps: vi.fn(),
     updatePatternStep: vi.fn(),
     clearPatternStep: vi.fn(),
     clearActiveSteps: vi.fn()
@@ -115,7 +114,9 @@ describe('Music', () => {
   describe('Startup', () => {
     beforeEach(() => {
       vi.clearAllMocks();
-      Tone.getTransport.mockReturnValue({ scheduleRepeat: vi.fn(), bpm: { value: 0 }, toggle: vi.fn() });
+      Tone.getTransport.mockReturnValue({
+        scheduleRepeat: vi.fn(), clear: vi.fn(), bpm: { value: 0 }, seconds: 0, toggle: vi.fn()
+      });
       Tone.start.mockResolvedValue(undefined);
     });
 
@@ -131,7 +132,7 @@ describe('Music', () => {
 
         expect(mockApp.$logger.log).toHaveBeenCalledWith(['MIDI unavailable:', failure]);
         expect(mockApp.$ui.setMidiUnavailable).toHaveBeenCalledWith(message);
-        expect(transport.scheduleRepeat).toHaveBeenCalledWith(expect.any(Function), 1);
+        expect(transport.scheduleRepeat).toHaveBeenCalledWith(expect.any(Function), 0.5, 0);
         expect(transport.bpm.value).toBe(120);
         expect(Tone.start).toHaveBeenCalledOnce();
         expect(transport.toggle).toHaveBeenCalledOnce();
@@ -158,6 +159,30 @@ describe('Music', () => {
       await expect(music.start()).rejects.toBe(failure);
 
       expect(mockApp.$ui.setMidiUnavailable).not.toHaveBeenCalled();
+    });
+
+    it('updates the visual beat interval without changing the audio transport tempo', async () => {
+      const transport = {
+        scheduleRepeat: vi.fn().mockReturnValueOnce(11).mockReturnValueOnce(12),
+        clear: vi.fn(),
+        bpm: { value: 0 },
+        seconds: 2,
+        toggle: vi.fn()
+      };
+      const draw = { schedule: vi.fn(callback => callback()) };
+      Tone.getTransport.mockReturnValue(transport);
+      Tone.getDraw.mockReturnValue(draw);
+      const music = new Music(mockApp);
+
+      await music.start();
+      music.setTempo(90);
+      transport.scheduleRepeat.mock.calls[1][0](2.5);
+
+      expect(transport.clear).toHaveBeenCalledWith(11);
+      expect(transport.scheduleRepeat).toHaveBeenLastCalledWith(expect.any(Function), 60 / 90, 2);
+      expect(mockApp.$ui.updateLoopTime).toHaveBeenCalledWith(25);
+      expect(draw.schedule).toHaveBeenCalledWith(expect.any(Function), 2.5);
+      expect(transport.bpm.value).toBe(120);
     });
   });
 

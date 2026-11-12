@@ -15,6 +15,7 @@ const $red = '#ff6767';
 
 export const DueTheme: { [selector: string]: StyleSpec } = {
   '&': {
+    position: 'relative',
     height: '100%',
     fontSize: '18pt',
     fontFamily: 'Fira Code',
@@ -22,7 +23,11 @@ export const DueTheme: { [selector: string]: StyleSpec } = {
     background: $black
   },
   '.cm-scroller': {
-    overflow: 'auto'
+    overflow: 'auto',
+    marginInlineEnd: '64px'
+  },
+  '.cm-no-minimap .cm-scroller': {
+    marginInlineEnd: '0'
   },
   '.cm-content': {
     caretColor: $purple
@@ -33,6 +38,55 @@ export const DueTheme: { [selector: string]: StyleSpec } = {
     backgroundColor: $black,
     color: $purpleFading,
     border: 'none'
+  },
+  '.cm-foldGutter': {
+    width: '1em',
+    color: $gray,
+    textAlign: 'center',
+    cursor: 'pointer'
+  },
+  '.cm-foldGutter span': {
+    padding: '0 1px',
+    cursor: 'pointer'
+  },
+  '.cm-minimap': {
+    position: 'absolute',
+    insetBlock: '4px',
+    insetInlineEnd: '3px',
+    zIndex: '2',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    gap: '1px',
+    overflow: 'hidden',
+    width: '56px',
+    padding: '2px',
+    backgroundColor: $black,
+    cursor: 'pointer'
+  },
+  '.cm-minimap[hidden]': {
+    display: 'none'
+  },
+  '.cm-minimap-line': {
+    display: 'block',
+    flex: '1 1 0',
+    minHeight: '0',
+    backgroundColor: $gray,
+    opacity: '0.5'
+  },
+  '.cm-minimap-line.cm-minimap-comment': {
+    backgroundColor: $purpleFading
+  },
+  '.cm-minimap-line.cm-minimap-track': {
+    backgroundColor: $blue
+  },
+  '.cm-minimap-line.cm-minimap-visible': {
+    backgroundColor: $orange,
+    opacity: '0.8'
+  },
+  '.cm-minimap-line.cm-minimap-cursor': {
+    backgroundColor: $green,
+    opacity: '1'
   },
   '.cm-mute-gutter': {
     width: '1.5em',
