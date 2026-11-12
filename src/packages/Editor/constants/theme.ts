@@ -29,7 +29,7 @@ export const DueTheme: { [selector: string]: StyleSpec } = {
   },
   '.cm-scroller': {
     overflow: 'auto',
-    marginInlineEnd: '40px'
+    marginInlineEnd: '56px'
   },
   '.cm-no-minimap .cm-scroller': {
     marginInlineEnd: '0'
@@ -49,6 +49,12 @@ export const DueTheme: { [selector: string]: StyleSpec } = {
     color: $gray,
     textAlign: 'center',
     cursor: 'pointer'
+  },
+  '.cm-foldGutter .cm-gutterElement': {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '0'
   },
   '.cm-foldGutter span': {
     padding: '0 1px',
@@ -73,10 +79,10 @@ export const DueTheme: { [selector: string]: StyleSpec } = {
     justifyContent: 'flex-start',
     gap: '1px',
     overflow: 'hidden',
-    width: '32px',
-    height: '42%',
-    minHeight: '160px',
-    maxHeight: '360px',
+    width: '48px',
+    height: '34%',
+    minHeight: '140px',
+    maxHeight: '300px',
     padding: '1px',
     backgroundColor: $black,
     cursor: 'pointer'
