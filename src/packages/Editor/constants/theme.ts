@@ -76,34 +76,44 @@ export const DueTheme: { [selector: string]: StyleSpec } = {
     zIndex: '2',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
+    gap: '0',
     overflow: 'hidden',
     width: '48px',
     padding: '1px',
     backgroundColor: $black,
-    cursor: 'pointer'
+    cursor: 'default'
   },
   '.cm-minimap[hidden]': {
     display: 'none'
   },
   '.cm-minimap-line': {
+    position: 'relative',
     display: 'block',
-    flex: '0 0 2px',
+    flex: '0 0 4px',
+    height: '4px',
+    minHeight: '4px',
+    cursor: 'pointer'
+  },
+  '.cm-minimap-line::after': {
+    position: 'absolute',
+    insetBlockStart: '1px',
+    insetInline: '0',
     height: '2px',
-    minHeight: '2px',
-    backgroundColor: $minimapLine
+    backgroundColor: $minimapLine,
+    content: '""'
   },
   '.cm-minimap-line.cm-minimap-comment': {
-    backgroundColor: $minimapComment
+    '&::after': { backgroundColor: $minimapComment }
   },
   '.cm-minimap-line.cm-minimap-track': {
-    backgroundColor: $minimapTrack
+    '&::after': { backgroundColor: $minimapTrack }
   },
   '.cm-minimap-line.cm-minimap-visible': {
-    backgroundColor: $minimapViewport
+    '&::after': { backgroundColor: $minimapViewport }
   },
   '.cm-minimap-line.cm-minimap-cursor': {
-    backgroundColor: $minimapCursor
+    '&::after': { backgroundColor: $minimapCursor }
   },
   '.cm-mute-gutter': {
     width: '1.5em',

@@ -56,6 +56,7 @@ export const codeMinimap = ViewPlugin.fromClass(class {
       if (line.text.trimStart().startsWith('//')) bar.classList.add('cm-minimap-comment');
       if (/^\s*(?:sam|n|mo)\d+/.test(line.text)) bar.classList.add('cm-minimap-track');
       bar.style.inlineSize = `${Math.max(12, Math.round((line.length / longestLine) * 100))}%`;
+      bar.setAttribute('data-line', String(number));
       bar.setAttribute('aria-hidden', 'true');
       this.bars.push(bar);
       fragment.append(bar);
@@ -107,10 +108,9 @@ export const codeMinimap = ViewPlugin.fromClass(class {
   }
 
   private readonly onClick = (event: MouseEvent): void => {
-    const bounds = this.dom.getBoundingClientRect();
-    if (!bounds.height) return;
-    const ratio = (event.clientY - bounds.top) / bounds.height;
-    this.goToLine(Math.floor(ratio * this.view.state.doc.lines) + 1);
+    const target = event.target as HTMLElement;
+    const line = getMinimapLine(target);
+    if (line !== undefined) this.goToLine(line);
   };
 
   private readonly onKeyDown = (event: KeyboardEvent): void => {
@@ -136,3 +136,9 @@ export const codeMinimap = ViewPlugin.fromClass(class {
     this.updateViewport();
   };
 });
+
+export function getMinimapLine (target: HTMLElement | null): number | undefined {
+  const marker = target?.closest<HTMLElement>('.cm-minimap-line');
+  const line = Number(marker?.getAttribute('data-line'));
+  return Number.isInteger(line) && line > 0 ? line : undefined;
+}

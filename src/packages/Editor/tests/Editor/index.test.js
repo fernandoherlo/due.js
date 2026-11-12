@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { DueLanguage } from '~/src/packages/Editor/constants/language';
 import Editor from '~/src/packages/Editor/services/Editor';
 import { getDiagnostics } from '~/src/packages/Editor/services/Editor/diagnostics';
+import { getMinimapLine } from '~/src/packages/Editor/services/Editor/minimap';
 import { dueRegionFolding } from '~/src/packages/Editor/services/Editor/regions';
 import {
   activePatternHighlight,
@@ -122,6 +123,16 @@ describe('Editor', () => {
     });
     expect(foldable(state, inlineComment.from, inlineComment.to)).toBeNull();
     expect(foldable(state, lastComment.from, lastComment.to)).toBeNull();
+  });
+
+  it('maps minimap clicks to the line marker instead of the full minimap height', () => {
+    const marker = { getAttribute: vi.fn().mockReturnValue('12') };
+    const target = { closest: vi.fn().mockReturnValue(marker) };
+    const emptyArea = { closest: vi.fn().mockReturnValue(null) };
+
+    expect(getMinimapLine(target)).toBe(12);
+    expect(getMinimapLine(emptyArea)).toBeUndefined();
+    expect(getMinimapLine(null)).toBeUndefined();
   });
 
   it('locates the malformed value on its original line', () => {
