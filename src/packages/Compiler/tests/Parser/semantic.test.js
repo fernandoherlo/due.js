@@ -55,6 +55,18 @@ describe('DSL semantic analyzer', () => {
     });
   });
 
+  it.each([
+    ['sam1#piano([C4|~];1;1)', 'cannot be part of a chord'],
+    ['sam1#piano(C4;~;1)', 'only allowed as a note'],
+    ['sam1#piano(C4;1;~)', 'only allowed as a note'],
+    ['mo1(~;1;1)', 'only supported in n or sam'],
+    ['sam1#piano(C4):v(~)', 'only supported in n or sam']
+  ])('rejects a rest outside valid note patterns: %s', (source, message) => {
+    const analyzer = new Analyzer(new ValueFactory());
+
+    expect(() => analyzer.exec(parser.parse(source))).toThrow(message);
+  });
+
   it('does not retain variables when the same analyzer is reused after an error', () => {
     const analyzer = new Analyzer(new ValueFactory());
     const invalid = parser.parse('$level=42\nv($level)');

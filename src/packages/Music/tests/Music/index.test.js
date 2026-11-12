@@ -4,6 +4,7 @@ import { WebMidi } from 'webmidi';
 import { COMMANDS } from '~/src/packages/Compiler/constants';
 import Compiler from '~/src/packages/Compiler/services/Compiler';
 import Delay from '~/src/packages/Music/services/Effect/Delay';
+import Instrument from '~/src/packages/Music/services/Instrument';
 import Sampler from '~/src/packages/Music/services/Instrument/Sampler';
 import Reverse from '~/src/packages/Music/services/Modes/Reverse';
 import Music from '~/src/packages/Music/services/Music';
@@ -82,6 +83,27 @@ describe('Music', () => {
     // Activate
     // Assert
     expect(music.app).toEqual(mockApp);
+  });
+
+  it('skips a rest step and continues an ordered note pattern', async () => {
+    const compiler = new Compiler(mockApp, new ValueFactory());
+    const instruction = compiler.prepare('sam1#birds([C4>~>E4];1;1)').addedInstructions[0];
+    const instrument = new Instrument(instruction, mockApp);
+    const triggerAttackRelease = vi.fn();
+    Tone.Loop.mockReset().mockImplementation((callback, interval) => ({
+      callback,
+      interval,
+      start: vi.fn().mockReturnThis()
+    }));
+    instrument.instrument = { triggerAttackRelease };
+
+    await instrument.play();
+    const loop = Tone.Loop.mock.results[0].value;
+    loop.callback(0);
+    loop.callback(1);
+    loop.callback(2);
+
+    expect(triggerAttackRelease.mock.calls.map(([note]) => note)).toEqual(['C4', 'E4']);
   });
 
   describe('Startup', () => {

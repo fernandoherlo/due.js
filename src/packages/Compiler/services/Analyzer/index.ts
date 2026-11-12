@@ -1,4 +1,4 @@
-import { AST_KIND, COMMANDS, COMMANDS_MAP, MODES, OPERATORS, TEMPO, TYPE_VALUE, VALUE_OPERATOR } from '~/src/packages/Compiler/constants';
+import { AST_KIND, COMMANDS, COMMANDS_MAP, MODES, OPERATORS, REST_VALUE, TEMPO, TYPE_VALUE, VALUE_OPERATOR } from '~/src/packages/Compiler/constants';
 import Instruction from '~/src/packages/Compiler/services/Instruction';
 import { parseExpression } from '~/src/packages/Compiler/services/Parser/value';
 import type { IAstProgram, IAstStatement, IAstValue, IAstValueExpression } from '~/src/packages/Compiler/types/IAst';
@@ -73,13 +73,24 @@ export default class Analyzer {
       mode,
       modeParameters: mode ? resolved.values.map(argument => argument.rawValue) : undefined,
       type: COMMANDS_MAP[name],
-      ...this.createValue(resolved, element, bpm)
+      ...this.createValue(resolved, element, bpm, name)
     });
   }
 
-  private createValue (expression: IAstValueExpression, element: string, bpm: number) {
+  private createValue (expression: IAstValueExpression, element: string, bpm: number, command: string) {
     const { valueFactory } = this;
     const [note, duration, interval] = expression.values;
+    if (containsRest(duration) || containsRest(interval)) {
+      throw Error(`The rest value "${REST_VALUE}" is only allowed as a note.`);
+    }
+    if (note && containsRest(note)) {
+      if (command !== COMMANDS.n && command !== COMMANDS.sam) {
+        throw Error(`The rest value "${REST_VALUE}" is only supported in n or sam note patterns.`);
+      }
+      if (note.kind === AST_KIND.collection && note.operator === VALUE_OPERATOR.chord) {
+        throw Error(`The rest value "${REST_VALUE}" cannot be part of a chord.`);
+      }
+    }
     const parameters = { value2: parameter(duration, bpm), value3: parameter(interval, bpm) };
     if (note?.kind === AST_KIND.collection) {
       if (note.operator === VALUE_OPERATOR.chord) {
@@ -99,6 +110,13 @@ export default class Analyzer {
       typeValue: TYPE_VALUE.normal
     };
   }
+}
+
+function containsRest (value: IAstValue | undefined): boolean {
+  if (!value) return false;
+  if (value.kind === AST_KIND.scalar) return value.rawValue === REST_VALUE;
+  if (value.kind === AST_KIND.range) return value.min === REST_VALUE || value.max === REST_VALUE;
+  return value.kind === AST_KIND.collection && value.values.some(containsRest);
 }
 
 function assertDefined (rawValue: string, location: { line: number, column: number }): void {

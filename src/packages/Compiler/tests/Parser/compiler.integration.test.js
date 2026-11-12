@@ -110,6 +110,16 @@ describe('Compiler integration', () => {
   });
 
   it.each([
+    ['sam1#piano([C4>~>E4];1;1)', TYPE_VALUE.sequence],
+    ['n1([C4,~,E4];1;1)', TYPE_VALUE.random]
+  ])('preserves rest steps in note patterns: %s', (source, typeValue) => {
+    const instruction = createCompiler().prepare(source).addedInstructions[0];
+
+    expect(instruction.typeValue).toBe(typeValue);
+    expect(instruction.value.map(note => note.value)).toEqual(['C4', '~', 'E4']);
+  });
+
+  it.each([
     [',', TYPE_VALUE.random],
     ['>', TYPE_VALUE.sequence]
   ])('supports chords inside a %s pattern', (separator, typeValue) => {

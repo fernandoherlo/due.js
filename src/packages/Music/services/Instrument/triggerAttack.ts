@@ -1,11 +1,12 @@
 import type { INote, INoteEvent, IOperator } from '~/src/types';
-import { TYPE_VALUE } from '~/src/packages/Compiler/constants';
+import { REST_VALUE, TYPE_VALUE } from '~/src/packages/Compiler/constants';
 
 export default class TriggerAttack {
   static play (
     value: any, typeValue: string, valueStep: number, instrument: any, time?: number, operators: readonly IOperator[] = []
   ): any[] | undefined {
     const note: INote = TriggerAttack.getValue(value, typeValue, valueStep);
+    if (note.value === REST_VALUE) return;
     if (note.value) {
       const duration = parseFloat(TriggerAttack.getValue(note.duration));
       let played = this._isChord(note.value, typeValue) && !Array.isArray(note.value)
@@ -32,7 +33,8 @@ export default class TriggerAttack {
 
   static getPool (value: any): string[] {
     const candidates = Array.isArray(value) ? value : [value];
-    return candidates.map(candidate => candidate?.value).filter(item => typeof item === 'string' && !item.includes('|'));
+    return candidates.map(candidate => candidate?.value)
+      .filter(item => typeof item === 'string' && !item.includes('|') && item !== REST_VALUE);
   }
 
   static getValue (values: any | Array<any>, typeValue?: string | undefined, valueStep: number | undefined = 0) {

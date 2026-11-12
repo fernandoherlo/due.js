@@ -18,6 +18,8 @@ describe('Numeric validation', () => {
     'sam1#piano(C4;[0-1];[1-2])',
     'sam1#piano(C4;[0,1];[1,2])',
     'sam1#piano(C4;0;[0-2])',
+    'sam1#piano([C4>~>E4];0.25;1)',
+    'n1([C3,~,G3];0.25;1)',
     'sam1#piano(C4):v(-1):v(5)',
     'sam1#piano(C4):r(0):cho(127):d(127;1):d(0;0)',
     '$$x=mi0(1@5)\nsam1#piano(C4):v($$x)'

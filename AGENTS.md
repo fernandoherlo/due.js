@@ -28,6 +28,7 @@ Lenguaje propio de live coding musical que corre en el navegador: Vite + TypeScr
 
 - `:` efectos (`v`, `r`, `d`, `cho`); `::` modos y operadores de nota; `=>` conexiones (sin ejecutor aun); `$var` variables; `$$var=mi0(1@5)` entrada MIDI.
 - Listas: `[a,b]` azar, `[a>b]` secuencia, `[a|b]` acorde; rangos `[a-b]` (duracion e intervalo); sufijo `b` para pulsos; `bpm(N)` solo en su linea.
+- `~` es un silencio de un paso en el primer argumento de `n` y `sam`; no se admite en acordes, duraciones ni intervalos.
 - Instrumentos: `samN#preset` (Tone.Sampler, polifonico), `nN` (Tone.Synth, monofonico: acordes o `late` mayor que el intervalo dan problemas), `moN`, `misamN`, `aiN`.
 - Presets de `sam` en `Music/constants/samplers.ts` (`piano`, `kick`, `hats`, `snare`, `harp`, `chorus`...) y datos en `Music/constants/samples.json`.
 - `v(0..127)` va de -30 a +30 dB (64 aprox. unidad; `v(90)` puede saturar). `r` de 0 a 20 s, `cho` de 0 a 30 Hz.

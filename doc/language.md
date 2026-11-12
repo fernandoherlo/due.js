@@ -100,6 +100,17 @@ Para el primer argumento, las listas usan estos separadores:
 
 La coma elige un valor al azar en cada repetición; `>` recorre los valores en orden y vuelve al inicio; `|` toca las notas como acorde.
 
+`~` representa un silencio de un paso en el primer argumento de `n` y `sam`:
+
+```text
+sam1#piano([C4>~>E4];1b;1b)
+n1([C3,~,G3];0.5b;1b)
+```
+
+En una secuencia, el silencio ocupa el paso y el patrón avanza tras el intervalo normal; en una lista aleatoria puede elegirse y omitir esa repetición.
+No dispara una nota ni corta las voces o colas de efectos que ya esten sonando. No se permite dentro de un acorde ni como duracion o intervalo.
+La prolongacion de notas es una propuesta distinta (F52).
+
 Las opciones pueden ser acordes: `[A2|C2|B2,D2|A2|G2]` elige al azar entre dos acordes y `[A2|C2|B2>D2|A2|G2]` los recorre en orden. Los corchetes rodean el patrón completo.
 
 Los campos de duración e intervalo también admiten listas o rangos:

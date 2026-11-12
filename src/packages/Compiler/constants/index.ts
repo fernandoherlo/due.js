@@ -89,6 +89,8 @@ export const VALUE_OPERATOR = {
   single: 'single'
 } as const;
 
+export const REST_VALUE = '~' as const;
+
 export const CHARACTERS_INSTRUCTIONS = {
   CONNECT: '=>',
   CONCATENATE_COMMANDS: ':',

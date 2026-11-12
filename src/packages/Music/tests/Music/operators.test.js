@@ -150,6 +150,23 @@ describe('Note operators', () => {
       expect(logged).toEqual(['C4', 0.5]);
     });
 
+    it('does not trigger an instrument for a rest step', () => {
+      const instrument = { triggerAttackRelease: vi.fn() };
+
+      const logged = TriggerAttack.play({ value: '~', duration: 0.5 }, 'normal', 0, instrument, 3);
+
+      expect(instrument.triggerAttackRelease).not.toHaveBeenCalled();
+      expect(logged).toBeUndefined();
+    });
+
+    it('excludes rests from the note pool used by operators', () => {
+      expect(TriggerAttack.getPool([
+        { value: 'C4' },
+        { value: '~' },
+        { value: 'E4' }
+      ])).toEqual(['C4', 'E4']);
+    });
+
     it('feeds each operator with the previous result', () => {
       const instrument = { triggerAttackRelease: vi.fn() };
       const operators = [operator('chord', 1), operator('oct', 1, 1)];

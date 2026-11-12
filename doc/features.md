@@ -12,11 +12,11 @@ F01 y F31 deben coordinarse para definir la relacion entre tiempo musical y temp
 
 ## Patrones y composicion
 
-### F07. Silencios y prolongaciones
+### F07. Silencios
 
-Representar pasos vacios y prolongaciones de notas dentro de las secuencias sin recurrir a trucos de volumen.
-Un silencio avanzaria el patron sin disparar una nota; una prolongacion extenderia la nota anterior.
-La sintaxis deberia contemplar acordes y definir el resultado cuando no existe una nota previa que prolongar.
+Disponible parcialmente: `~` representa un silencio de un paso en patrones de `n` y `sam`, tanto en secuencias como en elecciones aleatorias; ver `doc/language.md`.
+El silencio no dispara notas ni corta voces o colas de efectos. No se admite dentro de acordes ni en la duracion o el intervalo.
+Queda pendiente decidir si se amplia a otros generadores de notas.
 
 ### F08. Ritmos euclidianos
 
@@ -298,6 +298,13 @@ La integracion deberia ser opcional y sus fallos o su frecuencia de dibujo no de
 Encaje parcial: las reglas de traduccion pueden escribirse en el DSL, pero elegir y previsualizar una imagen necesita apoyo visual.
 El usuario definiria un recorrido de lectura y como brillo, color o posicion se convierten en alturas, duraciones o timbres.
 La imagen seria material de composicion, no una sustitucion del editor de texto por una cuadricula de notas.
+
+### F52. Prolongaciones de nota
+
+Extender una nota o acorde a traves de uno o mas pasos sin volver a disparar su ataque.
+La prolongacion conservaria el avance temporal del patron y deberia definir como se enlazan las voces de un acorde,
+que ocurre si no hay una nota previa y si un silencio interrumpe la prolongacion (ver F07).
+Tambien hay que especificar el comportamiento de instrumentos que no pueden sostener una nota, como samplers o ciertas salidas MIDI.
 Habria que resolver la carga del recurso, limitar el coste de analisis y conservar sus referencias al compartir un proyecto.
 
 ### F51. Evolucion por seleccion
