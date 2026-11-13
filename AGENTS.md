@@ -17,6 +17,9 @@ Lenguaje propio de live coding musical que corre en el navegador: Vite + TypeScr
 ## Preferencias del usuario
 
 - Escribe en espanol; respuestas breves e impersonales, sin emojis.
+- Economia de tokens: ir directo al resultado sin preambulos, introducciones ni despedidas; no repetir explicaciones conceptuales salvo peticion expresa; no volcar fragmentos de codigo extensos si basta con indicar el archivo y linea.
+- Comandos y herramientas: limitar la salida de comandos de terminal (usar `head`, `-n`, o filtros especificos); leer solo los rangos de lineas pertinentes al inspeccionar archivos.
+- Subagentes: usar modelo `flash` o `flash_lite` cuando se deleguen tareas de busqueda o consulta puntual.
 - No crear documentos markdown sin pedirlo; los ejemplos largos van a `doc/examples/*.duejs`.
 - Los commits son locales; nunca hacer push. Mensajes en ingles (`feat:`, `docs:`...).
 - Docs en espanol sin acentos ni enes en los `.md` nuevos de `doc/`.
