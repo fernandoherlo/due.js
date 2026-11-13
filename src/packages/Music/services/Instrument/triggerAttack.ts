@@ -32,8 +32,9 @@ export default class TriggerAttack {
     let detune = 0;
 
     if (operators.length) {
+      const pool = operators.some(operator => operator.needsPool) ? TriggerAttack.getPool(value) : undefined;
       const event = operators.reduce<INoteEvent>((current, operator) => operator.apply(current), {
-        notes: [played].flat(), duration, time, pool: TriggerAttack.getPool(value)
+        notes: [played].flat(), duration, time, pool
       });
       if (!event.notes.length) return;
       played = Array.isArray(played) || event.notes.length > 1 ? event.notes : event.notes[0];

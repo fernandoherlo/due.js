@@ -1,0 +1,35 @@
+// .#####..##..##.######........######..####..
+// .##..##.##..##.##................##.##.....
+// .##..##.##..##.####..............##..####..
+// .##..##.##..##.##.......##...##..##.....##.
+// .#####...####..######...##....####...####..
+// Supersaw ambiental: notas diatonicas aleatorias, capas con ritmos distintos y reverb larga.
+// Cada pista cambia su intervalo en cada paso; todas arrancan juntas al iniciar la pieza.
+bpm(84)
+
+$grave=[C2^4,G2^2,~]
+$pentatonica=[C3,D3,E3,G3,A3]
+$agudas=[G4,A4,C5,D5,E5,~]
+$abiertas=[C4,E4,G4,A4]
+$sala=116
+$detuneGrave=8
+$detuneAgudas=24
+$detune=14
+$salto=5
+$probLate=0.35
+$maxLate=1
+
+// Grave: notas que suelen durar mas que el intervalo para que se pisen entre si.
+n1#supersaw($grave;[14-32];[8-17]):r($sala):v(36)::detune($detuneGrave)
+
+// Centro: algunas notas tambien se solapan; los saltos siguen siendo moderados.
+n2#supersaw($pentatonica;[5-14];[4-12]):r($sala):v(30)::walk($salto)::late($probLate;$maxLate)::human(0.12)::detune($detune)
+
+// Agudos: capa escasa; la octava y el retraso hacen que algunas notas aparezcan como destellos.
+n3#supersaw($agudas;[1.5-4];[10-25]):r($sala):v(22)::oct(0.15;1)::late($probLate;$maxLate)::detune($detuneAgudas)
+
+// Una nota muy ocasional abre el registro sin marcar un ciclo regular.
+n4#supersaw($abiertas;[3-7];[18-36]):r($sala):v(18)::walk($salto)::late($probLate;$maxLate)::detune($detune)
+
+// Piano ocasional: notas sueltas que dejan una cola larga entre las capas sintetizadas.
+sam1#piano($abiertas;[3-7];[22-50]):r($sala):d(72;0.4):v(25)::late($probLate;$maxLate)

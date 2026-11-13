@@ -8,11 +8,13 @@ type Time = Parameters<Tone.Sampler['triggerAttackRelease']>[2];
 export default abstract class Mode extends Tone.Sampler implements IMode {
   private readonly samples: Map<number, AudioBuffer>;
   private readonly current: Map<number, AudioBuffer>;
+  private readonly sampleNotes: number[];
 
   constructor (protected readonly action: IInstruction, buffers: Record<string, AudioBuffer>) {
     super({ urls: buffers });
     this.samples = new Map(Object.entries(buffers).map(([note, buffer]) => [toMidi(note), buffer] as const));
     this.current = new Map(this.samples);
+    this.sampleNotes = [...this.samples.keys()];
   }
 
   static async loadBuffers (urls: Record<string, string>): Promise<Record<string, AudioBuffer>> {
@@ -40,9 +42,12 @@ export default abstract class Mode extends Tone.Sampler implements IMode {
   }
 
   private closestSample (midi: number): number {
-    return [...this.samples.keys()].reduce((closest, candidate) => {
+    let closest = this.sampleNotes[0];
+    for (let index = 1; index < this.sampleNotes.length; index++) {
+      const candidate = this.sampleNotes[index];
       const difference = Math.abs(candidate - midi) - Math.abs(closest - midi);
-      return difference < 0 || (difference === 0 && candidate > closest) ? candidate : closest;
-    });
+      if (difference < 0 || (difference === 0 && candidate > closest)) closest = candidate;
+    }
+    return closest;
   }
 }

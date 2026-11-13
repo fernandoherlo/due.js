@@ -35,7 +35,7 @@
     "@codemirror/view": "^6.38.0",
     "@magenta/music": "^1.23.1",
     "flatted": "^3.3.3",
-    "tone": "^15.1.22",
+    "tone": "^15.5.67",
     "webmidi": "^3.1.12"
   },
   "optionalDependencies": {
