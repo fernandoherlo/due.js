@@ -9,6 +9,6 @@ export interface IMusic {
   isMuted: (key: string) => boolean;
   validate: (instructions: Array<IInstruction>) => void;
   add: (instructions: Array<IInstruction>) => Promise<void>;
-  update: (instructions: Array<IInstruction>) => Promise<void>;
+  update: (instructions: Array<IInstruction>, previousInstructions?: Record<string, IInstruction>) => Promise<void>;
   delete: (instructions: Array<IInstruction>) => Promise<void>;
 }

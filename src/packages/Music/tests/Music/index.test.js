@@ -2,6 +2,7 @@ import * as Tone from 'tone';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { WebMidi } from 'webmidi';
 import { COMMANDS } from '~/src/packages/Compiler/constants';
+import { COMMANDS_ELEMENT_MAP } from '~/src/packages/Music/constants';
 import LiveVariableRegistry from '~/src/packages/App/services/LiveVariableRegistry';
 import Compiler from '~/src/packages/Compiler/services/Compiler';
 import Delay from '~/src/packages/Music/services/Effect/Delay';
@@ -399,6 +400,83 @@ describe('Music', () => {
       await music.delete(instructions);
       // Assert
       expect(mockApp.$debugger.add).not.toHaveBeenCalled();
+    });
+
+    it('cleans up created instruments and preserves existing ones when add fails halfway', async () => {
+      const music = new Music(mockApp);
+      await music.add([{ name: 'foo', key: 'stable' }]);
+      const stable = music.instructions.stable;
+
+      let callCount = 0;
+      const createdElements = [];
+      const originalFoo = COMMANDS_ELEMENT_MAP.foo;
+      COMMANDS_ELEMENT_MAP.foo = () => {
+        callCount++;
+        const el = {
+          start: callCount === 2 ? vi.fn().mockRejectedValue(new Error('start failed')) : vi.fn().mockResolvedValue(undefined),
+          update: vi.fn(),
+          end: vi.fn().mockResolvedValue(undefined)
+        };
+        createdElements.push(el);
+        return el;
+      };
+
+      try {
+        await expect(music.add([
+          { name: 'foo', key: 'first' },
+          { name: 'foo', key: 'second' }
+        ])).rejects.toThrow('start failed');
+
+        expect(createdElements[0].end).toHaveBeenCalled();
+        expect(createdElements[1].end).toHaveBeenCalled();
+        expect(music.instructions).not.toHaveProperty('first');
+        expect(music.instructions).not.toHaveProperty('second');
+        expect(music.instructions.stable).toBe(stable);
+      } finally {
+        COMMANDS_ELEMENT_MAP.foo = originalFoo;
+      }
+    });
+
+    it('rolls back updated instruments to their previous instructions when update fails', async () => {
+      const music = new Music(mockApp);
+      await music.add([
+        { name: 'foo', key: 'first' },
+        { name: 'foo', key: 'second' }
+      ]);
+      const firstOld = { name: 'foo', key: 'first', value: 'old1' };
+      const secondOld = { name: 'foo', key: 'second', value: 'old2' };
+      const firstNew = { name: 'foo', key: 'first', value: 'new1' };
+      const secondNew = { name: 'foo', key: 'second', value: 'new2' };
+
+      music.instructions.second.update.mockRejectedValueOnce(new Error('update failed'));
+
+      await expect(music.update([firstNew, secondNew], { first: firstOld, second: secondOld }))
+        .rejects.toThrow('update failed');
+
+      expect(music.instructions.first.update).toHaveBeenNthCalledWith(1, firstNew);
+      expect(music.instructions.first.update).toHaveBeenNthCalledWith(2, firstOld);
+      expect(music.instructions.second.update).toHaveBeenNthCalledWith(1, secondNew);
+      expect(music.instructions.second.update).toHaveBeenNthCalledWith(2, secondOld);
+    });
+
+    it('continues deleting remaining instructions when an end call throws', async () => {
+      const music = new Music(mockApp);
+      await music.add([
+        { name: 'foo', key: 'first' },
+        { name: 'foo', key: 'second' }
+      ]);
+      const second = music.instructions.second;
+
+      music.instructions.first.end.mockRejectedValueOnce(new Error('end failed'));
+
+      await music.delete([
+        { name: 'foo', key: 'first' },
+        { name: 'foo', key: 'second' }
+      ]);
+
+      expect(second.end).toHaveBeenCalled();
+      expect(music.instructions).not.toHaveProperty('first');
+      expect(music.instructions).not.toHaveProperty('second');
     });
   });
 

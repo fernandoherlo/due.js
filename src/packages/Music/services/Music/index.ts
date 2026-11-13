@@ -128,30 +128,68 @@ export default class Music implements IMusic {
       this.app.$debugger.add('ADD', instructions);
     }
 
-    for (let i = 0; i < instructions.length; i++) {
-      const instruction: IInstruction = instructions[i];
-      if (!this.instructions[instruction.key]) {
-        const element = COMMANDS_ELEMENT_MAP[instruction.name](instruction, this.app) as IInstrument;
-        await element.start();
-        if (this.muted.has(instruction.key)) {
-          element.setMuted(true);
+    const addedKeys: string[] = [];
+    try {
+      for (let i = 0; i < instructions.length; i++) {
+        const instruction: IInstruction = instructions[i];
+        if (!this.instructions[instruction.key]) {
+          const element = COMMANDS_ELEMENT_MAP[instruction.name](instruction, this.app) as IInstrument;
+          this.instructions[instruction.key] = element;
+          addedKeys.push(instruction.key);
+          await element.start();
+          if (this.muted.has(instruction.key)) {
+            element.setMuted(true);
+          }
         }
-
-        this.instructions[instruction.key] = element;
       }
+    } catch (error) {
+      for (const key of addedKeys) {
+        try {
+          await this.instructions[key]?.end();
+        } catch {
+          // ignore cleanup errors
+        }
+        delete this.instructions[key];
+      }
+      throw error;
     }
   }
 
-  async update (instructions: Array<IInstruction>) {
+  async update (instructions: Array<IInstruction>, previousInstructions: Record<string, IInstruction> = {}) {
     if (instructions.length) {
       this.app.$debugger.add('UPDATE', instructions);
     }
 
-    for (let i = 0; i < instructions.length; i++) {
-      const instruction: IInstruction = instructions[i];
-      if (this.instructions[instruction.key]) {
-        await this.instructions[instruction.key].update(instruction);
+    const updatedKeys: string[] = [];
+    let failedKey: string | undefined;
+
+    try {
+      for (let i = 0; i < instructions.length; i++) {
+        const instruction: IInstruction = instructions[i];
+        if (this.instructions[instruction.key]) {
+          failedKey = instruction.key;
+          await this.instructions[instruction.key].update(instruction);
+          updatedKeys.push(instruction.key);
+          failedKey = undefined;
+        }
       }
+    } catch (error) {
+      const keysToRollback = new Set(updatedKeys);
+      if (failedKey) {
+        keysToRollback.add(failedKey);
+      }
+
+      for (const key of keysToRollback) {
+        const prev = previousInstructions[key];
+        if (prev && this.instructions[key]) {
+          try {
+            await this.instructions[key].update(prev);
+          } catch {
+            // ignore rollback errors
+          }
+        }
+      }
+      throw error;
     }
   }
 
@@ -163,9 +201,13 @@ export default class Music implements IMusic {
     for (let i = 0; i < instructions.length; i++) {
       const instruction: IInstruction = instructions[i];
       if (this.instructions[instruction.key]) {
-        await this.instructions[instruction.key].end();
-
-        delete this.instructions[instruction.key];
+        try {
+          await this.instructions[instruction.key].end();
+        } catch {
+          // ignore cleanup errors to guarantee deleting all remaining instructions
+        } finally {
+          delete this.instructions[instruction.key];
+        }
       }
     }
   }

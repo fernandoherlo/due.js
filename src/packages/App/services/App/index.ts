@@ -1,4 +1,4 @@
-import type { IApp, ILogger, IStore, IErrorHandler, IDebugger, IMusic, ICompiler, IEditor, IUi, IMidiIn } from '~/src/types';
+import type { IApp, ILogger, IStore, IErrorHandler, IDebugger, IMusic, ICompiler, IEditor, IUi, IMidiIn, IInstruction } from '~/src/types';
 import Logger from '../Logger';
 import Store from '../Store';
 import ErrorHandler from '../Error/handler';
@@ -92,9 +92,36 @@ export default class App implements IApp {
           await this.$music.waitForNextBar(plan.bpm);
         }
 
-        await this.$music.add(plan.addedInstructions);
-        await this.$music.update(plan.updatedInstructions);
-        await this.$music.delete(plan.deletedInstructions);
+        let addedSucceeded = false;
+        let updateSucceeded = false;
+        try {
+          await this.$music.add(plan.addedInstructions);
+          addedSucceeded = true;
+          await this.$music.update(plan.updatedInstructions, plan.previousInstructions);
+          updateSucceeded = true;
+          await this.$music.delete(plan.deletedInstructions);
+        } catch (error) {
+          if (updateSucceeded && plan.updatedInstructions.length > 0 && plan.previousInstructions) {
+            const previousToRestore = plan.updatedInstructions
+              .map(instruction => plan.previousInstructions?.[instruction.key])
+              .filter((instruction): instruction is IInstruction => Boolean(instruction));
+            if (previousToRestore.length > 0) {
+              try {
+                await this.$music.update(previousToRestore);
+              } catch {
+                // ignore rollback errors
+              }
+            }
+          }
+          if (addedSucceeded && plan.addedInstructions.length > 0) {
+            try {
+              await this.$music.delete(plan.addedInstructions);
+            } catch {
+              // ignore cleanup errors
+            }
+          }
+          throw error;
+        }
 
         this.$compiler.commit(plan);
         this.$music.setTempo(plan.bpm);

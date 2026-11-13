@@ -256,7 +256,7 @@ En una cadena de efectos, el primer efecto escrito queda más cerca de la salida
 - El editor valida la estructura al escribir: subraya el primer error, marca su línea y muestra un mensaje con línea y columna. La barra se pone roja y el aviso se limpia al corregir el código. Esto no sustituye la validación semántica de presets, variables y valores.
 - Los valores explícitos `0` de duración y de feedback se conservan; el intervalo `0` se rechaza.
 - El tempo se configura con `bpm(N)` (ver Tempo y pulsos); no se usa el tempo del transporte de Tone.js.
-- El compilador prepara un plan y solo actualiza su snapshot y variables tras aplicar las operaciones de audio. Esto mantiene coherente el estado lógico, pero no revierte efectos de audio/MIDI si una operación falla a mitad.
+- El compilador prepara un plan y solo actualiza su snapshot y variables tras aplicar las operaciones de audio. Si la aplicacion falla a mitad, se liberan los instrumentos nuevos anadidos y se restauran las instrucciones previas en las actualizadas, manteniendo el audio previo en reproduccion.
 
 ## Posibles bugs e incompletitudes
 
