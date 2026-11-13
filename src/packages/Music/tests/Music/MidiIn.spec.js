@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { WebMidi } from 'webmidi';
 import { COMMANDS } from '~/src/packages/Compiler/constants';
 import Compiler from '~/src/packages/Compiler/services/Compiler';
+import LiveVariableRegistry from '~/src/packages/App/services/LiveVariableRegistry';
 import MidiIn from '~/src/packages/Music/services/MidiIn';
 import Music from '~/src/packages/Music/services/Music';
 import ValueFactory from '~/src/packages/Music/services/Music/valueFactory';
@@ -36,10 +37,13 @@ describe('MidiIn', () => {
       removeListener: vi.fn()
     };
     const update = vi.fn();
+    const liveVariableRegistry = new LiveVariableRegistry();
+    liveVariableRegistry.configure('$$control');
+    liveVariableRegistry.subscribe('$$control', update);
     const app = {
       $logger: { log: vi.fn() },
       $debugger: { add: vi.fn() },
-      $variablesLiveMap: { $$control: { update } }
+      $liveVariableRegistry: liveVariableRegistry
     };
 
     WebMidi.inputs = [{ name: 'input', channels: [undefined, undefined, channel] }];
@@ -48,7 +52,7 @@ describe('MidiIn', () => {
       name: '$$',
       element: '0',
       key: '$$control',
-      value: '2@5'
+      value: { channel: 2, controller: 5 }
     }, app);
 
     await midiIn.start();
@@ -59,12 +63,79 @@ describe('MidiIn', () => {
     onMidiMessage({ data: [176, 5, 60] });
 
     expect(update).toHaveBeenCalledTimes(1);
-    expect(update).toHaveBeenCalledWith(80);
+    expect(update).toHaveBeenCalledWith(80, false);
+  });
+
+  it('scales a MIDI source through its declared range', async () => {
+    let onMidiMessage;
+    const channel = {
+      addListener: vi.fn((event, listener) => { onMidiMessage = listener; }),
+      removeListener: vi.fn()
+    };
+    const app = {
+      $logger: { log: vi.fn() },
+      $debugger: { add: vi.fn() },
+      $variablesLive: {},
+      $liveVariableRegistry: new LiveVariableRegistry()
+    };
+    WebMidi.inputs = [{ name: 'input', channels: [undefined, channel] }];
+    const compiler = new Compiler(app, new ValueFactory());
+    const instruction = compiler.prepare('$$dur=mi0(1@7;[0.1-2])').addedInstructions[0];
+    const variable = new VariableLive(instruction, app);
+
+    await variable.start();
+    onMidiMessage({ data: [176, 7, 0] });
+    expect(app.$liveVariableRegistry.getValue('$$dur')).toBe(0.1);
+
+    onMidiMessage({ data: [176, 7, 127] });
+    expect(app.$liveVariableRegistry.getValue('$$dur')).toBe(2);
+
+    await variable.end();
+    expect(app.$liveVariableRegistry.getValue('$$dur')).toBeUndefined();
+  });
+
+  it('updates independent live variables on one channel and removes only the selected listener', async () => {
+    const listeners = new Set();
+    const channel = {
+      addListener: vi.fn((event, listener) => listeners.add(listener)),
+      removeListener: vi.fn((event, listener) => listeners.delete(listener))
+    };
+    const volumeUpdate = vi.fn();
+    const filterUpdate = vi.fn();
+    const liveVariableRegistry = new LiveVariableRegistry();
+    liveVariableRegistry.configure('$$volume');
+    liveVariableRegistry.configure('$$filter');
+    liveVariableRegistry.subscribe('$$volume', volumeUpdate);
+    liveVariableRegistry.subscribe('$$filter', filterUpdate);
+    const app = {
+      $logger: { log: vi.fn() },
+      $debugger: { add: vi.fn() },
+      $liveVariableRegistry: liveVariableRegistry
+    };
+    WebMidi.inputs = [{ name: 'input', channels: [undefined, channel] }];
+    const volume = new MidiIn({ element: '0', key: '$$volume', value: { channel: 1, controller: 7 } }, app);
+    const filter = new MidiIn({ element: '0', key: '$$filter', value: { channel: 1, controller: 74 } }, app);
+
+    await volume.start();
+    await filter.start();
+    for (const listener of listeners) listener({ data: [176, 7, 96] });
+    for (const listener of listeners) listener({ data: [176, 74, 32] });
+
+    expect(listeners.size).toBe(2);
+    expect(volumeUpdate).toHaveBeenCalledWith(96, false);
+    expect(filterUpdate).toHaveBeenCalledWith(32, false);
+
+    await volume.end();
+    for (const listener of listeners) listener({ data: [176, 74, 64] });
+
+    expect(listeners.size).toBe(1);
+    expect(volumeUpdate).toHaveBeenCalledTimes(1);
+    expect(filterUpdate).toHaveBeenLastCalledWith(64, false);
   });
 
   it('keeps a missing MIDI input inactive and allows it to be removed', async () => {
-    const app = { $logger: { log: vi.fn() }, $variablesLive: {} };
-    const variable = new VariableLive({ element: '0', key: '$$test', value: '1@5' }, app);
+    const app = { $logger: { log: vi.fn() }, $variablesLive: {}, $liveVariableRegistry: new LiveVariableRegistry() };
+    const variable = new VariableLive({ element: '0', key: '$$test', value: { channel: 1, controller: 5 } }, app);
 
     await variable.start();
 
@@ -78,8 +149,8 @@ describe('MidiIn', () => {
 
   it('still rejects an unavailable MIDI channel without registering the variable', async () => {
     WebMidi.inputs = [{ name: 'input', channels: [] }];
-    const app = { $logger: { log: vi.fn() }, $variablesLive: {} };
-    const variable = new VariableLive({ element: '0', key: '$$test', value: '1@5' }, app);
+    const app = { $logger: { log: vi.fn() }, $variablesLive: {}, $liveVariableRegistry: new LiveVariableRegistry() };
+    const variable = new VariableLive({ element: '0', key: '$$test', value: { channel: 1, controller: 5 } }, app);
 
     await expect(variable.start()).rejects.toThrow('MIDI channel 1 is not available');
 
@@ -90,7 +161,8 @@ describe('MidiIn', () => {
     const app = {
       $logger: { log: vi.fn() },
       $debugger: { add: vi.fn() },
-      $variablesLive: {}
+      $variablesLive: {},
+      $liveVariableRegistry: new LiveVariableRegistry()
     };
     const compiler = new Compiler(app, new ValueFactory());
     const music = new Music(app);

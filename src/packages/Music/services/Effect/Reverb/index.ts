@@ -15,7 +15,9 @@ export default class Reverb extends Effect implements IReverb {
   create () {
     this.effect = new Tone.Reverb();
     if (!Array.isArray(this.value)) {
-      this.effect.decay = this.getValue(this.value.value);
+      this.effect.decay = this.getValue(this.value.value, value => {
+        if (this.effect) this.effect.decay = value;
+      });
     }
 
     super.create();
@@ -23,7 +25,9 @@ export default class Reverb extends Effect implements IReverb {
 
   async update (value: any): Promise<void> {
     if (this.canUpdate && this.effect) {
-      this.effect.decay = this.getValue(value);
+      this.effect.decay = this.getValue(value, liveValue => {
+        if (this.effect) this.effect.decay = liveValue;
+      });
     }
   }
 }

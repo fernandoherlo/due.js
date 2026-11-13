@@ -31,12 +31,12 @@ describe('DSL semantic analyzer', () => {
 
     const result = analyzer.exec(program);
 
-    expect(result.instructions[`${COMMANDS_MAP[COMMANDS.$$]}1`]).toMatchObject({
+    expect(result.instructions.$$control).toMatchObject({
       name: COMMANDS.$$,
       element: '1',
       modifier: 'control',
       key: '$$control',
-      value: '2@5'
+      value: { channel: 2, controller: 5, range: undefined }
     });
     expect(valueFactory.create).not.toHaveBeenCalled();
     expect(valueFactory.adapt).not.toHaveBeenCalled();

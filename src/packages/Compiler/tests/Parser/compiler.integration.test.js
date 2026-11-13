@@ -80,6 +80,62 @@ describe('Compiler integration', () => {
     });
   });
 
+  it('keeps multiple live variables from the same MIDI input as separate instructions', () => {
+    const compiler = createCompiler();
+    const plan = compiler.prepare('$$volume=mi0(1@7)\n$$filter=mi0(1@74)');
+
+    expect(plan.addedInstructions.map(instruction => instruction.key).sort()).toEqual(['$$filter', '$$volume']);
+  });
+
+  it('accepts a declared live variable as an effect value', () => {
+    const compiler = createCompiler();
+    const plan = compiler.prepare('$$control=mi0(1@5)\nsam1#piano(C4;1;1):v($$control)');
+
+    expect(plan.addedInstructions.map(instruction => instruction.key)).toEqual(['$$control', 'sam1']);
+  });
+
+  it('stores an optional range on the live source config', () => {
+    const plan = createCompiler().prepare('$$dur=mi0(1@7;[0.1-2])\nsam1#piano(C4;1;1):r($$dur)');
+
+    expect(plan.addedInstructions[0].value).toEqual({
+      channel: 1,
+      controller: 7,
+      range: { min: 0.1, max: 2 }
+    });
+  });
+
+  it.each([
+    ['$$control=sam1(C4)', 'in the form miN'],
+    ['$$control=mi(1@5)', 'in the form miN'],
+    ['$$control=mi0(0@5)', 'channel must be between 1 and 16'],
+    ['$$control=mi0(1@128)', 'controller must be between 0 and 127'],
+    ['$$control=mi0(1@)', 'must use channel or channel@controller'],
+    ['$$control=mi0(1@5;7)', 'range must use [min-max]']
+  ])('rejects invalid live variable sources: %s', (source, message) => {
+    expect(() => createCompiler().prepare(source)).toThrow(message);
+  });
+
+  it('rejects live variable references without a prior MIDI declaration', () => {
+    expect(() => createCompiler().prepare('v($$missing)')).toThrow('Undefined live variable "$$missing"');
+  });
+
+  it('rejects a declared range outside the supported effect range', () => {
+    expect(() => createCompiler().prepare('$$decay=mi0(1@5;[0-30])\nsam1#piano(C4;1;1):r($$decay)'))
+      .toThrow('Live variable range for r must be between 0 and 20');
+  });
+
+  it.each([
+    'sam1#piano($$control;1;1)',
+    'sam1#piano(C4;$$control;1)',
+    'sam1#piano(C4;1;$$control)',
+    'sam1#piano(C4;1;1):d(64;$$control)',
+    'sam1#piano(C4;1;1)::late($$control)'
+  ])('rejects live variable references outside supported effect values: %s', (target) => {
+    const source = `$$control=mi0(1@5)\n${target}`;
+
+    expect(() => createCompiler().prepare(source)).toThrow('Live variables are currently supported only in effect values');
+  });
+
   it('updates, retains and deletes instructions relative to the committed snapshot', () => {
     const compiler = createCompiler();
     const initial = compiler.prepare('sam1(C4)\nsam2(E4)\nsam3(G4)');

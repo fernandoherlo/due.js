@@ -4,6 +4,7 @@ export type { IErrorHandler } from '~/src/packages/App/types/IErrorHandler';
 export type { IDebugger } from '~/src/packages/App/types/IDebugger';
 export type { IUi } from '~/src/packages/App/types/IUi';
 export type { IApp } from '~/src/packages/App/types/IApp';
+export type { ILiveVariableRegistry } from '~/src/packages/App/types/ILiveVariableRegistry';
 
 export type { IEditor } from '~/src/packages/Editor/types/IEditor';
 

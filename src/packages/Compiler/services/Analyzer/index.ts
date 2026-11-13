@@ -1,7 +1,8 @@
 import { AST_KIND, COMMANDS, COMMANDS_MAP, MODES, OPERATORS, REST_VALUE, TEMPO, TYPE_VALUE, VALUE_OPERATOR } from '~/src/packages/Compiler/constants';
 import Instruction from '~/src/packages/Compiler/services/Instruction';
 import { parseExpression } from '~/src/packages/Compiler/services/Parser/value';
-import type { IAstProgram, IAstStatement, IAstValue, IAstValueExpression } from '~/src/packages/Compiler/types/IAst';
+import type { IAstLiveVariable, IAstProgram, IAstStatement, IAstValue, IAstValueExpression } from '~/src/packages/Compiler/types/IAst';
+import type { ILiveVariableConfig } from '~/src/packages/Compiler/types/ILiveVariableConfig';
 import type { ICompilationPlan } from '~/src/packages/Compiler/types/ICompiler';
 import type { IInstruction, IValueFactory } from '~/src/types';
 
@@ -14,17 +15,22 @@ export default class Analyzer {
 
   exec (program: IAstProgram): Pick<ICompilationPlan, 'instructions' | 'variables' | 'bpm'> {
     const variables: Record<string, string> = {};
+    const liveVariables = new Map<string, ILiveVariableConfig>();
     const instructions: Record<string, IInstruction> = {};
     const bpm = readTempo(program);
     for (const line of program.lines) {
       let instrument: IInstruction | undefined;
       for (const statement of line.statements) {
         if (isTempo(statement)) continue;
-        const instruction = this.analyzeStatement(statement, variables, bpm);
+        const liveVariableConfig = statement.kind === AST_KIND.liveVariable
+          ? parseLiveVariableSource(statement)
+          : undefined;
+        const instruction = this.analyzeStatement(statement, variables, bpm, liveVariables, liveVariableConfig);
         if (!instruction) continue;
         validateMode(instruction, instrument);
         if (instruction.type && instruction.element) {
-          instructions[`${instruction.type}${instruction.element}`] = instruction;
+          const key = instruction.name === COMMANDS.$$ ? instruction.key : `${instruction.type}${instruction.element}`;
+          instructions[key] = instruction;
           instrument = instruction;
         } else if (instruction.type && instrument) {
           instrument.actions.push(instruction);
@@ -32,17 +38,26 @@ export default class Analyzer {
           const { location } = statement;
           throw Error(`Line ${location.line}, column ${location.column}: Cannot associate command with an instrument.`);
         }
+        if (statement.kind === AST_KIND.liveVariable && liveVariableConfig) {
+          liveVariables.set(statement.name, liveVariableConfig);
+        }
       }
     }
     const ordered = Object.fromEntries(Object.keys(instructions).sort().map(key => [key, instructions[key]]));
     return { instructions: ordered, variables, bpm };
   }
 
-  private analyzeStatement (statement: IAstStatement, variables: Record<string, string>, bpm: number): IInstruction | undefined {
+  private analyzeStatement (
+    statement: IAstStatement,
+    variables: Record<string, string>,
+    bpm: number,
+    liveVariables: Map<string, ILiveVariableConfig>,
+    liveVariableConfig?: ILiveVariableConfig
+  ): IInstruction | undefined {
     const { valueFactory } = this;
     if (statement.kind === AST_KIND.variable) {
       variables[statement.name] = valueFactory.adapt(statement.value.rawValue, variables);
-      assertDefined(variables[statement.name], statement.location);
+      assertDefined(variables[statement.name], statement.location, variables, liveVariables);
       return;
     }
     if (statement.kind === AST_KIND.liveVariable) {
@@ -52,7 +67,7 @@ export default class Analyzer {
         element: command.element,
         key: name,
         modifier: name.slice(COMMANDS.$$.length),
-        value: command.arguments.rawValue,
+        value: liveVariableConfig,
         type: COMMANDS_MAP[COMMANDS.$$],
         typeValue: TYPE_VALUE.normal
       });
@@ -63,9 +78,10 @@ export default class Analyzer {
     const modifier = connection ? undefined : statement.modifier;
     const expression = connection ? statement.target : statement.arguments;
     const rawValue = valueFactory.adapt(expression.rawValue, variables);
-    assertDefined(rawValue, statement.location);
+    assertDefined(rawValue, statement.location, variables, liveVariables);
     const resolved = rawValue === expression.rawValue ? expression : parseExpression(rawValue, expression.location);
     const mode = !connection && statement.mode;
+    validateLiveVariableUsage(name, mode, resolved, liveVariables, statement.location);
     return new Instruction({
       name,
       element,
@@ -158,10 +174,101 @@ function parseWeightedChoice (choice: IAstValue): { value: string, weight?: numb
   return { value, weight };
 }
 
-function assertDefined (rawValue: string, location: { line: number, column: number }): void {
-  const name = /(?<!\$)\$[A-Za-z_]\w*/.exec(rawValue)?.[0];
-  if (name) {
-    throw Error(`Line ${location.line}, column ${location.column}: Undefined variable "${name}".`);
+function assertDefined (
+  rawValue: string,
+  location: { line: number, column: number },
+  variables: Record<string, string>,
+  liveVariables: Map<string, ILiveVariableConfig>
+): void {
+  const references = rawValue.match(/\$\$?[A-Za-z_]\w*/g) ?? [];
+  for (const name of references) {
+    const defined = name.startsWith(COMMANDS.$$)
+      ? liveVariables.has(name)
+      : Object.prototype.hasOwnProperty.call(variables, name);
+    if (!defined) {
+      const label = name.startsWith(COMMANDS.$$) ? 'live variable' : 'variable';
+      throw Error(`Line ${location.line}, column ${location.column}: Undefined ${label} "${name}".`);
+    }
+  }
+}
+
+function parseLiveVariableSource (statement: IAstLiveVariable): ILiveVariableConfig {
+  const { command, location, name } = statement;
+  const where = `Line ${location.line}, column ${location.column}`;
+  if (!/^\$\$[A-Za-z_]\w*$/.test(name)) {
+    throw Error(`${where}: Live variable names must start with $$ and contain a name.`);
+  }
+  if (command.name !== COMMANDS.mi || !command.element) {
+    throw Error(`${where}: Live variables currently require a MIDI source in the form miN(channel@controller).`);
+  }
+  if (command.modifier || command.arguments.values.length < 1 || command.arguments.values.length > 2) {
+    throw Error(`${where}: A MIDI live variable must use channel@controller and an optional [min-max] range.`);
+  }
+
+  const source = /^(\d+)(?:@(\d+))?$/.exec(command.arguments.values[0].rawValue);
+  if (!source) {
+    throw Error(`${where}: MIDI source must use channel or channel@controller.`);
+  }
+  const channel = Number(source[1]);
+  if (!Number.isInteger(channel) || channel < 1 || channel > 16) {
+    throw Error(`${where}: MIDI channel must be between 1 and 16.`);
+  }
+  if (source[2] !== undefined) {
+    const controller = Number(source[2]);
+    if (!Number.isInteger(controller) || controller < 0 || controller > 127) {
+      throw Error(`${where}: MIDI controller must be between 0 and 127.`);
+    }
+  }
+
+  let range: ILiveVariableConfig['range'];
+  const rangeValue = command.arguments.values[1];
+  if (rangeValue) {
+    if (rangeValue.kind !== AST_KIND.range) {
+      throw Error(`${where}: Live variable range must use [min-max].`);
+    }
+    const min = Number(rangeValue.min);
+    const max = Number(rangeValue.max);
+    if (!Number.isFinite(min) || !Number.isFinite(max) || max <= min) {
+      throw Error(`${where}: Live variable range must contain finite values with max greater than min.`);
+    }
+    range = { min, max };
+  }
+
+  return {
+    channel,
+    controller: source[2] === undefined ? undefined : Number(source[2]),
+    range
+  };
+}
+
+function validateLiveVariableUsage (
+  command: string,
+  mode: boolean | undefined,
+  expression: IAstValueExpression,
+  liveVariables: Map<string, ILiveVariableConfig>,
+  location: { line: number, column: number }
+): void {
+  const liveReference = /^\$\$[A-Za-z_]\w*$/;
+  const liveIndexes = expression.values
+    .map((value, index) => value.kind === AST_KIND.reference && liveReference.test(value.rawValue) ? index : -1)
+    .filter(index => index >= 0);
+  if (!expression.rawValue.includes(COMMANDS.$$)) return;
+
+  const supportedEffects = [COMMANDS.v, COMMANDS.r, COMMANDS.d, COMMANDS.cho];
+  const supported = !mode && supportedEffects.includes(command) && liveIndexes.length === 1 && liveIndexes[0] === 0;
+  if (!supported) {
+    throw Error(`Line ${location.line}, column ${location.column}: Live variables are currently supported only in effect values.`);
+  }
+
+  const effectRanges: Partial<Record<string, { min: number, max: number }>> = {
+    [COMMANDS.r]: { min: 0, max: 20 },
+    [COMMANDS.d]: { min: 0, max: 3 },
+    [COMMANDS.cho]: { min: 0, max: 30 }
+  };
+  const limit = effectRanges[command];
+  const range = liveVariables.get(expression.values[liveIndexes[0]].rawValue)?.range;
+  if (limit && range && (range.min < limit.min || range.max > limit.max)) {
+    throw Error(`Line ${location.line}, column ${location.column}: Live variable range for ${command} must be between ${limit.min} and ${limit.max}.`);
   }
 }
 

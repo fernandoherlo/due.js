@@ -16,7 +16,9 @@ export default class Volumen extends Effect implements IVolumen {
   create () {
     this.effect = new Tone.Volume();
     if (!Array.isArray(this.value)) {
-      this.effect.volume.value = this.getValue(this.value.value);
+      this.effect.volume.value = this.getValue(this.value.value, value => {
+        if (this.effect) this.effect.volume.value = value;
+      });
     }
 
     super.create();
@@ -24,7 +26,9 @@ export default class Volumen extends Effect implements IVolumen {
 
   async update (value: any): Promise<void> {
     if (this.canUpdate && this.effect) {
-      this.effect.volume.value = this.getValue(value);
+      this.effect.volume.value = this.getValue(value, liveValue => {
+        if (this.effect) this.effect.volume.value = liveValue;
+      });
     }
   }
 }

@@ -1,0 +1,20 @@
+// .#####..##..##.######........######..####..
+// .##..##.##..##.##................##.##.....
+// .##..##.##..##.####..............##..####..
+// .##..##.##..##.##.......##...##..##.....##.
+// .#####...####..######...##....####...####..
+// Variables live: un CC compartido, rangos en unidades de efecto y dos pistas.
+bpm(100)
+
+// CC7 conserva el mapeo propio de volumen (-30..30 dB)
+$$nivel=mi0(1@7)
+
+// CC91 controla la reverb directamente en segundos (1..18 s)
+$$sala=mi0(1@91;[1-18])
+
+// CC74 controla el tiempo del delay directamente en segundos (0.1..2 s)
+$$eco=mi0(1@74;[0.1-2])
+
+// nivel, sala y eco alimentan seis destinos a partir de tres fuentes MIDI
+sam1#piano([C3>G3];2;4):v($$nivel):r($$sala):d($$eco;0.35)
+sam2#piano([E4>G4];1;2):v($$nivel):r($$sala):d($$eco;0.25)

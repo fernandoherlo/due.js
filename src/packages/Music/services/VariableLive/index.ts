@@ -12,8 +12,14 @@ export default class VariableLive extends Instruction implements IVariableLive {
   }
 
   async start (): Promise<void> {
+    this.app.$liveVariableRegistry.configure(this.key, this.value.range);
     const midiIn = new MidiIn(this, this.app);
-    await midiIn.start();
+    try {
+      await midiIn.start();
+    } catch (error) {
+      this.app.$liveVariableRegistry.reset(this.key);
+      throw error;
+    }
     this.app.$variablesLive[this.key] = midiIn;
   }
 
@@ -22,6 +28,7 @@ export default class VariableLive extends Instruction implements IVariableLive {
       await this.app.$variablesLive[this.key].end();
       delete this.app.$variablesLive[this.key];
     }
+    this.app.$liveVariableRegistry.reset(this.key);
   }
 
   async update (newVariable: IVariableLive): Promise<void> {

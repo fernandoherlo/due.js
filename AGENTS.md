@@ -26,7 +26,7 @@ Lenguaje propio de live coding musical que corre en el navegador: Vite + TypeScr
 
 `nombre+elemento#modificador(valor;duracion;intervalo):efecto(v)::modo(args)`
 
-- `:` efectos (`v`, `r`, `d`, `cho`); `::` modos y operadores de nota; `=>` conexiones (sin ejecutor aun); `$var` variables; `$$var=mi0(1@5)` entrada MIDI.
+- `:` efectos (`v`, `r`, `d`, `cho`); `::` modos y operadores de nota; `=>` conexiones (sin ejecutor aun); `$var` variables; `$$var=miN(canal@cc;[min-max])` entrada MIDI. Sin rango, cada efecto conserva su mapeo MIDI; con rango, el CC se escala a unidades del efecto. Una variable live se comparte entre varios valores de efecto; solo se admite en `v/r/d/cho`, no en notas, duraciones ni operadores.
 - Listas: `[a,b]` azar, `[a>b]` secuencia, `[a|b]` acorde; rangos `[a-b]` (duracion e intervalo); sufijo `b` para pulsos; `bpm(N)` solo en su linea.
 - En listas aleatorias, `^peso` asigna probabilidad relativa a una opcion (peso por defecto `1`; solo listas con coma, no secuencias `>`).
 - `~` es un silencio de un paso en el primer argumento de `n` y `sam`; no se admite en acordes, duraciones ni intervalos.
@@ -69,7 +69,7 @@ Poner `::walk` antes de `::trans` (walk mira la lista sin transponer). Argumento
 
 ## Ejemplos (`doc/examples/`)
 
-Todos empiezan con el banner ASCII `DUE.JS` (5 lineas de comentario, copiar de `sample1.duejs`). Existentes: `sample1`, `sample2`, `operators`, `operators-all`, `generative-ambient`, `dj-dave`.
+Todos empiezan con el banner ASCII `DUE.JS` (5 lineas de comentario, copiar de `sample1.duejs`). Existentes: `sample1`, `sample2`, `operators`, `operators-all`, `generative-ambient`, `dj-dave`, `weighted-choices`, `supersaw-detune`, `live-midi-controls`.
 `operators-all` mantiene todas las pistas en do mayor (transposiciones distintas por pista sonaban mal).
 
 ## Documentacion de ideas (`doc/`)

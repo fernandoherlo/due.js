@@ -12,8 +12,8 @@ Las propuestas de nuevas funcionalidades se recogen en [features.md](features.md
 
 - [x] Permitir arrancar el editor y reproducir audio si Web MIDI no esta soportado o se deniega el permiso.
 	Probar ambos casos sin bloquear los controles ni ocultar el motivo de la indisponibilidad de MIDI.
-- [ ] Retirar solo el listener propio al eliminar una entrada o variable MIDI.
-	Probar dos variables en el mismo canal y verificar que eliminar una no desactiva la otra.
+- [x] Retirar solo el listener propio al eliminar una entrada o variable MIDI.
+	Cada `MidiIn` quita su callback exacto; probado con dos variables en el mismo canal.
 
 ## Validar el DSL antes de modificar el audio
 
@@ -23,8 +23,8 @@ Las propuestas de nuevas funcionalidades se recogen en [features.md](features.md
 	Se rechaza: el intervalo debe ser mayor que 0 (un rango puede empezar en 0).
 - [x] Distinguir valores omitidos de ceros explicitos: el feedback `0` del delay no debe convertirse en `0.5`.
 	Revisar los valores por defecto equivalentes y cubrir el caso con pruebas.
-- [ ] Validar indices MIDI, canales de 1 a 16 y controladores de 0 a 127 antes de crear las conexiones,
-	tambien cuando no exista el dispositivo seleccionado.
+- [x] Validar la sintaxis de `miN`, canales de 1 a 16 y controladores de 0 a 127 antes de crear las conexiones,
+	tambien cuando no exista el dispositivo seleccionado. La reconexion automatica sigue pendiente.
 
 ## Errores en pantalla
 

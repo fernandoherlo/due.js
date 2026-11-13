@@ -83,7 +83,7 @@ y `late` debe ser menor que el intervalo. Las notas se transponen solo si son no
 El sintetizador `n` conserva su oscilador triangular por defecto. El modificador `#supersaw` selecciona cinco sierras con 20 cents de dispersion interna; sigue siendo monofonico. `::detune(cents)` desplaza el tono completo de cada nota y es distinto de la dispersion interna de la supersaw.
 
 ```text
-n1#supersaw([C2,E2,G3];1;1b)::detune(8)
+n1#supersaw([C2,E2,G2];1;1b)::detune(8)
 ```
 Ejemplos en `doc/examples/operators.duejs`.
 
@@ -202,9 +202,17 @@ Las variables que comienzan con `$$` reciben valores de entrada MIDI. Por ejempl
 ```text
 $$control=mi0(1@5)
 sam1#piano(C4;0.25;1):v($$control)
+sam2#piano(G4;0.25;1):r($$control)
+
+$$dur=mi0(1@7;[0.1-2])
+sam3#piano(E4;0.25;1):r($$dur)
 ```
 
-`mi0` selecciona la entrada MIDI de índice `0`; `1` indica el canal y `5`, el número de controlador MIDI CC. La implementación actual acepta únicamente mensajes CC del canal seleccionado y, si se indicó, del controlador `5`. El valor recibido puede controlar un efecto que use esa variable.
+`mi0` selecciona la entrada MIDI de índice `0`; `1` indica el canal y `5`, el número de controlador MIDI CC. El controlador es opcional: `mi0(1)` acepta cualquier CC del canal. El canal se valida entre `1` y `16`, y el CC entre `0` y `127`, antes de crear audio. El índice de entrada se valida al conectar; si no existe, la variable queda inactiva.
+
+Una variable live debe declararse antes de usarse y su fuente actual debe ser `miN(canal)` o `miN(canal@cc)`. El rango opcional `[min-max]` convierte linealmente CC `0..127` a esos extremos; por ejemplo, `$$dur=mi0(1@7;[0.1-2])` produce valores de `0.1` a `2` segundos. Sin rango se conserva el mapeo MIDI propio del efecto: `v` a `-30..30` dB, `r` a `0..20` segundos, `d` a `0..3` segundos y `cho` a `0..30` Hz. Con rango explícito el valor se usa directamente en unidades del efecto y se valida contra sus límites. En `d`, el CC controla el tiempo, no el feedback.
+
+Varias variables pueden escuchar el mismo dispositivo y canal, y una variable puede alimentar varios valores de efecto. El último CC se conserva para destinos añadidos después; antes del primer mensaje se usa el valor mínimo del rango explícito o CC `0`. Al cambiar una referencia live por un valor fijo, recompilar o quitar la fuente, se retira la suscripción; al eliminar la fuente, los destinos restantes vuelven a su valor inicial. Actualmente `$$` solo se permite como primer valor de esos efectos: no se admite en notas, duraciones, intervalos, feedback ni operadores.
 
 Una entrada MIDI ausente no bloquea la compilación: se registra un aviso, la variable queda inactiva
 y los demás instrumentos continúan. Un canal no disponible en una entrada presente sigue siendo un error.

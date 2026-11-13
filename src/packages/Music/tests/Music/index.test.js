@@ -2,8 +2,10 @@ import * as Tone from 'tone';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { WebMidi } from 'webmidi';
 import { COMMANDS } from '~/src/packages/Compiler/constants';
+import LiveVariableRegistry from '~/src/packages/App/services/LiveVariableRegistry';
 import Compiler from '~/src/packages/Compiler/services/Compiler';
 import Delay from '~/src/packages/Music/services/Effect/Delay';
+import Volumen from '~/src/packages/Music/services/Effect/Volumen';
 import Instrument from '~/src/packages/Music/services/Instrument';
 import Sampler from '~/src/packages/Music/services/Instrument/Sampler';
 import Synth from '~/src/packages/Music/services/Instrument/Synth';
@@ -18,6 +20,7 @@ vi.mock('tone', async (importOriginal) => {
   return {
     ...original,
     FeedbackDelay: vi.fn(),
+    Volume: vi.fn(),
     getDraw: vi.fn(() => ({ schedule: callback => callback() })),
     Loop: vi.fn(),
     Sampler: sampler,
@@ -68,6 +71,7 @@ const mockApp = {
   $debugger: {
     add: vi.fn()
   },
+  $liveVariableRegistry: new LiveVariableRegistry(),
   $ui: {
     setMidiUnavailable: vi.fn(),
     updateLoopTime: vi.fn(),
@@ -173,7 +177,76 @@ describe('Music', () => {
     expect(draw.schedule).toHaveBeenCalledWith(expect.any(Function), 12);
 
     draw.schedule.mock.calls[0][0]();
-    expect(mockApp.$ui.updatePatternStep).toHaveBeenCalledWith('sam1', 0);
+    expect(mockApp.$ui.updatePatternStep).toHaveBeenCalledWith('sam1', 0, 1);
+  });
+
+  it('fans a live value out to effects and releases only the updated destination', async () => {
+    const toneVolumes = [];
+    Tone.Volume.mockImplementation(() => {
+      const volume = { volume: { value: 0 }, debug: false, disconnect: vi.fn(), dispose: vi.fn() };
+      toneVolumes.push(volume);
+      return volume;
+    });
+    const registry = new LiveVariableRegistry();
+    const app = { ...mockApp, $liveVariableRegistry: registry };
+    const first = new Volumen({ name: COMMANDS.v, key: 'volume1', value: { value: '$$control' } }, app);
+    const second = new Volumen({ name: COMMANDS.v, key: 'volume2', value: { value: '$$control' } }, app);
+
+    first.create();
+    second.create();
+    registry.configure('$$control');
+    registry.publish('$$control', 127);
+    const lateTarget = new Volumen({ name: COMMANDS.v, key: 'volume3', value: { value: '$$control' } }, app);
+    lateTarget.create();
+
+    expect(toneVolumes.map(volume => volume.volume.value)).toEqual([30, 30, 30]);
+    await first.update(64);
+    registry.publish('$$control', 0);
+
+    expect(toneVolumes[0].volume.value).toBeCloseTo((64 / 127) * 60 - 30);
+    expect(toneVolumes[1].volume.value).toBe(-30);
+    expect(toneVolumes[2].volume.value).toBe(-30);
+    registry.publish('$$control', 127);
+
+    expect(toneVolumes[0].volume.value).toBeCloseTo((64 / 127) * 60 - 30);
+    expect(toneVolumes[1].volume.value).toBe(30);
+    expect(toneVolumes[2].volume.value).toBe(30);
+
+    registry.reset('$$control');
+    expect(toneVolumes[1].volume.value).toBe(-30);
+    expect(toneVolumes[2].volume.value).toBe(-30);
+
+    await second.end();
+    await lateTarget.end();
+
+    expect(registry.getValue('$$control')).toBeUndefined();
+  });
+
+  it('uses an explicit live range as the effect value without remapping it', async () => {
+    const feedbackDelay = {
+      delayTime: { value: 0 },
+      feedback: { value: 0 },
+      disconnect: vi.fn(),
+      dispose: vi.fn()
+    };
+    Tone.FeedbackDelay.mockReturnValue(feedbackDelay);
+    const registry = new LiveVariableRegistry();
+    const app = { ...mockApp, $liveVariableRegistry: registry };
+    registry.configure('$$duration', { min: 0.1, max: 2 });
+    const delay = new Delay({
+      name: COMMANDS.d,
+      key: 'sam1',
+      value: { value: '$$duration', duration: '0.35' }
+    }, app);
+
+    delay.create();
+    expect(feedbackDelay.delayTime.value).toBe(0.1);
+
+    registry.publish('$$duration', 127);
+    expect(feedbackDelay.delayTime.value).toBe(2);
+
+    await delay.end();
+    registry.reset('$$duration');
   });
 
   describe('Startup', () => {

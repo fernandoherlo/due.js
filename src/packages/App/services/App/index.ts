@@ -3,8 +3,10 @@ import Logger from '../Logger';
 import Store from '../Store';
 import ErrorHandler from '../Error/handler';
 import Debugger from '../Debugger';
+import LiveVariableRegistry from '../LiveVariableRegistry';
 import Ui from '../Ui';
 import { AUTO_COMPILE_DELAY_MS, LOCAL_STORAGE_KEY_CODE } from '../../constants';
+import type { ILiveVariableRegistry } from '~/src/packages/App/types/ILiveVariableRegistry';
 
 export default class App implements IApp {
   __debugEnabled: boolean;
@@ -22,7 +24,7 @@ export default class App implements IApp {
 
   $variables: Record<string, string> = {};
   $variablesLive: Record<string, IMidiIn> = {};
-  $variablesLiveMap: Record<string, any> = {};
+  $liveVariableRegistry: ILiveVariableRegistry;
 
   private compileQueue: Promise<void> = Promise.resolve();
   private autoCompile: boolean = false;
@@ -37,6 +39,7 @@ export default class App implements IApp {
     this.$error = new ErrorHandler(this);
     this.$debugger = new Debugger(this);
     this.$ui = new Ui(this);
+    this.$liveVariableRegistry = new LiveVariableRegistry();
   }
 
   async start () {

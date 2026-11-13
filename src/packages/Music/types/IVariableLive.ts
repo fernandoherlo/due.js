@@ -1,7 +1,8 @@
 import type { IInstruction } from '~/src/types';
+import type { ILiveVariableConfig } from '~/src/packages/Compiler/types/ILiveVariableConfig';
 
 export interface IVariableLive extends IInstruction {
-  value: any;
+  value: ILiveVariableConfig;
 
   start: () => Promise<void>;
   end: () => Promise<void>;

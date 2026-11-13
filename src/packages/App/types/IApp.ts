@@ -1,4 +1,5 @@
 import type { ICompiler, IDebugger, IMusic, IEditor, IErrorHandler, ILogger, IStore, IUi, IMidiIn } from '~/src/types';
+import type { ILiveVariableRegistry } from '~/src/packages/App/types/ILiveVariableRegistry';
 
 export interface IApp {
   __debugEnabled: boolean;
@@ -16,7 +17,7 @@ export interface IApp {
 
   $variables: Record<string, string>;
   $variablesLive: Record<string, IMidiIn>;
-  $variablesLiveMap: Record<string, any>;
+  $liveVariableRegistry: ILiveVariableRegistry;
 
   start: () => Promise<void>;
   compile: () => Promise<void>;

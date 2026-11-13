@@ -15,7 +15,9 @@ export default class Reverb extends Effect implements IChorus {
   create () {
     this.effect = new Tone.Chorus();
     if (!Array.isArray(this.value)) {
-      this.effect.frequency.value = this.getValue(this.value.value);
+      this.effect.frequency.value = this.getValue(this.value.value, value => {
+        if (this.effect) this.effect.frequency.value = value;
+      });
     }
 
     super.create();
@@ -23,7 +25,9 @@ export default class Reverb extends Effect implements IChorus {
 
   async update (value: any): Promise<void> {
     if (this.canUpdate && this.effect) {
-      this.effect.frequency.value = this.getValue(value);
+      this.effect.frequency.value = this.getValue(value, liveValue => {
+        if (this.effect) this.effect.frequency.value = liveValue;
+      });
     }
   }
 }

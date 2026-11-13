@@ -15,7 +15,9 @@ export default class Delay extends Effect implements IDelay {
   create () {
     this.effect = new Tone.FeedbackDelay({ maxDelay: this.max });
     if (!Array.isArray(this.value)) {
-      const delay: number = this.getValue(this.value.value);
+      const delay: number = this.getValue(this.value.value, value => {
+        if (this.effect) this.effect.delayTime.value = value;
+      });
       const feedback: number = parseFloat(this.value.duration);
 
       this.effect.delayTime.value = delay;
@@ -27,7 +29,9 @@ export default class Delay extends Effect implements IDelay {
 
   async update (value: any): Promise<void> {
     if (this.canUpdate && this.effect) {
-      this.effect.delayTime.value = this.getValue(value);
+      this.effect.delayTime.value = this.getValue(value, liveValue => {
+        if (this.effect) this.effect.delayTime.value = liveValue;
+      });
     }
   }
 }
