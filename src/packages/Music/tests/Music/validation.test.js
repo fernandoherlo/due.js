@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import Compiler from '~/src/packages/Compiler/services/Compiler';
+import Music from '~/src/packages/Music/services/Music';
 import validateInstruction from '~/src/packages/Music/helpers/validateInstruction';
 import ValueFactory from '~/src/packages/Music/services/Music/valueFactory';
 
@@ -41,6 +42,24 @@ describe('Numeric validation', () => {
     ['sam1#piano(C4):v(loud)', 'value must be a number']
   ])('rejects out-of-range or invalid values: %s', (code, message) => {
     expect(() => validate(code)).toThrow(message);
+  });
+});
+
+describe('Synth preset validation', () => {
+  it('accepts the supersaw preset and keeps the default synth valid', () => {
+    const music = new Music(app);
+    const compiler = new Compiler(app, new ValueFactory());
+
+    expect(() => music.validate(compiler.prepare('n1#supersaw(C4;1;1)').addedInstructions)).not.toThrow();
+    expect(() => music.validate(compiler.prepare('n1(C4;1;1)').addedInstructions)).not.toThrow();
+  });
+
+  it('rejects unknown synth presets before creating audio', () => {
+    const music = new Music(app);
+    const compiler = new Compiler(app, new ValueFactory());
+    const instructions = compiler.prepare('n1#unknown(C4;1;1)').addedInstructions;
+
+    expect(() => music.validate(instructions)).toThrow('Unknown synth preset "unknown".');
   });
 });
 

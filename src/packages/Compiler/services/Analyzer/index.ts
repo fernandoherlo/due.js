@@ -176,6 +176,9 @@ function validateMode (instruction: IInstruction, instrument: IInstruction | und
     throw Error(`Unsupported playback mode. Use ${[...MODES, ...OPERATORS].map(mode => `::${mode}(...)`).join(' or ')}.`);
   }
   if (operator) {
+    if (instruction.name === COMMANDS.detune && instrument?.name !== COMMANDS.n) {
+      throw Error(`::${instruction.name}(...) is only available on n instruments.`);
+    }
     if (instrument?.name !== COMMANDS.n && instrument?.name !== COMMANDS.sam) {
       throw Error(`::${instruction.name}(...) is only available on n or sam instruments.`);
     }

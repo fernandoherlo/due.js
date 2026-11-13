@@ -3,7 +3,7 @@
 // .##..##.##..##.####..............##..####..
 // .##..##.##..##.##.......##...##..##.....##.
 // .#####...####..######...##....####...####..
-// Operadores de nota (G31): ::oct(prob;octavas) ::late(prob;max s) ::chord(prob) ::human(s) ::unique(s) ::walk(semitonos) ::trans(semitonos)
+// Operadores de nota (G31): ::oct(prob;octavas) ::late(prob;max s) ::chord(prob) ::human(s) ::unique(s) ::walk(semitonos) ::trans(semitonos) ::detune(cents)
 // Probabilidades de 0 a 1. chord solo en sam; en n, late debe ser menor que el intervalo.
 bpm(100)
 
@@ -25,6 +25,9 @@ n3([C4,D4,E4,G4,A4,C5];1;1b)::walk(4)
 // Transposicion: la misma frase una cuarta arriba y una octava abajo
 n4([C4,E4,G4];1;1b)::trans(5)
 n5([C4,E4,G4];1;1b)::trans(-12)
+
+// Supersaw monofonica con una variacion de afinacion de hasta 8 cents por nota
+n7#supersaw([C3,E3,G3];1;1b)::detune(8)
 
 // Combinadas: pasos cortos, sin repetir en 4 s, una tercera menor arriba y humanizada
 n6([C3,D3,E3,G3,A3,C4];1;1b)::walk(3)::unique(4)::trans(3)::human(0.03)

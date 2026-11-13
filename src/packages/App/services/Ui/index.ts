@@ -3,11 +3,13 @@ export default class Ui implements IUi {
   private app: IApp;
   private htmlIdProgressBar: string;
   private idTimeoutValid: number | undefined;
+  private patternStepTimeouts: Map<string, number>;
 
   constructor (app: IApp) {
     this.app = app;
     this.htmlIdProgressBar = 'progress-bar';
     this.idTimeoutValid = undefined;
+    this.patternStepTimeouts = new Map();
   }
 
   async start () {
@@ -124,16 +126,36 @@ export default class Ui implements IUi {
     this.updateProgressBar(Math.ceil(progress));
   }
 
-  updatePatternStep (key: string, step: number): void {
+  updatePatternStep (key: string, step: number, duration: number): void {
+    this.clearPatternStepTimeout(key);
+    if (duration <= 0) {
+      this.app.$editor?.clearActivePatternStep(key);
+      return;
+    }
+
     this.app.$editor?.setActivePatternStep(key, step);
+    const timeout = window.setTimeout(() => {
+      this.patternStepTimeouts.delete(key);
+      this.app.$editor?.clearActivePatternStep(key);
+    }, duration * 1000);
+    this.patternStepTimeouts.set(key, timeout);
   }
 
   clearPatternStep (key: string): void {
+    this.clearPatternStepTimeout(key);
     this.app.$editor?.clearActivePatternStep(key);
   }
 
   clearActiveSteps (): void {
+    for (const key of this.patternStepTimeouts.keys()) this.clearPatternStepTimeout(key);
     this.app.$editor?.clearActivePatternSteps();
+  }
+
+  private clearPatternStepTimeout (key: string): void {
+    const timeout = this.patternStepTimeouts.get(key);
+    if (timeout === undefined) return;
+    clearTimeout(timeout);
+    this.patternStepTimeouts.delete(key);
   }
 
   private updateProgressBar (width: number) {

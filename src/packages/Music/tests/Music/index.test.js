@@ -6,6 +6,7 @@ import Compiler from '~/src/packages/Compiler/services/Compiler';
 import Delay from '~/src/packages/Music/services/Effect/Delay';
 import Instrument from '~/src/packages/Music/services/Instrument';
 import Sampler from '~/src/packages/Music/services/Instrument/Sampler';
+import Synth from '~/src/packages/Music/services/Instrument/Synth';
 import Reverse from '~/src/packages/Music/services/Modes/Reverse';
 import Music from '~/src/packages/Music/services/Music';
 import ValueFactory from '~/src/packages/Music/services/Music/valueFactory';
@@ -20,6 +21,7 @@ vi.mock('tone', async (importOriginal) => {
     getDraw: vi.fn(() => ({ schedule: callback => callback() })),
     Loop: vi.fn(),
     Sampler: sampler,
+    Synth: vi.fn(),
     ToneAudioBuffer: { load: vi.fn() },
     getTransport: vi.fn(),
     start: vi.fn()
@@ -107,8 +109,43 @@ describe('Music', () => {
     loop.callback(2);
 
     expect(triggerAttackRelease.mock.calls.map(([note]) => note)).toEqual(['C4', 'E4']);
-    expect(mockApp.$ui.updatePatternStep.mock.calls).toEqual([['sam1', 0], ['sam1', 1], ['sam1', 2]]);
+    expect(mockApp.$ui.updatePatternStep.mock.calls).toEqual([
+      ['sam1', 0, 1],
+      ['sam1', 1, 0],
+      ['sam1', 2, 1]
+    ]);
     expect(mockApp.$ui.clearPatternStep).not.toHaveBeenCalled();
+  });
+
+  it('switches between the default and supersaw synth configurations on update', async () => {
+    Tone.Synth.mockImplementation(options => ({
+      options,
+      connect: vi.fn(),
+      toDestination: vi.fn(),
+      triggerAttackRelease: vi.fn(),
+      detune: { setValueAtTime: vi.fn() },
+      disconnect: vi.fn(),
+      dispose: vi.fn()
+    }));
+    Tone.Loop.mockReset().mockImplementation((callback, interval) => ({
+      callback,
+      interval,
+      start: vi.fn().mockReturnThis(),
+      cancel: vi.fn().mockReturnThis(),
+      dispose: vi.fn().mockReturnThis()
+    }));
+    const compiler = new Compiler(mockApp, new ValueFactory());
+    const supersaw = compiler.prepare('n1#supersaw(C4;1;1)').addedInstructions[0];
+    const normal = compiler.prepare('n1(C4;1;1)').addedInstructions[0];
+    const synth = new Synth(supersaw, mockApp);
+
+    await synth.start();
+    await synth.update(normal);
+
+    expect(Tone.Synth).toHaveBeenNthCalledWith(1, {
+      oscillator: { type: 'fatsawtooth', count: 5, spread: 20 }
+    });
+    expect(Tone.Synth).toHaveBeenNthCalledWith(2, {});
   });
 
   it('keeps the active marker until a delayed note is due', async () => {

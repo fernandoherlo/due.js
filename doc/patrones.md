@@ -64,7 +64,7 @@ La duracion y el intervalo pueden ser numeros, elecciones aleatorias con coma o 
 
 ## Estado y solapamientos
 
-- G31 esta implementada: sus siete operadores son parte del lenguaje actual. G32 esta implementada parcialmente con `::walk(n)`; no genera frases de longitud aleatoria ni su terminacion probabilistica.
+- G31 esta implementada: sus ocho operadores son parte del lenguaje actual. `::detune(cents)` solo se admite en `n`. G32 esta implementada parcialmente con `::walk(n)`; no genera frases de longitud aleatoria ni su terminacion probabilistica.
 - F14 y S18 se solapan en la transposicion global. `::trans(n)` transpone notas de `n` y `sam`, pero no define una tonalidad global ni una transposicion compartida entre pistas.
 - F11 y G08 describen probabilidad por evento; F12 y G10 describen semilla; F17, G03 y S28 describen acordes por nombre/progresion. Conviene tratarlos como grupos relacionados al priorizar, no como entregas independientes.
 - G01/G02 se consideran descartadas en `AGENTS.md`, y S17 remite a esa decision, aunque F16 sigue en el catalogo como propuesta. Resolver esa diferencia antes de retomarlas.

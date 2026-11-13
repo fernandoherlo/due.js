@@ -58,7 +58,7 @@ describe('Note operators', () => {
     );
 
     expect(instrument.triggerAttackRelease).toHaveBeenCalledWith('F#4', 1, 3);
-    expect(onPatternStep).toHaveBeenCalledWith(1, 3);
+    expect(onPatternStep).toHaveBeenCalledWith(1, 3, 1);
   });
 
   it.each([
@@ -77,7 +77,7 @@ describe('Note operators', () => {
   });
 
   it('parses chained operators after n and sam tracks', () => {
-    expect(actionsOf('n1(C4)::oct(0.2;1)::late(0.3)').map(action => action.name)).toEqual(['oct', 'late']);
+    expect(actionsOf('n1(C4)::oct(0.2;1)::late(0.3)::detune(12)').map(action => action.name)).toEqual(['oct', 'late', 'detune']);
     expect(actionsOf('sam1#piano(C4):v(60)::human(0.02)').map(action => action.name)).toEqual(['v', 'human']);
   });
 
@@ -86,6 +86,7 @@ describe('Note operators', () => {
     'oct1(0.2)',
     'mo1(C4)::oct(0.2)',
     'n1(C4)::reverse(10)',
+    'sam1#piano(C4)::detune(12)',
     'sam1#piano(C4)::oct#x(0.2)'
   ])('rejects invalid usage: %s', (code) => {
     expect(() => new Compiler(app, new ValueFactory()).prepare(code)).toThrow();
@@ -98,7 +99,8 @@ describe('Note operators', () => {
     ['human', -1], ['human', 1, 2],
     ['unique'], ['unique', -1], ['unique', 'a'], ['unique', 1, 2],
     ['walk'], ['walk', -1], ['walk', 'a'], ['walk', 1, 2],
-    ['trans'], ['trans', 1.5], ['trans', 'a'], ['trans', 1, 2]
+    ['trans'], ['trans', 1.5], ['trans', 'a'], ['trans', 1, 2],
+    ['detune'], ['detune', -1], ['detune', 101], ['detune', 'a'], ['detune', 1, 2]
   ])('rejects invalid arguments: %s', (name, ...args) => {
     expect(() => operator(name, ...args)).toThrow();
   });
@@ -145,6 +147,15 @@ describe('Note operators', () => {
     expect(operator('trans', 0).apply(event(['C4'])).notes).toEqual(['C4']);
   });
 
+  it('detunes each note uniformly within the requested cents range', () => {
+    vi.spyOn(Math, 'random').mockReturnValueOnce(0).mockReturnValueOnce(0.5).mockReturnValueOnce(1);
+    const detune = operator('detune', 12);
+
+    expect(detune.apply(event(['C4'])).detune).toBe(-12);
+    expect(detune.apply(event(['C4'])).detune).toBe(0);
+    expect(detune.apply(event(['C4'])).detune).toBe(12);
+  });
+
   it('limits leaps to notes of the pool within the step', () => {
     const walk = operator('walk', 4);
     const pool = ['C4', 'E4', 'C5'];
@@ -183,12 +194,35 @@ describe('Note operators', () => {
 
   describe('TriggerAttack', () => {
     it('plays unchanged without operators', () => {
-      const instrument = { triggerAttackRelease: vi.fn() };
+      const instrument = {
+        detune: { setValueAtTime: vi.fn() },
+        triggerAttackRelease: vi.fn()
+      };
 
       const logged = TriggerAttack.play({ value: 'C4', duration: 0.5 }, 'normal', 0, instrument, 3);
 
       expect(instrument.triggerAttackRelease).toHaveBeenCalledWith('C4', 0.5, 3);
+      expect(instrument.detune.setValueAtTime).toHaveBeenCalledWith(0, 3);
       expect(logged).toEqual(['C4', 0.5]);
+    });
+
+    it('schedules per-note detune at the note audio time', () => {
+      vi.spyOn(Math, 'random').mockReturnValue(0.75);
+      const instrument = {
+        detune: { setValueAtTime: vi.fn() },
+        triggerAttackRelease: vi.fn()
+      };
+
+      TriggerAttack.play(
+        { value: 'C4', duration: 0.5 },
+        'normal',
+        0,
+        instrument,
+        3,
+        [operator('detune', 12)]
+      );
+
+      expect(instrument.detune.setValueAtTime).toHaveBeenCalledWith(6, 3);
     });
 
     it('does not trigger an instrument for a rest step', () => {

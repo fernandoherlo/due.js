@@ -9,7 +9,7 @@ export default class TriggerAttack {
     instrument: any,
     time?: number,
     operators: readonly IOperator[] = [],
-    onPatternStep?: (step: number, time?: number) => void
+    onPatternStep?: (step: number, time?: number, duration?: number) => void
   ): any[] | undefined {
     const patternStep = Array.isArray(value) ? TriggerAttack.getPatternIndex(value, typeValue, valueStep) : 0;
     const note: INote | undefined = Array.isArray(value)
@@ -17,7 +17,7 @@ export default class TriggerAttack {
       : TriggerAttack.getValue(value, typeValue, valueStep);
     if (!note) return;
     if (note.value === REST_VALUE) {
-      onPatternStep?.(patternStep ?? 0, time);
+      onPatternStep?.(patternStep ?? 0, time, 0);
       return;
     }
     if (!note.value) return;
@@ -28,6 +28,7 @@ export default class TriggerAttack {
       : note.value;
     let playedDuration = duration;
     let playedTime = time;
+    let detune = 0;
 
     if (operators.length) {
       const event = operators.reduce<INoteEvent>((current, operator) => operator.apply(current), {
@@ -37,10 +38,12 @@ export default class TriggerAttack {
       played = Array.isArray(played) || event.notes.length > 1 ? event.notes : event.notes[0];
       playedDuration = event.duration;
       playedTime = event.time;
+      detune = event.detune ?? 0;
     }
 
+    setDetune(instrument, detune, playedTime);
     instrument.triggerAttackRelease(played, playedDuration, playedTime);
-    onPatternStep?.(patternStep ?? 0, playedTime);
+    onPatternStep?.(patternStep ?? 0, playedTime, playedDuration);
 
     return [operators.length ? played : note.value, playedDuration];
   }
@@ -120,4 +123,13 @@ export default class TriggerAttack {
   static _createChord (string: string): Array<string> {
     return string.replace(/\[|\]/g, '').trim().split('|');
   }
+}
+
+function setDetune (instrument: any, cents: number, time?: number): void {
+  if (!instrument.detune) return;
+  if (time === undefined) {
+    instrument.detune.value = cents;
+    return;
+  }
+  instrument.detune.setValueAtTime(cents, time);
 }

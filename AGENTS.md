@@ -30,13 +30,13 @@ Lenguaje propio de live coding musical que corre en el navegador: Vite + TypeScr
 - Listas: `[a,b]` azar, `[a>b]` secuencia, `[a|b]` acorde; rangos `[a-b]` (duracion e intervalo); sufijo `b` para pulsos; `bpm(N)` solo en su linea.
 - En listas aleatorias, `^peso` asigna probabilidad relativa a una opcion (peso por defecto `1`; solo listas con coma, no secuencias `>`).
 - `~` es un silencio de un paso en el primer argumento de `n` y `sam`; no se admite en acordes, duraciones ni intervalos.
-- Instrumentos: `samN#preset` (Tone.Sampler, polifonico), `nN` (Tone.Synth, monofonico: acordes o `late` mayor que el intervalo dan problemas), `moN`, `misamN`, `aiN`.
+- Instrumentos: `samN#preset` (Tone.Sampler, polifonico), `nN` (Tone.Synth, monofonico; `nN#supersaw` selecciona cinco sierras), `moN`, `misamN`, `aiN`.
 - Presets de `sam` en `Music/constants/samplers.ts` (`piano`, `kick`, `hats`, `snare`, `harp`, `chorus`...) y datos en `Music/constants/samples.json`.
 - `v(0..127)` va de -30 a +30 dB (64 aprox. unidad; `v(90)` puede saturar). `r` de 0 a 20 s, `cho` de 0 a 30 Hz.
 
 ## Operadores de nota (G31)
 
-Solo en `n` y `sam`, encadenables y aplicados en el orden escrito.
+Encadenables y aplicados en el orden escrito. Todos funcionan en `n` y `sam`, salvo `::detune`, que solo funciona en `n`.
 
 | Operador | Efecto |
 | --- | --- |
@@ -47,6 +47,7 @@ Solo en `n` y `sam`, encadenables y aplicados en el orden escrito.
 | `::unique(s)` | Quita notas que sonaron en los ultimos `s` s; si no queda ninguna, silencio |
 | `::walk(n)` | Limita el salto a `n` semitonos respecto a la nota anterior, usando la lista de candidatas (`pool`); solo notas sueltas |
 | `::trans(n)` | Transpone `n` semitonos |
+| `::detune(cents)` | En `n`, aplica una variacion aleatoria uniforme de `-cents` a `+cents`, con limite de 100 cents |
 
 Poner `::walk` antes de `::trans` (walk mira la lista sin transponer). Argumentos validados al compilar.
 

@@ -5,6 +5,7 @@ import { COMMANDS, OPERATORS } from '~/src/packages/Compiler/constants';
 import { COMMANDS_ELEMENT_MAP } from '~/src/packages/Music/constants';
 import { MODES_MAP } from '~/src/packages/Music/constants/modes';
 import { SAMPLER_MAP } from '~/src/packages/Music/constants/samplers';
+import { isSynthPreset } from '~/src/packages/Music/constants/synths';
 import validateInstruction from '~/src/packages/Music/helpers/validateInstruction';
 import { createOperator } from '~/src/packages/Music/helpers/createOperators';
 import type { IApp, IInstruction, IInstrument, IMusic } from '~/src/types';
@@ -115,6 +116,9 @@ export default class Music implements IMusic {
 
       if (instruction.name === COMMANDS.sam && instruction.modifier && !SAMPLER_MAP[instruction.modifier]) {
         throw Error(`Unknown sample preset "${instruction.modifier}".`);
+      }
+      if (instruction.name === COMMANDS.n && instruction.modifier && !isSynthPreset(instruction.modifier)) {
+        throw Error(`Unknown synth preset "${instruction.modifier}".`);
       }
     }
   }

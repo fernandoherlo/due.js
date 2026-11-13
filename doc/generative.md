@@ -248,10 +248,10 @@ Las propuestas mas cercanas a capacidades existentes son G31 (implementada), G32
 
 ### G31. Operadores de nota encadenables
 
-**Implementado:** `::oct(p;octavas)`, `::late(p;max)`, `::chord(p)`, `::human(s)`, `::unique(s)`, `::walk(n)` y `::trans(n)`; ver `doc/language.md`.
+**Implementado:** `::oct(p;octavas)`, `::late(p;max)`, `::chord(p)`, `::human(s)`, `::unique(s)`, `::walk(n)`, `::trans(n)` y `::detune(cents)`; ver `doc/language.md`.
 
 En "Observable Streams" el flujo de notas pasa por una cadena de operadores: cambiar de octava con cierta probabilidad,
-retrasar la nota, convertirla en acorde, limitar repeticiones, humanizar, limitar saltos y transponer.
+retrasar la nota, convertirla en acorde, limitar repeticiones, humanizar, limitar saltos, transponer y desafinar ligeramente cada nota.
 En due.js estos operadores se encadenan con `::` y se aplican en el orden escrito; solo los que lo especifican usan probabilidad.
 
 ### G32. Melodias por pasos cortos

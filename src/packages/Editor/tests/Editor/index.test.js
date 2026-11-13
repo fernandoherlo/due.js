@@ -49,8 +49,11 @@ describe('Editor', () => {
   it('suggests commands, presets, effects, and note operators in structural contexts', () => {
     expect(getCompletions('sa')).toContain('sam');
     expect(getCompletions('sam1#pi')).toContain('piano');
+    expect(getCompletions('n1#su')).toContain('supersaw');
     expect(getCompletions('sam1#piano(...):d')).toContain('d');
     expect(getCompletions('sam1#piano(... )::tra')).toContain('trans');
+    expect(getCompletions('n1(C4)::det')).toContain('detune');
+    expect(getCompletions('sam1#piano(C4)::det')).not.toContain('detune');
   });
 
   it('does not suggest musical content or DSL names inside patterns and arguments', () => {

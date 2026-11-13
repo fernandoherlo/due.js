@@ -24,11 +24,15 @@ Todos usan Strudel. Las ideas estan escritas sin probar; el ID es solo para refe
 
 ### S01. Supersaw y dientes de sierra
 
+Implementado parcialmente: `nN#supersaw(...)` usa cinco sierras con 20 cents de dispersion. La seleccion de otras formas de onda sigue pendiente.
+
 `supersaw` (varias sierras desafinadas) y `sawtooth` son la base de todo el trance y el drum and bass de los videos.
 Un instrumento `saw` y otro `supersaw` (Tone.FatOscillator con `count` y `spread`) cambiarian de golpe lo que suena en `n`.
 Ejemplo: `n1([C2,E2,G2];1;1b)#supersaw` con un `::detune(c)` para los cents de desafinacion.
 
 ### S02. Detune aleatorio por nota
+
+Implementado: `::detune(cents)` desplaza cada nota de `n` uniformemente entre `-cents` y `+cents`; ver `doc/language.md`.
 
 `detune(rand)` desafina cada nota un poco distinto, y da el sonido ancho de la capa grave. Un operador `::detune(cents)` por nota, con el valor al azar dentro de un rango.
 

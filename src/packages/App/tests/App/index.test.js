@@ -127,6 +127,8 @@ describe('App', () => {
   });
 
   it('forwards active pattern steps to the editor', () => {
+    vi.useFakeTimers();
+    vi.stubGlobal('window', { setTimeout, clearTimeout });
     const editor = {
       setActivePatternStep: vi.fn(),
       clearActivePatternStep: vi.fn(),
@@ -134,13 +136,35 @@ describe('App', () => {
     };
     const ui = new Ui({ $editor: editor });
 
-    ui.updatePatternStep('sam1', 1);
+    ui.updatePatternStep('sam1', 1, 0.5);
     ui.clearPatternStep('sam1');
     ui.clearActiveSteps();
 
     expect(editor.setActivePatternStep).toHaveBeenCalledWith('sam1', 1);
     expect(editor.clearActivePatternStep).toHaveBeenCalledWith('sam1');
     expect(editor.clearActivePatternSteps).toHaveBeenCalledOnce();
+  });
+
+  it('clears active note marks after their duration and replaces stale timers', () => {
+    vi.useFakeTimers();
+    vi.stubGlobal('window', { setTimeout, clearTimeout });
+    const editor = {
+      setActivePatternStep: vi.fn(),
+      clearActivePatternStep: vi.fn(),
+      clearActivePatternSteps: vi.fn()
+    };
+    const ui = new Ui({ $editor: editor });
+
+    ui.updatePatternStep('sam1', 0, 1);
+    vi.advanceTimersByTime(500);
+    ui.updatePatternStep('sam1', 1, 1);
+    vi.advanceTimersByTime(500);
+
+    expect(editor.clearActivePatternStep).not.toHaveBeenCalled();
+
+    vi.advanceTimersByTime(500);
+
+    expect(editor.clearActivePatternStep).toHaveBeenCalledWith('sam1');
   });
 
   it('Should throw error on compile if not has services', async () => {

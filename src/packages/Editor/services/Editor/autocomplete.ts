@@ -7,8 +7,9 @@ import {
   OPERATORS
 } from '~/src/packages/Compiler/constants';
 import { SAMPLER_MAP } from '~/src/packages/Music/constants/samplers';
+import { SYNTH_PRESETS } from '~/src/packages/Music/constants/synths';
 
-type CompletionKind = 'command' | 'effect' | 'mode' | 'preset';
+type CompletionKind = 'command' | 'effect' | 'mode' | 'preset' | 'synthPreset';
 
 const excludedCommands = new Set([
   ...OPERATORS,
@@ -31,9 +32,17 @@ const modeOptions = [...MODES, ...OPERATORS]
 const presetOptions = Object.keys(SAMPLER_MAP)
   .map(label => ({ label, type: 'constant' }));
 
+const synthPresetOptions = Object.keys(SYNTH_PRESETS)
+  .map(label => ({ label, type: 'constant' }));
+
 function isSamplerCommand (command: string): boolean {
   const commandName = command.trim();
   return commandName.startsWith(COMMANDS.sam) && /^\d*$/.test(commandName.slice(COMMANDS.sam.length));
+}
+
+function isSynthCommand (command: string): boolean {
+  const commandName = command.trim();
+  return commandName.startsWith(COMMANDS.n) && /^\d+$/.test(commandName.slice(COMMANDS.n.length));
 }
 
 function getCompletionKind (linePrefix: string): CompletionKind | null {
@@ -57,7 +66,10 @@ function getCompletionKind (linePrefix: string): CompletionKind | null {
     }
     if (linePrefix.startsWith(CHAR.CONNECT, index) || character === CHAR.EQUAL) return null;
     if (character === CHAR.IDENTIFIER) {
-      marker = isSamplerCommand(linePrefix.slice(segmentStart, index)) ? 'preset' : null;
+      const command = linePrefix.slice(segmentStart, index);
+      if (isSamplerCommand(command)) marker = 'preset';
+      else if (isSynthCommand(command)) marker = 'synthPreset';
+      else marker = null;
       markerIndex = index + CHAR.IDENTIFIER.length;
       continue;
     }
@@ -78,7 +90,8 @@ function getCompletionKind (linePrefix: string): CompletionKind | null {
 
 export function dueCompletionSource (context: CompletionContext) {
   const line = context.state.doc.lineAt(context.pos);
-  const kind = getCompletionKind(context.state.sliceDoc(line.from, context.pos));
+  const linePrefix = context.state.sliceDoc(line.from, context.pos);
+  const kind = getCompletionKind(linePrefix);
   if (!kind) return null;
 
   const word = context.matchBefore(/[a-z]*/);
@@ -88,8 +101,13 @@ export function dueCompletionSource (context: CompletionContext) {
     command: commandOptions,
     effect: effectOptions,
     mode: modeOptions,
-    preset: presetOptions
+    preset: presetOptions,
+    synthPreset: synthPresetOptions
   }[kind];
+  const isSynthLine = new RegExp(`^\\s*${COMMANDS.n}\\d+`).test(linePrefix);
+  const contextualOptions = kind === 'mode' && !isSynthLine
+    ? options.filter(option => option.label !== COMMANDS.detune)
+    : options;
 
-  return { from: word.from, options, validFor: /^[a-z]*$/ };
+  return { from: word.from, options: contextualOptions, validFor: /^[a-z]*$/ };
 }

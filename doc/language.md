@@ -59,7 +59,7 @@ El prototipo `::grain` se ha retirado y ya no se admite.
 
 ## Operadores de nota
 
-Tambien con `::`, pero en `n` y `sam`, transforman cada nota antes de tocarla. Se pueden encadenar y el orden importa:
+Tambien con `::`, transforman cada nota antes de tocarla. Salvo `::detune`, que solo se admite en `n`, los operadores funcionan en `n` y `sam`. Se pueden encadenar y el orden importa:
 
 ```text
 n1([C3,E3,G3,B3];0.8;1b)::oct(0.3;1)::late(0.4;0.3)
@@ -75,9 +75,16 @@ sam1#piano([C4,E4,G4];1b;2b)::chord(0.25)::human(0.04)
 | `::unique(s)` | Quita las notas que ya sonaron en los ultimos `s` segundos; si no queda ninguna, el paso queda en silencio |
 | `::walk(n)` | Limita el salto respecto a la nota anterior a `n` semitonos, eligiendo otra nota de la misma lista si hace falta (solo notas sueltas) |
 | `::trans(n)` | Transpone todas las notas `n` semitonos (negativo baja). Los operadores se aplican en orden: poner `::walk` antes de `::trans` |
+| `::detune(cents)` | En `n`, desplaza cada nota aleatoriamente entre `-cents` y `+cents`; admite de 0 a 100 cents |
 
-Los operadores se validan al compilar y se actualizan en vivo. Limites conocidos: en `n` (sintetizador monofonico) `chord` no es util
+Los operadores se validan al compilar y se actualizan en vivo. `::detune` se programa en el tiempo de audio de cada nota y las notas sin este operador vuelven a 0 cents. Limites conocidos: en `n` (sintetizador monofonico) `chord` no es util
 y `late` debe ser menor que el intervalo. Las notas se transponen solo si son nombres (`C4`, `F#3`); un numero MIDI se deja igual.
+
+El sintetizador `n` conserva su oscilador triangular por defecto. El modificador `#supersaw` selecciona cinco sierras con 20 cents de dispersion interna; sigue siendo monofonico. `::detune(cents)` desplaza el tono completo de cada nota y es distinto de la dispersion interna de la supersaw.
+
+```text
+n1#supersaw([C2,E2,G3];1;1b)::detune(8)
+```
 Ejemplos en `doc/examples/operators.duejs`.
 
 ## Patron, duracion e intervalo

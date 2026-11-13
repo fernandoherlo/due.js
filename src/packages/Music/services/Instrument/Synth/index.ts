@@ -2,6 +2,7 @@ import type { ISynth, IApp } from '~/src/types';
 import * as Tone from 'tone';
 import Instrument from '..';
 import { EFFECTS_MAP } from '../../../constants/effects';
+import { isSynthPreset, SYNTH_PRESETS } from '~/src/packages/Music/constants/synths';
 
 export default class Synth extends Instrument implements ISynth {
   protected instrument: Tone.Synth<Tone.SynthOptions> | null = null;
@@ -18,7 +19,8 @@ export default class Synth extends Instrument implements ISynth {
       connect = await this.startActions(EFFECTS_MAP);
     }
 
-    this.instrument = new Tone.Synth();
+    const options = this.modifier && isSynthPreset(this.modifier) ? SYNTH_PRESETS[this.modifier] : {};
+    this.instrument = new Tone.Synth(options);
     this.instrument.debug = this.app.__debugEnabled;
 
     if (connect) {
@@ -28,5 +30,20 @@ export default class Synth extends Instrument implements ISynth {
     }
 
     await super.start();
+  }
+
+  async update (newInstrument: ISynth): Promise<void> {
+    if (this.modifier !== newInstrument.modifier) {
+      await this.end();
+      this.value = newInstrument.value;
+      this.typeValue = newInstrument.typeValue;
+      this.modifier = newInstrument.modifier;
+      this.actions = newInstrument.actions;
+      this.setOperators(newInstrument.actions);
+      await this.start();
+      return;
+    }
+
+    await super.update(newInstrument);
   }
 }

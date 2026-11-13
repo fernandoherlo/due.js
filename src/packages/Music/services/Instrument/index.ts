@@ -73,10 +73,10 @@ export default class Instrument extends Instruction implements IInstrument {
             this.instrument,
             time,
             this.operators,
-            (step, eventTime) => {
+            (step, eventTime, eventDuration) => {
               hasPatternStep = true;
               Tone.getDraw().schedule(
-                () => this.app.$ui.updatePatternStep(this.key, step),
+                () => this.app.$ui.updatePatternStep(this.key, step, eventDuration ?? 0),
                 eventTime ?? time
               );
             }
