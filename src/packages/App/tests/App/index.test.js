@@ -2,6 +2,19 @@ import { describe, afterEach, it, expect, vi } from 'vitest';
 import App from '~/src/packages/App/services/App';
 import Ui from '~/src/packages/App/services/Ui';
 
+function createClassList (initialClasses = []) {
+  const classes = new Set(initialClasses);
+  return {
+    contains: className => classes.has(className),
+    toggle: vi.fn((className, force) => {
+      const enabled = force ?? !classes.has(className);
+      if (enabled) classes.add(className);
+      else classes.delete(className);
+      return enabled;
+    })
+  };
+}
+
 describe('App', () => {
   global.window = {
     onerror: vi.fn()
@@ -59,6 +72,58 @@ describe('App', () => {
     expect(status.textContent).toBe('MIDI off');
     expect(status.title).toBe('Permission denied');
     expect(status.setAttribute).toHaveBeenCalledWith('aria-label', 'MIDI unavailable: Permission denied');
+  });
+
+  it('opens app options and synchronizes them with the toolbar controls', async () => {
+    const auto = { classList: createClassList(), setAttribute: vi.fn() };
+    const debug = { classList: createClassList(), setAttribute: vi.fn() };
+    const debuggerElement = { classList: createClassList() };
+    const appElement = { classList: createClassList() };
+    const autoOption = { checked: false };
+    const debuggerOption = { checked: false };
+    const menu = { setAttribute: vi.fn() };
+    const optionsDialog = { addEventListener: vi.fn(), showModal: vi.fn() };
+    const elements = {
+      toggle: {},
+      save: {},
+      auto,
+      'option-auto-compile': autoOption,
+      debug,
+      debugger: debuggerElement,
+      app: appElement,
+      'option-debugger': debuggerOption,
+      menu,
+      'app-options': optionsDialog
+    };
+    const app = { setAutoCompile: vi.fn(), compile: vi.fn() };
+    vi.stubGlobal('document', {
+      addEventListener: vi.fn(),
+      getElementById: vi.fn(id => elements[id])
+    });
+    const ui = new Ui(app);
+
+    await ui.start();
+    menu.onclick();
+    autoOption.checked = true;
+    autoOption.onchange();
+    debuggerOption.checked = true;
+    debuggerOption.onchange();
+
+    expect(optionsDialog.showModal).toHaveBeenCalledOnce();
+    expect(auto.classList.contains('active')).toBe(true);
+    expect(auto.setAttribute).toHaveBeenCalledWith('aria-pressed', 'true');
+    expect(app.setAutoCompile).toHaveBeenCalledWith(true);
+    expect(debuggerElement.classList.contains('show')).toBe(true);
+    expect(appElement.classList.contains('debugger-visible')).toBe(true);
+    expect(debug.classList.contains('active')).toBe(true);
+    expect(debuggerOption.checked).toBe(true);
+    expect(debug.setAttribute).toHaveBeenCalledWith('aria-pressed', 'true');
+
+    debuggerOption.checked = false;
+    debuggerOption.onchange();
+
+    expect(debuggerElement.classList.contains('show')).toBe(false);
+    expect(appElement.classList.contains('debugger-visible')).toBe(false);
   });
 
   it('forwards active pattern steps to the editor', () => {

@@ -1,17 +1,19 @@
+import { CompletionContext } from '@codemirror/autocomplete';
 import { foldable, syntaxTree } from '@codemirror/language';
 import { EditorState } from '@codemirror/state';
 import { highlightTree, tagHighlighter, tags } from '@lezer/highlight';
 import { describe, expect, it, vi } from 'vitest';
 import { DueLanguage } from '~/src/packages/Editor/constants/language';
 import Editor from '~/src/packages/Editor/services/Editor';
-import { getDiagnostics } from '~/src/packages/Editor/services/Editor/diagnostics';
-import { getMinimapLine } from '~/src/packages/Editor/services/Editor/minimap';
-import { dueRegionFolding } from '~/src/packages/Editor/services/Editor/regions';
+import { dueCompletionSource } from '~/src/packages/Editor/services/Editor/autocomplete';
 import {
   activePatternHighlight,
   setActivePatternStep,
   setPatternSource
 } from '~/src/packages/Editor/services/Editor/activeTrack';
+import { getDiagnostics } from '~/src/packages/Editor/services/Editor/diagnostics';
+import { getMinimapLine } from '~/src/packages/Editor/services/Editor/minimap';
+import { dueRegionFolding } from '~/src/packages/Editor/services/Editor/regions';
 
 const mockApp = {
   getFromLocalStorage: vi.fn()
@@ -37,7 +39,26 @@ function highlight (source) {
   return tokens;
 }
 
+function getCompletions (source) {
+  const state = EditorState.create({ doc: source });
+  const result = dueCompletionSource(new CompletionContext(state, source.length, false));
+  return result?.options.map(option => option.label) ?? [];
+}
+
 describe('Editor', () => {
+  it('suggests commands, presets, effects, and note operators in structural contexts', () => {
+    expect(getCompletions('sa')).toContain('sam');
+    expect(getCompletions('sam1#pi')).toContain('piano');
+    expect(getCompletions('sam1#piano(...):d')).toContain('d');
+    expect(getCompletions('sam1#piano(... )::tra')).toContain('trans');
+  });
+
+  it('does not suggest musical content or DSL names inside patterns and arguments', () => {
+    expect(getCompletions('sam1#piano([C4>')).toEqual([]);
+    expect(getCompletions('sam1#piano([C4]:d')).toEqual([]);
+    expect(getCompletions('sam1#piano(C4;0.25;')).toEqual([]);
+  });
+
   it('Create new instance', () => {
     // Arrange
     const editor = new Editor(mockApp);
@@ -190,6 +211,24 @@ describe('Editor', () => {
     });
 
     expect(remaining).toEqual([]);
+  });
+
+  it('highlights scalar notes on the correct track after comment lines', () => {
+    const source = [
+      '// generative intro',
+      'sam1#piano(C3;8;[20-40]):r(110):d(64;0.5)',
+      'sam8#piano(E4;6;[15-35]):r(110):d(64;0.5)'
+    ].join('\n');
+    const state = EditorState.create({ doc: source, extensions: [activePatternHighlight] });
+    const compiled = state.update({ effects: setPatternSource.of(source) }).state;
+    const active = compiled.update({ effects: setActivePatternStep.of({ key: 'sam8', step: 0 }) }).state;
+    const ranges = [];
+
+    active.field(activePatternHighlight).decorations.between(0, active.doc.length, (from, to) => {
+      ranges.push(active.doc.sliceString(from, to));
+    });
+
+    expect(ranges).toEqual(['E4']);
   });
 
   it('highlights the active occurrence when a note repeats in a sequence', () => {

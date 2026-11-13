@@ -27,11 +27,30 @@ export default class Ui implements IUi {
 
     const auto: HTMLButtonElement = document.getElementById('auto') as HTMLButtonElement;
     auto.onclick = () => {
-      const enabled = !auto.classList.contains('active');
+      setAutoCompile(!auto.classList.contains('active'));
+    };
+
+    const autoOption = document.getElementById('option-auto-compile') as HTMLInputElement;
+    const setAutoCompile = (enabled: boolean) => {
       auto.classList.toggle('active', enabled);
       auto.setAttribute('aria-pressed', String(enabled));
       this.app.setAutoCompile(enabled);
     };
+    autoOption.onchange = () => setAutoCompile(autoOption.checked);
+
+    const debug: HTMLButtonElement = document.getElementById('debug') as HTMLButtonElement;
+    const debuggerElement: HTMLDivElement = document.getElementById('debugger') as HTMLDivElement;
+    const appElement: HTMLDivElement = document.getElementById('app') as HTMLDivElement;
+    const debuggerOption = document.getElementById('option-debugger') as HTMLInputElement;
+    const setDebuggerVisible = (visible: boolean) => {
+      debuggerElement.classList.toggle('show', visible);
+      appElement.classList.toggle('debugger-visible', visible);
+      debug.classList.toggle('active', visible);
+      debug.setAttribute('aria-pressed', String(visible));
+      debuggerOption.checked = visible;
+    };
+    debug.onclick = () => setDebuggerVisible(!debuggerElement.classList.contains('show'));
+    debuggerOption.onchange = () => setDebuggerVisible(debuggerOption.checked);
 
     document.addEventListener('keydown', (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.code === 'KeyS') {
@@ -47,13 +66,16 @@ export default class Ui implements IUi {
       }
     });
 
-    const menu: HTMLDivElement | null = document.getElementById('menu') as HTMLDivElement;
-    menu.onclick = () => {};
-
-    const debug: HTMLDivElement | null = document.getElementById('debug') as HTMLDivElement;
-    debug.onclick = () => {
-      const debuggerElement: HTMLDivElement | null = document.getElementById('debugger') as HTMLDivElement;
-      debuggerElement.classList.toggle('show');
+    const menu = document.getElementById('menu') as HTMLButtonElement;
+    const optionsDialog = document.getElementById('app-options') as HTMLDialogElement;
+    optionsDialog.addEventListener('close', () => {
+      menu.setAttribute('aria-expanded', 'false');
+    });
+    menu.onclick = () => {
+      autoOption.checked = auto.classList.contains('active');
+      debuggerOption.checked = debuggerElement.classList.contains('show');
+      menu.setAttribute('aria-expanded', 'true');
+      optionsDialog.showModal();
     };
   }
 

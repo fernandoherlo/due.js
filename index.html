@@ -31,16 +31,32 @@
           <path d="M4 12C4 7.58 7.58 4 12 4C14.5 4 16.7 5.15 18.2 6.9M20 12C20 16.42 16.42 20 12 20C9.5 20 7.3 18.85 5.8 17.1M18 3V7H14M6 21V17H10" stroke="#edecee" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
-      <button id="debug">
+      <button id="debug" aria-label="Mostrar depurador" aria-controls="debugger" aria-pressed="false">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 8H12.01M12 11V16M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#edecee" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
-      <button id="menu">
+      <button id="menu" aria-label="Abrir opciones" aria-haspopup="dialog" aria-controls="app-options" aria-expanded="false">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M4 6H20M4 12H20M4 18H20" stroke="#edecee" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
+      <dialog id="app-options" class="options-dialog" aria-labelledby="app-options-title">
+        <form method="dialog" class="options-dialog-header">
+          <h2 id="app-options-title">Opciones</h2>
+          <button type="submit" class="options-close" aria-label="Cerrar opciones">×</button>
+        </form>
+        <div class="options-list">
+          <label class="options-row" for="option-auto-compile">
+            <span>Compilación automática</span>
+            <input id="option-auto-compile" class="options-checkbox" type="checkbox">
+          </label>
+          <label class="options-row" for="option-debugger">
+            <span>Mostrar depurador</span>
+            <input id="option-debugger" class="options-checkbox" type="checkbox">
+          </label>
+        </div>
+      </dialog>
       <span id="midi-status" role="status" hidden></span>
       <div class="wrapper-progress-bar">
         <div id="progress-bar"></div>

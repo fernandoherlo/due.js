@@ -1,3 +1,4 @@
+import { autocompletion } from '@codemirror/autocomplete';
 import { defaultKeymap, history, historyKeymap, toggleComment } from '@codemirror/commands';
 import { foldGutter, foldKeymap, syntaxHighlighting } from '@codemirror/language';
 import { linter, lintGutter } from '@codemirror/lint';
@@ -13,11 +14,12 @@ import {
   setActivePatternStep,
   setPatternSource
 } from '~/src/packages/Editor/services/Editor/activeTrack';
-import { getDiagnostics } from '~/src/packages/Editor/services/Editor/diagnostics';
 import { adjustNumberAtCursor } from '~/src/packages/Editor/services/Editor/adjustNumber';
-import { dueRegionFolding } from '~/src/packages/Editor/services/Editor/regions';
+import { dueCompletionSource } from '~/src/packages/Editor/services/Editor/autocomplete';
+import { getDiagnostics } from '~/src/packages/Editor/services/Editor/diagnostics';
 import { codeMinimap } from '~/src/packages/Editor/services/Editor/minimap';
 import { muteGutter, toggleMuteSelection } from '~/src/packages/Editor/services/Editor/muteGutter';
+import { dueRegionFolding } from '~/src/packages/Editor/services/Editor/regions';
 import type { IApp, IEditor } from '~/src/types';
 
 export default class Editor implements IEditor {
@@ -38,6 +40,7 @@ export default class Editor implements IEditor {
     const startState = EditorState.create({
       doc: code,
       extensions: [
+        autocompletion({ override: [dueCompletionSource], icons: false }),
         history(),
         keymap.of([
           { key: 'Mod-/', run: toggleComment },

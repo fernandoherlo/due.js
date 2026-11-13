@@ -3,6 +3,7 @@ import { HighlightStyle } from '@codemirror/language';
 import { tags as t } from '@lezer/highlight';
 
 const $black = '#15141b';
+const $gutter = '#121117';
 const $white = '#edecee';
 const $gray = '#6d6d6d';
 const $purple = '#a277ff';
@@ -12,6 +13,7 @@ const $orange = '#ffca85';
 const $pink = '#f694ff';
 const $blue = '#82e2ff';
 const $red = '#ff6767';
+const $activePattern = '#294b62';
 const $minimapLine = '#4b4851';
 const $minimapComment = '#302e38';
 const $minimapTrack = '#53616b';
@@ -39,8 +41,40 @@ export const DueTheme: { [selector: string]: StyleSpec } = {
   },
   '.cm-cursor, .cm-dropCursor': { borderLeftColor: $purple },
   '&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection': { backgroundColor: $purpleFading },
+  '.cm-tooltip.cm-tooltip-autocomplete': {
+    backgroundColor: '#24222c',
+    border: '1px solid #484550',
+    borderRadius: '3px',
+    boxShadow: '0 6px 20px rgba(0, 0, 0, 0.35)',
+    color: $white,
+    overflow: 'hidden'
+  },
+  '.cm-tooltip-autocomplete > ul': {
+    fontFamily: 'Fira Code',
+    fontSize: '14px',
+    maxHeight: '12em',
+    maxWidth: 'min(320px, 90vw)',
+    minWidth: '160px'
+  },
+  '.cm-tooltip-autocomplete > ul > li': {
+    lineHeight: '1.4',
+    padding: '4px 10px'
+  },
+  '.cm-tooltip-autocomplete > ul > li[aria-selected]': {
+    backgroundColor: $purpleFading,
+    color: $white
+  },
+  '.cm-completionMatchedText': {
+    color: $purple,
+    fontWeight: '600',
+    textDecoration: 'none'
+  },
+  '.cm-lint-marker': {
+    width: '0.7em',
+    height: '0.7em'
+  },
   '.cm-gutters': {
-    backgroundColor: $black,
+    backgroundColor: $gutter,
     color: $purpleFading,
     border: 'none'
   },
@@ -129,7 +163,7 @@ export const DueTheme: { [selector: string]: StyleSpec } = {
     fontWeight: '600'
   },
   '.cm-active-pattern-note': {
-    backgroundColor: '#25473e',
+    backgroundColor: $activePattern,
     borderRadius: '2px'
   }
 };

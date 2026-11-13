@@ -108,7 +108,35 @@ describe('Music', () => {
 
     expect(triggerAttackRelease.mock.calls.map(([note]) => note)).toEqual(['C4', 'E4']);
     expect(mockApp.$ui.updatePatternStep.mock.calls).toEqual([['sam1', 0], ['sam1', 1], ['sam1', 2]]);
-    expect(mockApp.$ui.clearPatternStep.mock.calls).toEqual([['sam1'], ['sam1'], ['sam1']]);
+    expect(mockApp.$ui.clearPatternStep).not.toHaveBeenCalled();
+  });
+
+  it('keeps the active marker until a delayed note is due', async () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    mockApp.$ui.clearPatternStep.mockClear();
+    mockApp.$ui.updatePatternStep.mockClear();
+    const compiler = new Compiler(mockApp, new ValueFactory());
+    const instruction = compiler.prepare('sam1#birds(C4;1;1)::late(1;4)').addedInstructions[0];
+    const instrument = new Instrument(instruction, mockApp);
+    const triggerAttackRelease = vi.fn();
+    const draw = { schedule: vi.fn() };
+    Tone.getDraw.mockReturnValue(draw);
+    Tone.Loop.mockReset().mockImplementation((callback, interval) => ({
+      callback,
+      interval,
+      start: vi.fn().mockReturnThis()
+    }));
+    instrument.instrument = { triggerAttackRelease };
+
+    await instrument.play();
+    Tone.Loop.mock.results[0].value.callback(10);
+
+    expect(mockApp.$ui.clearPatternStep).not.toHaveBeenCalled();
+    expect(triggerAttackRelease).toHaveBeenCalledWith('C4', 1, 12);
+    expect(draw.schedule).toHaveBeenCalledWith(expect.any(Function), 12);
+
+    draw.schedule.mock.calls[0][0]();
+    expect(mockApp.$ui.updatePatternStep).toHaveBeenCalledWith('sam1', 0);
   });
 
   describe('Startup', () => {
