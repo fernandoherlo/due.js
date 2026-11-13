@@ -220,6 +220,70 @@ describe('App', () => {
     expect(app.$ui.setError).toHaveBeenCalled();
   });
 
+  it('rolls back added instructions when music update fails', async () => {
+    const app = new App();
+    const failure = new Error('update failed');
+    const added = [{ key: 'added1' }];
+    const updated = [{ key: 'updated1' }];
+    const plan = {
+      instructions: {},
+      variables: {},
+      addedInstructions: added,
+      updatedInstructions: updated,
+      deletedInstructions: []
+    };
+    app.$compiler = { prepare: vi.fn().mockReturnValue(plan), commit: vi.fn() };
+    app.$editor = { getCode: vi.fn().mockReturnValue('code'), setPatternSource: vi.fn() };
+    app.$music = {
+      validate: vi.fn(),
+      add: vi.fn().mockResolvedValue(undefined),
+      update: vi.fn().mockRejectedValue(failure),
+      delete: vi.fn().mockResolvedValue(undefined)
+    };
+    app.$ui = { setWaiting: vi.fn(), setError: vi.fn(), setOk: vi.fn() };
+
+    await expect(app.compile()).rejects.toBe(failure);
+
+    expect(app.$music.add).toHaveBeenCalledWith(added);
+    expect(app.$music.delete).toHaveBeenCalledWith(added);
+    expect(app.$compiler.commit).not.toHaveBeenCalled();
+    expect(app.$ui.setError).toHaveBeenCalled();
+  });
+
+  it('rolls back added and updated instructions when music delete fails', async () => {
+    const app = new App();
+    const failure = new Error('delete failed');
+    const added = [{ key: 'added1' }];
+    const updated = [{ key: 'updated1' }];
+    const deleted = [{ key: 'deleted1' }];
+    const previous = { updated1: { key: 'updated1', value: 'old' } };
+    const plan = {
+      instructions: {},
+      previousInstructions: previous,
+      variables: {},
+      addedInstructions: added,
+      updatedInstructions: updated,
+      deletedInstructions: deleted
+    };
+    app.$compiler = { prepare: vi.fn().mockReturnValue(plan), commit: vi.fn() };
+    app.$editor = { getCode: vi.fn().mockReturnValue('code'), setPatternSource: vi.fn() };
+    app.$music = {
+      validate: vi.fn(),
+      add: vi.fn().mockResolvedValue(undefined),
+      update: vi.fn().mockResolvedValue(undefined),
+      delete: vi.fn().mockRejectedValue(failure)
+    };
+    app.$ui = { setWaiting: vi.fn(), setError: vi.fn(), setOk: vi.fn() };
+
+    await expect(app.compile()).rejects.toBe(failure);
+
+    expect(app.$music.update).toHaveBeenNthCalledWith(1, updated, previous);
+    expect(app.$music.update).toHaveBeenNthCalledWith(2, [previous.updated1]);
+    expect(app.$music.delete).toHaveBeenCalledWith(added);
+    expect(app.$compiler.commit).not.toHaveBeenCalled();
+    expect(app.$ui.setError).toHaveBeenCalled();
+  });
+
   it('Should validate commands before applying a compiled plan', async () => {
     const app = new App();
     const plan = { instructions: {}, variables: {}, addedInstructions: [{ name: 'unknown', actions: [] }], updatedInstructions: [], deletedInstructions: [] };
@@ -235,7 +299,7 @@ describe('App', () => {
 
     await expect(app.compile()).rejects.toThrowError();
 
-    expect(app.$music.validate).toHaveBeenCalledWith(plan.addedInstructions);
+    expect(app.$music.validate).toHaveBeenCalledWith(Object.values(plan.instructions));
     expect(app.$music.add).not.toHaveBeenCalled();
     expect(app.$compiler.commit).not.toHaveBeenCalled();
   });

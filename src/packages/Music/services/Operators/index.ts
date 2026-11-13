@@ -1,6 +1,7 @@
 import type { IInstruction, INoteEvent, IOperator } from '~/src/types';
 
 export default abstract class Operator implements IOperator {
+  readonly needsPool: boolean = false;
   abstract apply (event: INoteEvent): INoteEvent;
 
   protected static label (action: IInstruction): string {

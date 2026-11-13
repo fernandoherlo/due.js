@@ -25,6 +25,8 @@ export default class Synth extends Instrument implements ISynth {
 
     if (connect) {
       this.instrument.connect(connect.effect);
+    } else if (this.targetBus && this.app.$music) {
+      this.instrument.connect(this.app.$music.getBus(this.targetBus));
     } else {
       this.instrument.toDestination();
     }
@@ -33,11 +35,12 @@ export default class Synth extends Instrument implements ISynth {
   }
 
   async update (newInstrument: ISynth): Promise<void> {
-    if (this.modifier !== newInstrument.modifier) {
+    if (this.modifier !== newInstrument.modifier || this.targetBus !== newInstrument.targetBus) {
       await this.end();
       this.value = newInstrument.value;
       this.typeValue = newInstrument.typeValue;
       this.modifier = newInstrument.modifier;
+      this.targetBus = newInstrument.targetBus;
       this.actions = newInstrument.actions;
       this.setOperators(newInstrument.actions);
       await this.start();

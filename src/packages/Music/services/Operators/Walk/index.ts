@@ -4,6 +4,7 @@ import Operator from '../index';
 
 // ::walk(semitones) limits the leap from the previous single note, picking a nearer note of the same list when needed.
 export default class Walk extends Operator {
+  override readonly needsPool = true;
   private readonly maxStep: number;
   private last?: number;
 
@@ -25,14 +26,25 @@ export default class Walk extends Operator {
     }
 
     const last = this.last;
-    const candidates = (event.pool ?? [])
-      .map(name => ({ name, midi: noteToMidi(name) }))
-      .filter((candidate): candidate is { name: string, midi: number } => candidate.midi !== undefined);
-    if (!candidates.length) return event;
+    const near: Array<{ name: string, midi: number }> = [];
+    let closest: Array<{ name: string, midi: number }> = [];
+    let closestDistance = Infinity;
+    for (const name of event.pool ?? []) {
+      const midi = noteToMidi(name);
+      if (midi === undefined) continue;
+      const distance = Math.abs(midi - last);
+      const candidate = { name, midi };
+      if (distance <= this.maxStep) near.push(candidate);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closest = [candidate];
+      } else if (distance === closestDistance) {
+        closest.push(candidate);
+      }
+    }
+    if (!closest.length) return event;
 
-    const near = candidates.filter(candidate => Math.abs(candidate.midi - last) <= this.maxStep);
-    const closest = Math.min(...candidates.map(candidate => Math.abs(candidate.midi - last)));
-    const options = near.length ? near : candidates.filter(candidate => Math.abs(candidate.midi - last) === closest);
+    const options = near.length ? near : closest;
     const chosen = options[Math.floor(Math.random() * options.length)];
     this.last = chosen.midi;
     return { ...event, notes: [chosen.name] };

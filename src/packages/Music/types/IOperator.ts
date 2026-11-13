@@ -10,6 +10,7 @@ export interface INoteEvent {
 }
 
 export interface IOperator {
+  needsPool: boolean;
   apply: (event: INoteEvent) => INoteEvent;
 }
 

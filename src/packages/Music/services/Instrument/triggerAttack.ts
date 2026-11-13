@@ -12,12 +12,13 @@ export default class TriggerAttack {
     onPatternStep?: (step: number, time?: number, duration?: number) => void
   ): any[] | undefined {
     const patternStep = Array.isArray(value) ? TriggerAttack.getPatternIndex(value, typeValue, valueStep) : 0;
+    const resolvedPatternStep = patternStep ?? 0;
     const note: INote | undefined = Array.isArray(value)
-      ? value[patternStep ?? 0]
+      ? value[resolvedPatternStep]
       : TriggerAttack.getValue(value, typeValue, valueStep);
     if (!note) return;
     if (note.value === REST_VALUE) {
-      onPatternStep?.(patternStep ?? 0, time, 0);
+      onPatternStep?.(resolvedPatternStep, time, 0);
       return;
     }
     if (!note.value) return;
@@ -31,8 +32,9 @@ export default class TriggerAttack {
     let detune = 0;
 
     if (operators.length) {
+      const pool = operators.some(operator => operator.needsPool) ? TriggerAttack.getPool(value) : undefined;
       const event = operators.reduce<INoteEvent>((current, operator) => operator.apply(current), {
-        notes: [played].flat(), duration, time, pool: TriggerAttack.getPool(value)
+        notes: [played].flat(), duration, time, pool
       });
       if (!event.notes.length) return;
       played = Array.isArray(played) || event.notes.length > 1 ? event.notes : event.notes[0];
@@ -43,7 +45,7 @@ export default class TriggerAttack {
 
     setDetune(instrument, detune, playedTime);
     instrument.triggerAttackRelease(played, playedDuration, playedTime);
-    onPatternStep?.(patternStep ?? 0, playedTime, playedDuration);
+    onPatternStep?.(resolvedPatternStep, playedTime, playedDuration);
 
     return [operators.length ? played : note.value, playedDuration];
   }

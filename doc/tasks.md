@@ -34,8 +34,10 @@ Las propuestas de nuevas funcionalidades se recogen en [features.md](features.md
 
 ## Recuperar tras fallos
 
-- [ ] Liberar los recursos creados si una compilacion falla a mitad.
-- [ ] Definir el comportamiento del audio cuando falla la aplicacion de un plan.
+- [x] Liberar los recursos creados si una compilacion falla a mitad.
+	Music.add limpia los instrumentos instanciados si uno falla al arrancar; App revierte los anadidos si falla la actualizacion.
+- [x] Definir el comportamiento del audio cuando falla la aplicacion de un plan.
+	Mantiene sonando el audio previo sin cambios: se deshacen los elementos anadidos y se restauran las instrucciones previas en las actualizadas.
 
 ## Persistencia
 

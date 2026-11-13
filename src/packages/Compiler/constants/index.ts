@@ -24,6 +24,7 @@ export const COMMANDS: Record<string, string> = {
   d: 'd',
   cho: 'cho',
   con: 'con',
+  bus: 'bus',
   bpm: 'bpm',
   $: '$',
   $$: '$$'
@@ -62,6 +63,7 @@ export const COMMANDS_MAP: Record<typeof COMMANDS[keyof typeof COMMANDS], string
   [COMMANDS.d]: 'delay',
   [COMMANDS.cho]: 'chorus',
   [COMMANDS.con]: 'connect',
+  [COMMANDS.bus]: 'bus',
   [COMMANDS.$]: '0_variable_',
   [COMMANDS.$$]: '1_live_variable_'
 };
@@ -95,6 +97,7 @@ export const REST_VALUE = '~' as const;
 
 export const CHARACTERS_INSTRUCTIONS = {
   CONNECT: '=>',
+  BUS_PREFIX: '@',
   CONCATENATE_COMMANDS: ':',
   MODE_COMMAND: '::',
   COMMENT: '//',

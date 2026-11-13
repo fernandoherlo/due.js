@@ -1,4 +1,4 @@
-import { AST_KIND, COMMANDS, COMMANDS_MAP, MODES, OPERATORS, REST_VALUE, TEMPO, TYPE_VALUE, VALUE_OPERATOR } from '~/src/packages/Compiler/constants';
+import { AST_KIND, CHARACTERS_INSTRUCTIONS as CHAR, COMMANDS, COMMANDS_MAP, MODES, OPERATORS, REST_VALUE, TEMPO, TYPE_VALUE, VALUE_OPERATOR } from '~/src/packages/Compiler/constants';
 import Instruction from '~/src/packages/Compiler/services/Instruction';
 import { parseExpression } from '~/src/packages/Compiler/services/Parser/value';
 import type { IAstLiveVariable, IAstProgram, IAstStatement, IAstValue, IAstValueExpression } from '~/src/packages/Compiler/types/IAst';
@@ -32,6 +32,11 @@ export default class Analyzer {
           const key = instruction.name === COMMANDS.$$ ? instruction.key : `${instruction.type}${instruction.element}`;
           instructions[key] = instruction;
           instrument = instruction;
+        } else if (instruction.name === COMMANDS.con && instrument) {
+          instrument.actions.push(instruction);
+          if (String(instruction.value.value).startsWith(CHAR.BUS_PREFIX)) {
+            instrument.targetBus = String(instruction.value.value).slice(CHAR.BUS_PREFIX.length);
+          }
         } else if (instruction.type && instrument) {
           instrument.actions.push(instruction);
         } else {
@@ -77,6 +82,10 @@ export default class Analyzer {
     const element = connection ? '' : statement.element;
     const modifier = connection ? undefined : statement.modifier;
     const expression = connection ? statement.target : statement.arguments;
+    if (connection) {
+      const target = expression.rawValue.trim();
+      return new Instruction({ name, element, modifier, type: COMMANDS_MAP[name], value: { value: target }, typeValue: TYPE_VALUE.normal });
+    }
     const rawValue = valueFactory.adapt(expression.rawValue, variables);
     assertDefined(rawValue, statement.location, variables, liveVariables);
     const resolved = rawValue === expression.rawValue ? expression : parseExpression(rawValue, expression.location);

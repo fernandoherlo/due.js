@@ -256,11 +256,11 @@ En una cadena de efectos, el primer efecto escrito queda más cerca de la salida
 - El editor valida la estructura al escribir: subraya el primer error, marca su línea y muestra un mensaje con línea y columna. La barra se pone roja y el aviso se limpia al corregir el código. Esto no sustituye la validación semántica de presets, variables y valores.
 - Los valores explícitos `0` de duración y de feedback se conservan; el intervalo `0` se rechaza.
 - El tempo se configura con `bpm(N)` (ver Tempo y pulsos); no se usa el tempo del transporte de Tone.js.
-- El compilador prepara un plan y solo actualiza su snapshot y variables tras aplicar las operaciones de audio. Esto mantiene coherente el estado lógico, pero no revierte efectos de audio/MIDI si una operación falla a mitad.
+- El compilador prepara un plan y solo actualiza su snapshot y variables tras aplicar las operaciones de audio. Si la aplicacion falla a mitad, se liberan los instrumentos nuevos anadidos y se restauran las instrucciones previas en las actualizadas, manteniendo el audio previo en reproduccion.
 
 ## Posibles bugs e incompletitudes
 
-- **Sintaxis incompleta:** el parser reconoce `=>`, pero no hay ejecutor para el comando `con`; el preflight lo rechaza antes de modificar el audio.
+- **Buses:** declara un bus con `@drums:r(2):v(80)` y enruta pistas con `sam1#kick(C2;1;1) => @drums`. Las pistas que comparten bus pasan por su cadena de efectos y el bus termina en la salida principal. Los destinos heredados como `out1` se conservan en el AST, pero no tienen salida dedicada en Tone.js.
 - **Función incompleta:** nombres como `p`, `seq`, `s`, `c` y `e` están declarados, pero no conectados al motor; el preflight los rechaza. `miN(...)` se usa para declarar una entrada asociada a una variable `$$`, no como instrumento independiente.
 - El comentario de `sample1.duejs` describe `mi0(1@5)` como una nota. El código lo interpreta como número de controlador CC; no está claro si el comentario o la implementación refleja la intención.
 

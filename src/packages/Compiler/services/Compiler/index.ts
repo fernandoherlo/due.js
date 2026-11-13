@@ -21,6 +21,7 @@ export default class Compiler implements ICompiler {
 
     return {
       instructions: this.cloneInstructions(instructions),
+      previousInstructions: this.cloneInstructions(this.previousInstructions),
       variables,
       bpm,
       ...this.calculateInstructions(instructions)

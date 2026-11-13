@@ -8,17 +8,18 @@ import { SAMPLER_MAP } from '~/src/packages/Music/constants/samplers';
 import { isSynthPreset } from '~/src/packages/Music/constants/synths';
 import validateInstruction from '~/src/packages/Music/helpers/validateInstruction';
 import { createOperator } from '~/src/packages/Music/helpers/createOperators';
-import type { IApp, IInstruction, IInstrument, IMusic } from '~/src/types';
+import type { IApp, IBus, IInstruction, IInstrument, IMusic } from '~/src/types';
 
 const BEATS_PER_BAR = 4;
 
 export default class Music implements IMusic {
   private app: IApp;
-  private instructions: any;
+  private instructions: Record<string, IInstrument>;
   private muted: Set<string> = new Set();
   private progressEventId: number | undefined;
   private progressStep = 0;
   private progressTempo: number | undefined;
+  private buses = new Map<string, IBus>();
 
   constructor (app: IApp) {
     this.app = app;
@@ -94,15 +95,23 @@ export default class Music implements IMusic {
     return this.muted.has(key);
   }
 
+  getBus (name: string): Tone.Gain {
+    const bus = this.buses.get(name);
+    if (!bus) throw Error(`Unknown bus "${name}".`);
+    return bus.output;
+  }
+
   samples () {
     this.app.$logger.log(SAMPLER_MAP);
   }
 
   validate (instructions: Array<IInstruction>): void {
+    const declaredBuses = new Set(instructions.filter(instruction => instruction.name === COMMANDS.bus).map(instruction => instruction.element));
     for (const instruction of instructions) {
       const commands = [instruction, ...instruction.actions];
 
       for (const command of commands) {
+        if (command.name === COMMANDS.con) continue;
         if (command.mode) {
           if (OPERATORS.includes(command.name)) createOperator(command);
           else MODES_MAP[command.name].parse(command);
@@ -120,6 +129,9 @@ export default class Music implements IMusic {
       if (instruction.name === COMMANDS.n && instruction.modifier && !isSynthPreset(instruction.modifier)) {
         throw Error(`Unknown synth preset "${instruction.modifier}".`);
       }
+      if (instruction.targetBus && !declaredBuses.has(instruction.targetBus)) {
+        throw Error(`Unknown bus "${instruction.targetBus}".`);
+      }
     }
   }
 
@@ -128,30 +140,71 @@ export default class Music implements IMusic {
       this.app.$debugger.add('ADD', instructions);
     }
 
-    for (let i = 0; i < instructions.length; i++) {
-      const instruction: IInstruction = instructions[i];
-      if (!this.instructions[instruction.key]) {
-        const element = COMMANDS_ELEMENT_MAP[instruction.name](instruction, this.app) as IInstrument;
-        await element.start();
-        if (this.muted.has(instruction.key)) {
-          element.setMuted(true);
+    const addedKeys: string[] = [];
+    try {
+      const orderedInstructions = [...instructions].sort((left, right) => Number(right.name === COMMANDS.bus) - Number(left.name === COMMANDS.bus));
+      for (let i = 0; i < orderedInstructions.length; i++) {
+        const instruction: IInstruction = orderedInstructions[i];
+        if (!this.instructions[instruction.key]) {
+          const element = COMMANDS_ELEMENT_MAP[instruction.name](instruction, this.app) as IInstrument;
+          this.instructions[instruction.key] = element;
+          if (instruction.name === COMMANDS.bus) this.buses.set(instruction.element, element as unknown as IBus);
+          addedKeys.push(instruction.key);
+          await element.start();
+          if (this.muted.has(instruction.key)) {
+            element.setMuted(true);
+          }
         }
-
-        this.instructions[instruction.key] = element;
       }
+    } catch (error) {
+      for (const key of addedKeys) {
+        try {
+          await this.instructions[key]?.end();
+        } catch {
+          // ignore cleanup errors
+        }
+        delete this.instructions[key];
+      }
+      throw error;
     }
   }
 
-  async update (instructions: Array<IInstruction>) {
+  async update (instructions: Array<IInstruction>, previousInstructions: Record<string, IInstruction> = {}) {
     if (instructions.length) {
       this.app.$debugger.add('UPDATE', instructions);
     }
 
-    for (let i = 0; i < instructions.length; i++) {
-      const instruction: IInstruction = instructions[i];
-      if (this.instructions[instruction.key]) {
-        await this.instructions[instruction.key].update(instruction);
+    const updatedKeys: string[] = [];
+    let failedKey: string | undefined;
+
+    try {
+      const ordered = [...instructions].sort((left, right) => Number(right.name === COMMANDS.bus) - Number(left.name === COMMANDS.bus));
+      for (let i = 0; i < ordered.length; i++) {
+        const instruction: IInstruction = ordered[i];
+        if (this.instructions[instruction.key]) {
+          failedKey = instruction.key;
+          await this.instructions[instruction.key].update(instruction as IInstrument);
+          updatedKeys.push(instruction.key);
+          failedKey = undefined;
+        }
       }
+    } catch (error) {
+      const keysToRollback = new Set(updatedKeys);
+      if (failedKey) {
+        keysToRollback.add(failedKey);
+      }
+
+      for (const key of keysToRollback) {
+        const prev = previousInstructions[key];
+        if (prev && this.instructions[key]) {
+          try {
+            await this.instructions[key].update(prev as IInstrument);
+          } catch {
+            // ignore rollback errors
+          }
+        }
+      }
+      throw error;
     }
   }
 
@@ -160,12 +213,18 @@ export default class Music implements IMusic {
       this.app.$debugger.add('DELETE', instructions);
     }
 
-    for (let i = 0; i < instructions.length; i++) {
-      const instruction: IInstruction = instructions[i];
+    const ordered = [...instructions].sort((left, right) => Number(left.name === COMMANDS.bus) - Number(right.name === COMMANDS.bus));
+    for (let i = 0; i < ordered.length; i++) {
+      const instruction: IInstruction = ordered[i];
       if (this.instructions[instruction.key]) {
-        await this.instructions[instruction.key].end();
-
-        delete this.instructions[instruction.key];
+        try {
+          await this.instructions[instruction.key].end();
+        } catch {
+          // ignore cleanup errors to guarantee deleting all remaining instructions
+        } finally {
+          delete this.instructions[instruction.key];
+          if (instruction.name === COMMANDS.bus) this.buses.delete(instruction.element);
+        }
       }
     }
   }
