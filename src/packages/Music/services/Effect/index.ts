@@ -72,17 +72,6 @@ export default class Effect extends Instrument implements IEffect {
   }
 
   protected mapValue (value: number): number {
-    const { min: fromMin, max: fromMax }: { min: number, max: number } = { min: 0, max: 127 };
-    const { min: toMin, max: toMax }: { min: number, max: number } = { min: this.min, max: this.max };
-
-    // Determine how wide the ranges are
-    const fromSize: number = fromMax - fromMin;
-    const toSize: number = toMax - toMin;
-    // Get the percentage of the original range `value` represents, ignoring the minimum value
-    const fromPercent: number = (value - fromMin) / fromSize;
-    // Get the corresponding percentage of the new range, plus its minimum value
-    const result: number = (fromPercent * toSize) + toMin;
-
-    return result;
+    return (value / 127) * (this.max - this.min) + this.min;
   }
 }

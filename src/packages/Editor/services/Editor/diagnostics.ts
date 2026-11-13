@@ -1,7 +1,7 @@
 import type { Diagnostic } from '@codemirror/lint';
 import type { EditorState } from '@codemirror/state';
 import Parser from '~/src/packages/Compiler/services/Parser';
-import { AST_KIND, COMMANDS } from '~/src/packages/Compiler/constants';
+import { AST_KIND, CHARACTERS_INSTRUCTIONS as CHAR, COMMANDS } from '~/src/packages/Compiler/constants';
 import ParseError from '~/src/packages/Compiler/services/Parser/error';
 
 const parser = new Parser();
@@ -19,10 +19,15 @@ export function getDiagnostics (state: EditorState): Diagnostic[] {
       const connection = line.statements.find(statement => statement.kind === AST_KIND.connection);
       if (!connection) continue;
       const target = connection.target.rawValue;
-      if (!target.startsWith('@') || buses.has(target.slice(1))) continue;
+      if (!target.startsWith(CHAR.BUS_PREFIX) || buses.has(target.slice(CHAR.BUS_PREFIX.length))) continue;
       const lineText = state.doc.line(connection.location.line);
       const from = lineText.from + lineText.text.indexOf(target, connection.location.column - 1);
-      return [{ from, to: from + target.length, severity: 'error', message: `Unknown bus "${target.slice(1)}".` }];
+      return [{
+        from,
+        to: from + target.length,
+        severity: 'error',
+        message: `Unknown bus "${target.slice(CHAR.BUS_PREFIX.length)}".`
+      }];
     }
     return [];
   } catch (error) {

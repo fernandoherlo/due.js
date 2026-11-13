@@ -1,4 +1,4 @@
-import { AST_KIND, COMMANDS, COMMANDS_MAP, MODES, OPERATORS, REST_VALUE, TEMPO, TYPE_VALUE, VALUE_OPERATOR } from '~/src/packages/Compiler/constants';
+import { AST_KIND, CHARACTERS_INSTRUCTIONS as CHAR, COMMANDS, COMMANDS_MAP, MODES, OPERATORS, REST_VALUE, TEMPO, TYPE_VALUE, VALUE_OPERATOR } from '~/src/packages/Compiler/constants';
 import Instruction from '~/src/packages/Compiler/services/Instruction';
 import { parseExpression } from '~/src/packages/Compiler/services/Parser/value';
 import type { IAstLiveVariable, IAstProgram, IAstStatement, IAstValue, IAstValueExpression } from '~/src/packages/Compiler/types/IAst';
@@ -34,8 +34,8 @@ export default class Analyzer {
           instrument = instruction;
         } else if (instruction.name === COMMANDS.con && instrument) {
           instrument.actions.push(instruction);
-          if (String(instruction.value.value).startsWith('@')) {
-            instrument.targetBus = String(instruction.value.value).slice(1);
+          if (String(instruction.value.value).startsWith(CHAR.BUS_PREFIX)) {
+            instrument.targetBus = String(instruction.value.value).slice(CHAR.BUS_PREFIX.length);
           }
         } else if (instruction.type && instrument) {
           instrument.actions.push(instruction);

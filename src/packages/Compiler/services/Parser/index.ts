@@ -62,10 +62,10 @@ export default class Parser {
   }
 
   private parseStatement (source: string, location: ISourceLocation): IAstStatement {
-    if (source.startsWith('@')) {
-      const match = /^(@[a-zA-Z][a-zA-Z0-9_]*)/.exec(source);
+    if (source.startsWith(CHAR.BUS_PREFIX)) {
+      const match = new RegExp(`^(${CHAR.BUS_PREFIX}[a-zA-Z][a-zA-Z0-9_]*)`).exec(source);
       if (match) {
-        const busName = match[1].slice(1);
+        const busName = match[1].slice(CHAR.BUS_PREFIX.length);
         const suffix = source.slice(match[1].length);
         if (!suffix) {
           return {

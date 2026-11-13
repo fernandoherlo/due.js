@@ -97,6 +97,7 @@ export const REST_VALUE = '~' as const;
 
 export const CHARACTERS_INSTRUCTIONS = {
   CONNECT: '=>',
+  BUS_PREFIX: '@',
   CONCATENATE_COMMANDS: ':',
   MODE_COMMAND: '::',
   COMMENT: '//',
