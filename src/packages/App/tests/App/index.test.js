@@ -299,7 +299,7 @@ describe('App', () => {
 
     await expect(app.compile()).rejects.toThrowError();
 
-    expect(app.$music.validate).toHaveBeenCalledWith(plan.addedInstructions);
+    expect(app.$music.validate).toHaveBeenCalledWith(Object.values(plan.instructions));
     expect(app.$music.add).not.toHaveBeenCalled();
     expect(app.$compiler.commit).not.toHaveBeenCalled();
   });

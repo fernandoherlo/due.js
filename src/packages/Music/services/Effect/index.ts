@@ -28,8 +28,12 @@ export default class Effect extends Instrument implements IEffect {
 
   connect (action: any) {
     if (this.effect) {
-      this.effect.connect(action.effect);
+      this.effect.connect(action.effect ?? action);
     }
+  }
+
+  get output () {
+    return this.effect;
   }
 
   async end (): Promise<void> {

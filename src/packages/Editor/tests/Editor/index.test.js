@@ -90,6 +90,13 @@ describe('Editor', () => {
     ]));
   });
 
+  it('highlights bus declarations as a single named token', () => {
+    expect(highlight('@base:r(3):v(60)\n@base')).toEqual(expect.arrayContaining([
+      { text: '@base', type: 'preset' },
+      { text: '@base', type: 'preset' }
+    ]));
+  });
+
   it('recognizes live MIDI variables, channels, sharps, flats and chords', () => {
     const source = '$$control=mi0(1@5)\nmo1#2([C#4|Db4];0.25;1):v($$control)';
 
@@ -182,6 +189,17 @@ describe('Editor', () => {
     }).state;
 
     expect(getDiagnostics(corrected)).toEqual([]);
+  });
+
+  it('reports connections to undeclared buses', () => {
+    const source = 'sam1#kick(C2;1;1) => @base';
+    const diagnostics = getDiagnostics(EditorState.create({ doc: source }));
+    expect(diagnostics).toEqual([expect.objectContaining({
+      from: source.indexOf('@base'),
+      to: source.indexOf('@base') + '@base'.length,
+      severity: 'error',
+      message: 'Unknown bus "base".'
+    })]);
   });
 
   it('does not report random chord patterns as syntax errors', () => {

@@ -36,14 +36,16 @@ export default class Instrument extends Instruction implements IInstrument {
 
     for (let i = 0; i < this.actions.length; i++) {
       const action: IInstruction = this.actions[i];
-      if (action.mode) continue;
+      if (action.mode || action.name === 'con') continue;
 
       const element = effects[action.name](action, this.app) as IEffect;
       element.create();
       this.actions[i] = element;
 
       if (!lastAction) {
-        this.actions[i].toDestination();
+        const target = this.targetBus && this.app.$music ? this.app.$music.getBus(this.targetBus) : undefined;
+        if (target) this.actions[i].connect(target);
+        else this.actions[i].toDestination();
       } else {
         this.actions[i].connect(lastAction);
       }
@@ -112,7 +114,7 @@ export default class Instrument extends Instruction implements IInstrument {
 
     if (this.actions) {
       for (let i = 0; i < this.actions.length; i++) {
-        if (this.actions[i].mode) continue;
+        if (this.actions[i].mode || this.actions[i].name === 'con') continue;
         await this.actions[i].end();
       }
     }
@@ -128,6 +130,7 @@ export default class Instrument extends Instruction implements IInstrument {
       this.value = newInstrument.value;
       this.typeValue = newInstrument.typeValue;
       this.modifier = newInstrument.modifier;
+      this.targetBus = newInstrument.targetBus;
       this.setOperators(newInstrument.actions);
       await this.play();
     }

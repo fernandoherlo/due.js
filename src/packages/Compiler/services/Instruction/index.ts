@@ -11,6 +11,7 @@ export default class Instruction implements IInstruction {
   mode?: boolean;
   modeParameters?: readonly string[];
   actions: Array<any>;
+  targetBus?: string;
 
   constructor (data: Record<string, any> = {}) {
     this.name = data.name;
@@ -27,5 +28,6 @@ export default class Instruction implements IInstruction {
     this.mode = data.mode;
     this.modeParameters = data.modeParameters;
     this.actions = data.actions || [];
+    this.targetBus = data.targetBus;
   }
 }

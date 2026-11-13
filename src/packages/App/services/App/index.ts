@@ -86,7 +86,7 @@ export default class App implements IApp {
 
       if (editorCode !== undefined) {
         const plan = this.$compiler.prepare(editorCode);
-        this.$music.validate([...plan.addedInstructions, ...plan.updatedInstructions]);
+        this.$music.validate(Object.values(plan.instructions));
 
         if (quantized) {
           await this.$music.waitForNextBar(plan.bpm);

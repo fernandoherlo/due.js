@@ -24,6 +24,7 @@ export const DueLanguage = StreamLanguage.define<IDueState>({
       stream.skipToEnd();
       return 'comment';
     }
+    if (stream.match(/^@[a-zA-Z][a-zA-Z0-9_]*/)) return 'labelName';
     if (stream.match(/^\$\$?\w*/)) return 'variableName';
     if (stream.match(/^#[\w-]*/)) return 'labelName';
     if (stream.match(/^[A-G](?:#|b)?-?\d+\b/)) return 'atom';

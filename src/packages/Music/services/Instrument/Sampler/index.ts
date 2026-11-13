@@ -43,6 +43,8 @@ export default class Sampler extends Instrument implements ISampler {
 
     if (connect) {
       this.instrument.connect(connect.effect);
+    } else if (this.targetBus && this.app.$music) {
+      this.instrument.connect(this.app.$music.getBus(this.targetBus));
     } else {
       this.instrument.toDestination();
     }
@@ -56,12 +58,14 @@ export default class Sampler extends Instrument implements ISampler {
 
       if (
         this.modifier !== newInstrument.modifier ||
+        this.targetBus !== newInstrument.targetBus ||
         this.actions.some((action, index) => areDifferentInstructions(newInstrument.actions?.[index], action)) ||
         newInstrument.actions.some((action, index) => areDifferentInstructions(this.actions?.[index], action))
       ) {
         await this.end();
 
         this.modifier = newInstrument.modifier;
+        this.targetBus = newInstrument.targetBus;
         this.actions = newInstrument.actions;
 
         await this.start();

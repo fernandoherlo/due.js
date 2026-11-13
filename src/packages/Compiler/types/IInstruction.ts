@@ -11,4 +11,5 @@ export interface IInstruction {
   modeParameters?: readonly string[];
   actions: Array<any>;
   type?: string;
+  targetBus?: string;
 }

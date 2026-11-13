@@ -260,7 +260,7 @@ En una cadena de efectos, el primer efecto escrito queda más cerca de la salida
 
 ## Posibles bugs e incompletitudes
 
-- **Sintaxis incompleta:** el parser reconoce `=>`, pero no hay ejecutor para el comando `con`; el preflight lo rechaza antes de modificar el audio.
+- **Buses:** declara un bus con `@drums:r(2):v(80)` y enruta pistas con `sam1#kick(C2;1;1) => @drums`. Las pistas que comparten bus pasan por su cadena de efectos y el bus termina en la salida principal. Los destinos heredados como `out1` se conservan en el AST, pero no tienen salida dedicada en Tone.js.
 - **Función incompleta:** nombres como `p`, `seq`, `s`, `c` y `e` están declarados, pero no conectados al motor; el preflight los rechaza. `miN(...)` se usa para declarar una entrada asociada a una variable `$$`, no como instrumento independiente.
 - El comentario de `sample1.duejs` describe `mi0(1@5)` como una nota. El código lo interpreta como número de controlador CC; no está claro si el comentario o la implementación refleja la intención.
 

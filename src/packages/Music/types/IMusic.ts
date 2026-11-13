@@ -1,4 +1,5 @@
 import type { IInstruction } from '~/src/types';
+import type * as Tone from 'tone';
 
 export interface IMusic {
   start: () => Promise<void>;
@@ -7,6 +8,7 @@ export interface IMusic {
   waitForNextBar: (bpm: number) => Promise<void>;
   toggleMute: (key: string) => boolean;
   isMuted: (key: string) => boolean;
+  getBus: (name: string) => Tone.Gain;
   validate: (instructions: Array<IInstruction>) => void;
   add: (instructions: Array<IInstruction>) => Promise<void>;
   update: (instructions: Array<IInstruction>, previousInstructions?: Record<string, IInstruction>) => Promise<void>;

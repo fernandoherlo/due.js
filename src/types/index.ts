@@ -12,6 +12,7 @@ export type { ICompiler } from '~/src/packages/Compiler/types/ICompiler';
 export type { IInstruction } from '~/src/packages/Compiler/types/IInstruction';
 
 export type { IMusic } from '~/src/packages/Music/types/IMusic';
+export type { IBus } from '~/src/packages/Music/types/IBus';
 export type { IInstrument } from '~/src/packages/Music/types/IInstrument';
 export type { ISynth } from '~/src/packages/Music/types/ISynth';
 export type { ISampler } from '~/src/packages/Music/types/ISampler';

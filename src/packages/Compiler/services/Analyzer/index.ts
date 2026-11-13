@@ -32,6 +32,11 @@ export default class Analyzer {
           const key = instruction.name === COMMANDS.$$ ? instruction.key : `${instruction.type}${instruction.element}`;
           instructions[key] = instruction;
           instrument = instruction;
+        } else if (instruction.name === COMMANDS.con && instrument) {
+          instrument.actions.push(instruction);
+          if (String(instruction.value.value).startsWith('@')) {
+            instrument.targetBus = String(instruction.value.value).slice(1);
+          }
         } else if (instruction.type && instrument) {
           instrument.actions.push(instruction);
         } else {
@@ -77,6 +82,10 @@ export default class Analyzer {
     const element = connection ? '' : statement.element;
     const modifier = connection ? undefined : statement.modifier;
     const expression = connection ? statement.target : statement.arguments;
+    if (connection) {
+      const target = expression.rawValue.trim();
+      return new Instruction({ name, element, modifier, type: COMMANDS_MAP[name], value: { value: target }, typeValue: TYPE_VALUE.normal });
+    }
     const rawValue = valueFactory.adapt(expression.rawValue, variables);
     assertDefined(rawValue, statement.location, variables, liveVariables);
     const resolved = rawValue === expression.rawValue ? expression : parseExpression(rawValue, expression.location);

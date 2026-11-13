@@ -62,6 +62,26 @@ export default class Parser {
   }
 
   private parseStatement (source: string, location: ISourceLocation): IAstStatement {
+    if (source.startsWith('@')) {
+      const match = /^(@[a-zA-Z][a-zA-Z0-9_]*)/.exec(source);
+      if (match) {
+        const busName = match[1].slice(1);
+        const suffix = source.slice(match[1].length);
+        if (!suffix) {
+          return {
+            kind: AST_KIND.command,
+            name: COMMANDS.bus,
+            element: busName,
+            modifier: undefined,
+            arguments: parseExpression('', location),
+            location
+          };
+        }
+        if (suffix.startsWith(CHAR.INIT_VALUE_COMMAND)) {
+          throw new ParseError(location, 'Bus declarations do not take arguments');
+        }
+      }
+    }
     const assignmentIndex = source.indexOf(CHAR.EQUAL);
     if (!source.startsWith(COMMANDS.$) || assignmentIndex < 1) {
       return this.parseCommand(source, location);
